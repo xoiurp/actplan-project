@@ -5,7 +5,7 @@ dist
 .gitignore
 .dockerignore
 Dockerfile
-nginx.conf
+# nginx.conf # Allow this file to be copied into the image
 README.md
 
 # Ignore development environment files
