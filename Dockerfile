@@ -14,11 +14,11 @@ RUN npm install
 COPY . .
 
 # Build the application
-# Pass Supabase env vars as build arguments (optional, only if needed during build)
-# ARG VITE_SUPABASE_URL
-# ARG VITE_SUPABASE_ANON_KEY
-# ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-# ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+# Pass Supabase env vars as build arguments
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 RUN npm run build
 
 # Stage 2: Serve the application with Nginx
