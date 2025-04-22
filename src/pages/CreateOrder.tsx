@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CalendarIcon, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react'; // Remove CalendarIcon
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { OrderItemsTable } from '../components/OrderItemsTable';
@@ -13,15 +13,21 @@ import { Header } from '@/components/Header';
 import { Order, OrderItem } from '@/types';
 import toast from 'react-hot-toast';
 import { processDarfPDF } from '../lib/darfProcessor';
+import { DatePicker } from '@/components/ui/date-picker';
+import { format as formatDateFn } from 'date-fns';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface FormData {
   customer: string;
-  orderDate: string;
+  orderDate: Date | undefined; // Changed type
   status: string;
   commission: string;
   reduction: string;
   supplier: string;
-  dueDate: string;
+  dueDate: Date | undefined; // Changed type
   notes: string;
   documentos: Order['documentos'];
 }
@@ -33,14 +39,15 @@ export default function CreateOrder() {
   const [calculations, setCalculations] = useState<any[]>([]);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isSituacaoFiscalModalOpen, setIsSituacaoFiscalModalOpen] = useState(false);
+  // Update initial state for dates
   const [formData, setFormData] = useState<FormData>({
     customer: '',
-    orderDate: '',
+    orderDate: undefined, // Changed initial value
     status: '',
     commission: '',
     reduction: '',
     supplier: '',
-    dueDate: '',
+    dueDate: undefined, // Changed initial value
     notes: '',
     documentos: undefined
   });
@@ -56,13 +63,17 @@ export default function CreateOrder() {
     }
   });
 
+  // Corrected handler type to include Select elements until replaced
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  // Helper for Shadcn Select components
+  const handleSelectChange = (name: keyof FormData) => (value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
 
   const handleSubmit = () => {
     if (!formData.customer) {
@@ -85,16 +96,26 @@ export default function CreateOrder() {
       return;
     }
 
+    // Format dates before submitting
+    const formattedOrderDate = formData.orderDate ? formatDateFn(formData.orderDate, 'yyyy-MM-dd') : '';
+    const formattedDueDate = formData.dueDate ? formatDateFn(formData.dueDate, 'yyyy-MM-dd') : '';
+
+    if (!formattedOrderDate) {
+      toast.error('Selecione a data do pedido');
+      return;
+    }
+    // Optional: Add validation for dueDate if needed
+
     const orderData = {
       customer_id: formData.customer,
-      data_pedido: formData.orderDate,
+      data_pedido: formattedOrderDate, // Use formatted date
       status: formData.status,
       comissaoPercentage: formData.commission || '0',
       reducaoPercentage: formData.reduction || '0',
       fornecedor: formData.supplier,
-      vencimento: formData.dueDate,
+      vencimento: formattedDueDate, // Use formatted date
       notas: formData.notes,
-      itens_pedido: itens_pedido,
+      itens_pedido: itens_pedido, // Ensure OrderItem type matches expected structure
       documentos: formData.documentos
     };
 
@@ -123,7 +144,8 @@ export default function CreateOrder() {
     setIsAddItemModalOpen(true);
   };
 
-  const handleItemAdd = (newItem: OrderItem) => {
+  // Construct a more complete OrderItem, handle potential missing fields from modal
+  const handleItemAdd = (newItemData: Partial<OrderItem>) => { 
     // Map tax types to their numeric IDs
     const taxTypeIds: Record<string, string> = {
       'PIS': '9',
@@ -136,11 +158,34 @@ export default function CreateOrder() {
       'IRRF': '15'
     };
 
-    const itemWithId = {
-      ...newItem,
-      id: taxTypeIds[newItem.tax_type] || newItem.tax_type
+    // Create a more complete item, providing defaults for required fields
+    // Merge defaults with newItemData, ensuring newItemData overrides defaults
+    const completeNewItem: OrderItem = {
+      id: `temp-${Date.now()}-${Math.random()}`, // Temporary client-side ID
+      order_id: '', // Will be set after order creation
+      code: '',
+      tax_type: '',
+      start_period: '',
+      end_period: '',
+      due_date: '',
+      original_value: 0,
+      current_balance: 0,
+      fine: 0,
+      interest: 0,
+      status: 'pending', // Default status
+      created_at: new Date().toISOString(), // Set creation time
+      updated_at: new Date().toISOString(), // Set update time
+      ...newItemData, // Spread newItemData to override defaults and add optional fields like cno
     };
-    setItensPedido(prev => [...prev, itemWithId]);
+    // Ensure current_balance defaults to original_value if not provided or nullish in newItemData
+    if (completeNewItem.current_balance == null) {
+       completeNewItem.current_balance = completeNewItem.original_value ?? 0;
+    }
+    
+    // Remove the tax type based ID logic as we use a temp ID now
+    // completeNewItem.id = taxTypeIds[completeNewItem.tax_type] || completeNewItem.tax_type; 
+    
+    setItensPedido(prev => [...prev, completeNewItem]);
   };
 
   const handleImportDarf = () => {
@@ -345,61 +390,53 @@ export default function CreateOrder() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-semibold mb-4">Informações do Cliente</h2>
           <div className="space-y-4">
-            <div>
-              <label htmlFor="customer" className="block text-sm font-medium text-gray-700">
-                Cliente
-              </label>
-              <select
-                id="customer"
-                name="customer"
+            <div className="space-y-1"> {/* Added wrapper for Label + Select */}
+              <Label htmlFor="customer">Cliente</Label>
+              <Select
                 value={formData.customer}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+                onValueChange={handleSelectChange('customer')}
               >
-                <option value="">Selecione um cliente...</option>
-                {customers?.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.razao_social}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="customer" className="w-full">
+                  <SelectValue placeholder="Selecione um cliente..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {customers?.map((customer) => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.razao_social}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <label htmlFor="orderDate" className="block text-sm font-medium text-gray-700">
-                Data do Pedido
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  type="date"
-                  id="orderDate"
-                  name="orderDate"
-                  value={formData.orderDate}
-                  onChange={handleInputChange}
-                  className="block w-full rounded-md border border-shadow-dark px-3 py-2 pr-10 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-                />
-                <CalendarIcon className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
-              </div>
+            <div className="space-y-1"> {/* Added wrapper for Label + DatePicker */}
+              <Label htmlFor="orderDate">Data do Pedido</Label> {/* Ensured closing tag */}
+              {/* Use DatePicker for orderDate */}
+              <DatePicker
+                date={formData.orderDate}
+                setDate={(date) => setFormData(prev => ({ ...prev, orderDate: date }))}
+                placeholder="Selecione a data do pedido"
+                className="mt-1"
+              />
             </div>
 
-            <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                Status
-              </label>
-              <select
-                id="status"
-                name="status"
+            <div className="space-y-1"> {/* Added wrapper for Label + Select */}
+              <Label htmlFor="status">Status</Label>
+              <Select
                 value={formData.status}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+                onValueChange={handleSelectChange('status')}
               >
-                <option value="">Selecione o status...</option>
-                {orderStatuses.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="status" className="w-full">
+                  <SelectValue placeholder="Selecione o status..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {orderStatuses.map((status) => (
+                    <SelectItem key={status.id} value={status.id}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -416,11 +453,9 @@ export default function CreateOrder() {
             
             <TabsContent value="summary" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="commission" className="block text-sm font-medium text-gray-700">
-                    Comissão (%)
-                  </label>
-                  <input
+                <div className="space-y-1"> {/* Added wrapper */}
+                  <Label htmlFor="commission">Comissão (%)</Label>
+                  <Input
                     type="number"
                     id="commission"
                     name="commission"
@@ -431,11 +466,9 @@ export default function CreateOrder() {
                     placeholder="0.00"
                   />
                 </div>
-                <div>
-                  <label htmlFor="reduction" className="block text-sm font-medium text-gray-700">
-                    Redução (%)
-                  </label>
-                  <input
+                <div className="space-y-1"> {/* Added wrapper */}
+                  <Label htmlFor="reduction">Redução (%)</Label>
+                  <Input
                     type="number"
                     id="reduction"
                     name="reduction"
@@ -449,40 +482,33 @@ export default function CreateOrder() {
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="supplier" className="block text-sm font-medium text-gray-700">
-                    Fornecedor
-                  </label>
-                  <select
-                    id="supplier"
-                    name="supplier"
+                <div className="space-y-1"> {/* Added wrapper */}
+                  <Label htmlFor="supplier">Fornecedor</Label> 
+                  <Select
                     value={formData.supplier}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+                    onValueChange={handleSelectChange('supplier')}
                   >
-                    <option value="">Selecione o fornecedor...</option>
-                    {suppliers.map((supplier) => (
-                      <option key={supplier.id} value={supplier.id}>
-                        {supplier.name}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="supplier" className="w-full">
+                      <SelectValue placeholder="Selecione o fornecedor..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {suppliers.map((supplier) => (
+                        <SelectItem key={supplier.id} value={supplier.id}>
+                          {supplier.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
-                  <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">
-                    Vencimento
-                  </label>
-                  <div className="mt-1 relative">
-                    <input
-                      type="date"
-                      id="dueDate"
-                      name="dueDate"
-                      value={formData.dueDate}
-                      onChange={handleInputChange}
-                      className="block w-full rounded-md border border-shadow-dark px-3 py-2 pr-10 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-                    />
-                    <CalendarIcon className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
-                  </div>
+                <div className="space-y-1"> {/* Added wrapper */}
+                  <Label htmlFor="dueDate">Vencimento</Label> {/* Corrected closing tag */}
+                   {/* Use DatePicker for dueDate */}
+                  <DatePicker
+                    date={formData.dueDate}
+                    setDate={(date) => setFormData(prev => ({ ...prev, dueDate: date }))}
+                    placeholder="Selecione a data de vencimento"
+                    className="mt-1"
+                  />
                 </div>
               </div>
               
@@ -566,11 +592,9 @@ export default function CreateOrder() {
             </TabsContent>
             
             <TabsContent value="financial" className="space-y-4">
-              <div>
-                <label htmlFor="principal" className="block text-sm font-medium text-gray-700">
-                  Valor Principal
-                </label>
-                <input
+              <div className="space-y-1"> {/* Added wrapper */}
+                <Label htmlFor="principal">Valor Principal</Label>
+                <Input
                   type="number"
                   id="principal"
                   name="principal"
@@ -579,11 +603,9 @@ export default function CreateOrder() {
                   placeholder="0.00"
                 />
               </div>
-              <div>
-                <label htmlFor="fine" className="block text-sm font-medium text-gray-700">
-                  Multa
-                </label>
-                <input
+              <div className="space-y-1"> {/* Added wrapper */}
+                <Label htmlFor="fine">Multa</Label>
+                <Input
                   type="number"
                   id="fine"
                   name="fine"
@@ -592,11 +614,9 @@ export default function CreateOrder() {
                   placeholder="0.00"
                 />
               </div>
-              <div>
-                <label htmlFor="interest" className="block text-sm font-medium text-gray-700">
-                  Juros
-                </label>
-                <input
+              <div className="space-y-1"> {/* Added wrapper */}
+                <Label htmlFor="interest">Juros</Label>
+                <Input
                   type="number"
                   id="interest"
                   name="interest"
@@ -608,17 +628,14 @@ export default function CreateOrder() {
             </TabsContent>
             
             <TabsContent value="notes" className="space-y-4">
-              <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-                  Observações
-                </label>
-                <textarea
+              <div className="space-y-1"> {/* Added wrapper */}
+                <Label htmlFor="notes">Observações</Label>
+                <Textarea
                   id="notes"
                   name="notes"
-                  rows={6}
                   value={formData.notes}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+                  className="mt-1" // Use default Shadcn styling, remove specific classes if needed
                   placeholder="Adicione observações sobre o pedido..."
                 />
               </div>

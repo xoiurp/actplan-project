@@ -38,9 +38,9 @@ export function OrderItemsTable({
 }: OrderItemsTableProps) {
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4 py-4 px-4"> {/* Added px-4 for horizontal padding */}
         <h3 className="text-lg font-medium">Itens do Pedido</h3>
-        <div className="space-x-2">
+        <div className="flex space-x-4"> {/* Kept horizontal space between buttons */}
           <button
             type="button"
             onClick={onImportSituacaoFiscal}

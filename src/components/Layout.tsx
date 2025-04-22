@@ -121,7 +121,7 @@ export default function Layout() {
             <NavUser user={userData} />
           </SidebarFooter>
         </Sidebar>
-        {/* Removed redundant background class, as it's now handled globally in index.css */}
+        {/* SidebarInset uses bg-content-background internally now */}
         <SidebarInset> 
           <Outlet />
         </SidebarInset>

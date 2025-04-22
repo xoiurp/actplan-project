@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CalendarIcon, FileText } from 'lucide-react';
+import { FileText, ArrowLeft, CalendarIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { OrderItemsTable } from '../components/OrderItemsTable';
 import { AddOrderItemModal } from '../components/AddOrderItemModal';
 import { ImportSituacaoFiscalModal } from '../components/ImportSituacaoFiscalModal';
 import { getCustomers, getOrders, updateOrder } from '../lib/api';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BillingCalculationsTable } from '../components/BillingCalculationsTable';
 import { ImportDarfModal } from '../components/ImportDarfModal';
 import { Header } from '@/components/Header';
 import { Order, OrderItem } from '@/types';
 import toast from 'react-hot-toast';
 import { processDarfPDF } from '../lib/darfProcessor';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { DatePicker } from '@/components/ui/date-picker';
+import { Button } from '@/components/ui/button'; // Import Button
+import { formatCurrency } from '../lib/utils';
 
 interface FormData {
   customer: string;
@@ -34,6 +41,7 @@ export default function EditOrder() {
   const [calculations, setCalculations] = useState<any[]>([]);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isSituacaoFiscalModalOpen, setIsSituacaoFiscalModalOpen] = useState(false);
+  const [isCustomerExpanded, setIsCustomerExpanded] = useState(true); // Set initial state to true
   const [formData, setFormData] = useState<FormData>({
     customer: '',
     orderDate: '',
@@ -56,26 +64,27 @@ export default function EditOrder() {
   useEffect(() => {
     if (order) {
       setFormData({
-        customer: order.customer_id || '',
-        orderDate: order.data_pedido ? formatDateString(order.data_pedido) : '',
-        status: order.status || '',
-        commission: order.comissao_percentage?.toString() || '',
-        reduction: order.reducao_percentage?.toString() || '',
-        supplier: order.fornecedor || '',
-        dueDate: order.vencimento ? formatDateString(order.vencimento) : '',
-        notes: order.notas || ''
+    customer: order.customer_id || '',
+    orderDate: order.data_pedido ? formatDateString(order.data_pedido) : '',
+    status: order.status || '',
+    commission: order.comissao_percentage?.toString() || '',
+    reduction: order.reducao_percentage?.toString() || '',
+    supplier: order.fornecedor || '',
+    dueDate: order.vencimento ? formatDateString(order.vencimento) : '',
+    notes: order.notas || '',
+    documentos: order.documentos
       });
 
       // Transform order items to match the expected format
       const transformedItems = order.itens_pedido.map((item: OrderItem) => ({
         id: item.id,
         code: item.code,
-        taxType: item.tax_type,
-        startPeriod: item.start_period,
-        endPeriod: item.end_period,
-        dueDate: item.due_date,
-        originalValue: item.original_value,
-        currentBalance: item.current_balance,
+        tax_type: item.tax_type,
+        start_period: item.start_period,
+        end_period: item.end_period,
+        due_date: item.due_date,
+        original_value: item.original_value,
+        current_balance: item.current_balance,
         status: item.status,
         fine: item.fine,
         interest: item.interest,
@@ -169,7 +178,7 @@ export default function EditOrder() {
     setIsAddItemModalOpen(true);
   };
 
-  const handleItemAdd = (newItem: OrderItem) => {
+  const handleItemAdd = (newItem: Partial<OrderItem>) => {
     const taxTypeIds: Record<string, string> = {
       'PIS': '9',
       'PASEP': '9',
@@ -181,9 +190,22 @@ export default function EditOrder() {
       'IRRF': '15'
     };
 
-    const itemWithId = {
-      ...newItem,
-      id: taxTypeIds[newItem.taxType] || newItem.taxType
+    const itemWithId: OrderItem = {
+      id: taxTypeIds[newItem.tax_type || ''] || newItem.tax_type || '',
+      order_id: '',
+      code: newItem.code || '',
+      tax_type: newItem.tax_type || '',
+      start_period: newItem.start_period || '',
+      end_period: newItem.end_period || '',
+      due_date: newItem.due_date || '',
+      original_value: newItem.original_value || 0,
+      current_balance: newItem.current_balance || 0,
+      fine: newItem.fine || 0,
+      interest: newItem.interest || 0,
+      status: newItem.status || 'pending',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      cno: newItem.cno
     };
     setItensPedido(prev => [...prev, itemWithId]);
   };
@@ -224,7 +246,7 @@ export default function EditOrder() {
         if (darfData.code === '1646' && darfData.cno) {
           matchingItem = matchingCodeItems.find((item: OrderItem) => 
             item.cno === darfData.cno && 
-            item.startPeriod.includes(darfData.period)
+            item.start_period.includes(darfData.period)
           );
           
           if (!matchingItem) {
@@ -236,16 +258,16 @@ export default function EditOrder() {
           if (itemIndex !== -1) {
             updatedItems[itemIndex] = {
               ...matchingItem,
-              originalValue: darfData.principal,
+              original_value: darfData.principal,
               fine: darfData.fine,
               interest: darfData.interest,
-              currentBalance: darfData.totalValue
+              current_balance: darfData.totalValue
             };
             updatedCount++;
           }
         } else {
           matchingItem = matchingCodeItems.find((item: OrderItem) => 
-            Math.abs(item.currentBalance - darfData.principal) < 0.01
+            Math.abs(item.current_balance - darfData.principal) < 0.01
           );
 
           if (!matchingItem) {
@@ -259,7 +281,7 @@ export default function EditOrder() {
               ...matchingItem,
               fine: darfData.fine,
               interest: darfData.interest,
-              currentBalance: darfData.totalValue
+              current_balance: darfData.totalValue
             };
             updatedCount++;
           }
@@ -294,7 +316,7 @@ export default function EditOrder() {
 
     const newItems = importedItems.map(item => ({
       ...item,
-      id: taxTypeIds[item.taxType] || item.taxType
+      id: taxTypeIds[item.tax_type] || item.tax_type
     }));
     
     setItensPedido(prevItems => [...prevItems, ...newItems]);
@@ -305,6 +327,24 @@ export default function EditOrder() {
     setItensPedido(prevItems => prevItems.filter(item => item.id !== itemId));
     toast.success('Item removido com sucesso');
   };
+
+  const calculateTotal = (items: OrderItem[], selector: (item: OrderItem) => number): number => {
+    return items.reduce((sum, item) => sum + selector(item), 0);
+  };
+
+  const originalTotal = calculateTotal(itens_pedido, item => item.original_value);
+  const currentTotal = calculateTotal(itens_pedido, item => item.current_balance);
+
+  const taxSummary = itens_pedido.reduce((acc: Record<string, { count: number; originalTotal: number; currentTotal: number }>, item) => {
+    const key = item.tax_type;
+    if (!acc[key]) {
+      acc[key] = { count: 0, originalTotal: 0, currentTotal: 0 };
+    }
+    acc[key].count += 1;
+    acc[key].originalTotal += item.original_value;
+    acc[key].currentTotal += item.current_balance;
+    return acc;
+  }, {});
 
   if (!order) {
     return (
@@ -343,92 +383,107 @@ export default function EditOrder() {
         title={`Editar Pedido #${order.order_year}/${order.order_number.toString().padStart(4, '0')}`}
         actions={
           <div className="flex items-center gap-2">
-            <button
+            <Button
               type="button"
+              variant="outline" // Use outline variant
               onClick={() => navigate(`/orders/${id}`)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               Cancelar
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              // Default variant
             >
               Criar Cobranças
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               onClick={handleSubmit}
               disabled={updateOrderMutation.isPending}
-              className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              // Default variant
             >
               {updateOrderMutation.isPending ? 'Salvando...' : 'Salvar'}
-            </button>
+            </Button>
           </div>
         }
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold mb-4">Informações do Cliente</h2>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="customer" className="block text-sm font-medium text-gray-700">
-                Cliente
-              </label>
-              <select
-                id="customer"
-                name="customer"
-                value={formData.customer}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-              >
-                <option value="">Selecione um cliente...</option>
-                {customers?.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.razao_social}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Use Button for expand/collapse */}
+          <Button
+            variant="ghost"
+            onClick={() => setIsCustomerExpanded(!isCustomerExpanded)}
+            className="w-full flex items-center justify-between text-left px-6 py-4 hover:bg-transparent" // Adjusted styling
+          >
+            <h2 className="text-lg font-semibold">Informações do Cliente</h2>
+            {isCustomerExpanded ? (
+              <ChevronUp className="h-5 w-5 text-gray-400" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-400" />
+            )}
+          </Button>
+          
+          {isCustomerExpanded && (
+            <div className="px-6 pb-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="customer">Cliente</Label> {/* Use Label */}
+                  <Select
+                    name="customer"
+                    value={formData.customer}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, customer: value }))} // Use onValueChange
+                  >
+                    <SelectTrigger id="customer">
+                      <SelectValue placeholder="Selecione um cliente..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {customers?.map((customer) => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {customer.razao_social}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div>
-              <label htmlFor="orderDate" className="block text-sm font-medium text-gray-700">
-                Data do Pedido
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  type="date"
-                  id="orderDate"
-                  name="orderDate"
-                  value={formData.orderDate}
-                  onChange={handleInputChange}
-                  className="block w-full rounded-md border border-shadow-dark px-3 py-2 pr-10 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-                />
-                <CalendarIcon className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+                <div>
+                  <label htmlFor="orderDate" className="block text-sm font-medium text-gray-700">
+                    Data do Pedido
+                  </label>
+                  <DatePicker
+                    date={formData.orderDate ? new Date(formData.orderDate) : undefined}
+                    setDate={(date: Date | undefined) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        orderDate: date ? date.toISOString().split('T')[0] : ''
+                      }));
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="status">Status</Label> {/* Use Label */}
+                   <Select
+                    name="status"
+                    value={formData.status}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))} // Use onValueChange
+                  >
+                    <SelectTrigger id="status">
+                      <SelectValue placeholder="Selecione o status..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {orderStatuses.map((status) => (
+                        <SelectItem key={status.id} value={status.id}>
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-
-            <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                Status
-              </label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-              >
-                <option value="">Selecione o status...</option>
-                {orderStatuses.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -444,32 +499,26 @@ export default function EditOrder() {
             <TabsContent value="summary" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="commission" className="block text-sm font-medium text-gray-700">
-                    Comissão (%)
-                  </label>
-                  <input
+                  <Label htmlFor="commission">Comissão (%)</Label> {/* Use Label */}
+                  <Input
                     type="number"
                     id="commission"
                     name="commission"
                     value={formData.commission}
                     onChange={handleInputChange}
                     step="0.01"
-                    className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
                     placeholder="0.00"
                   />
                 </div>
                 <div>
-                  <label htmlFor="reduction" className="block text-sm font-medium text-gray-700">
-                    Redução (%)
-                  </label>
-                  <input
+                  <Label htmlFor="reduction">Redução (%)</Label> {/* Use Label */}
+                  <Input
                     type="number"
                     id="reduction"
                     name="reduction"
                     value={formData.reduction}
                     onChange={handleInputChange}
                     step="0.01"
-                    className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
                     placeholder="0.00"
                   />
                 </div>
@@ -477,39 +526,37 @@ export default function EditOrder() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="supplier" className="block text-sm font-medium text-gray-700">
-                    Fornecedor
-                  </label>
-                  <select
-                    id="supplier"
+                  <Label htmlFor="supplier">Fornecedor</Label> {/* Use Label */}
+                  <Select
                     name="supplier"
                     value={formData.supplier}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+                     onValueChange={(value) => setFormData(prev => ({ ...prev, supplier: value }))} // Use onValueChange
                   >
-                    <option value="">Selecione o fornecedor...</option>
-                    {suppliers.map((supplier) => (
-                      <option key={supplier.id} value={supplier.id}>
-                        {supplier.name}
-                      </option>
-                    ))}
-                  </select>
+                     <SelectTrigger id="supplier">
+                       <SelectValue placeholder="Selecione o fornecedor..." />
+                     </SelectTrigger>
+                     <SelectContent>
+                       {suppliers.map((supplier) => (
+                         <SelectItem key={supplier.id} value={supplier.id}>
+                           {supplier.name}
+                         </SelectItem>
+                       ))}
+                     </SelectContent>
+                   </Select>
                 </div>
                 <div>
-                  <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">
+                  <Label htmlFor="dueDate"> {/* Use Label */}
                     Vencimento
-                  </label>
-                  <div className="mt-1 relative">
-                    <input
-                      type="date"
-                      id="dueDate"
-                      name="dueDate"
-                      value={formData.dueDate}
-                      onChange={handleInputChange}
-                      className="block w-full rounded-md border border-shadow-dark px-3 py-2 pr-10 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-                    />
-                    <CalendarIcon className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
-                  </div>
+                  </Label> {/* Added missing closing tag */}
+                  <DatePicker
+                    date={formData.dueDate ? new Date(formData.dueDate) : undefined}
+                    setDate={(date: Date | undefined) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        dueDate: date ? date.toISOString().split('T')[0] : ''
+                      }));
+                    }}
+                  />
                 </div>
               </div>
               
@@ -522,13 +569,15 @@ export default function EditOrder() {
                   <div className="p-4 border border-shadow-dark rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-sm font-medium text-gray-900">Situação Fiscal</h3>
-                      <button
+                      {/* Use Button for import */}
+                      <Button
+                        variant="link"
                         type="button"
                         onClick={() => setIsSituacaoFiscalModalOpen(true)}
-                        className="text-sm text-primary hover:text-primary-hover"
+                        className="text-sm h-auto p-0" // Adjust styling
                       >
                         Importar
-                      </button>
+                      </Button>
                     </div>
                     {formData.documentos?.situacaoFiscal ? (
                       <div className="flex items-center justify-between">
@@ -557,13 +606,15 @@ export default function EditOrder() {
                   <div className="p-4 border border-shadow-dark rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-sm font-medium text-gray-900">DARF</h3>
-                      <button
+                       {/* Use Button for import */}
+                      <Button
+                        variant="link"
                         type="button"
                         onClick={() => setIsImportModalOpen(true)}
-                        className="text-sm text-primary hover:text-primary-hover"
+                        className="text-sm h-auto p-0" // Adjust styling
                       >
                         Importar
-                      </button>
+                      </Button>
                     </div>
                     {formData.documentos?.darf ? (
                       <div className="flex items-center justify-between">
@@ -594,52 +645,50 @@ export default function EditOrder() {
             
             <TabsContent value="financial" className="space-y-4">
               <div>
-                <label htmlFor="principal" className="block text-sm font-medium text-gray-700">
-                  Valor Principal
-                </label>
-                <input
+                <Label htmlFor="principal">Valor Principal</Label> {/* Use Label */}
+                <Input
                   type="number"
                   id="principal"
                   name="principal"
                   step="0.01"
-                  className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
                   placeholder="0.00"
+                  // Assuming you might want to handle this value in state later
+                  // value={formData.principal || ''} 
+                  // onChange={handleInputChange}
                 />
               </div>
               <div>
-                <label htmlFor="fine" className="block text-sm font-medium text-gray-700">
-                  Multa
-                </label>
-                <input
+                <Label htmlFor="fine">Multa</Label> {/* Use Label */}
+                <Input
                   type="number"
                   id="fine"
                   name="fine"
                   step="0.01"
-                  className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
                   placeholder="0.00"
+                   // Assuming you might want to handle this value in state later
+                  // value={formData.fine || ''}
+                  // onChange={handleInputChange}
                 />
               </div>
               <div>
-                <label htmlFor="interest" className="block text-sm font-medium text-gray-700">
-                  Juros
-                </label>
-                <input
+                <Label htmlFor="interest">Juros</Label> {/* Use Label */}
+                <Input
                   type="number"
                   id="interest"
                   name="interest"
                   step="0.01"
-                  className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
                   placeholder="0.00"
+                   // Assuming you might want to handle this value in state later
+                  // value={formData.interest || ''}
+                  // onChange={handleInputChange}
                 />
               </div>
             </TabsContent>
             
             <TabsContent value="notes" className="space-y-4">
               <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-                  Observações
-                </label>
-                <textarea
+                <Label htmlFor="notes">Observações</Label> {/* Use Label */}
+                <Textarea
                   id="notes"
                   name="notes"
                   rows={6}
@@ -655,14 +704,75 @@ export default function EditOrder() {
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
-        <OrderItemsTable
-          itens_pedido={itens_pedido}
-          onAddItem={handleAddItem}
-          onImportDarf={handleImportDarf}
-          onImportSituacaoFiscal={handleImportSituacaoFiscal}
-          onDeleteItem={handleDeleteItem}
-          isEditing={true}
-        />
+        <div className="bg-white rounded-lg border border-shadow-dark overflow-hidden mb-6">
+          <OrderItemsTable
+            itens_pedido={itens_pedido}
+            onDeleteItem={handleDeleteItem}
+            onAddItem={handleAddItem}
+            onImportDarf={handleImportDarf}
+            onImportSituacaoFiscal={handleImportSituacaoFiscal}
+            isEditing={true}
+          />
+        </div>
+
+        {/* Tax Summary */}
+        {itens_pedido.length > 0 && (
+          <div className="mt-6 bg-white rounded-lg border border-shadow-dark p-4">
+            <h3 className="text-sm font-medium mb-3">Resumo por Tipo de Imposto</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Quantidade
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Vl. Original
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Sdo. Devedor
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {Object.entries(taxSummary).map(([taxType, data]) => (
+                    <tr key={taxType}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {taxType}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {data.count}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatCurrency(data.originalTotal)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatCurrency(data.currentTotal)}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-gray-50 font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      Total
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {itens_pedido.length}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatCurrency(originalTotal)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatCurrency(currentTotal)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
     </div>

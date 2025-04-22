@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { Order } from '@/types';
 import { Header } from '@/components/Header';
+import { Button } from '@/components/ui/button'; // Added Button import
 
 type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
 
@@ -54,26 +55,36 @@ export default function Orders() {
     return <div className="animate-pulse">Carregando...</div>;
   }
 
+  const orderActions = (
+    <div className="flex items-center gap-2">
+      {/* Using Button component with size="sm" and variant="outline" */}
+      <Button
+        size="sm" 
+        variant="outline"
+        onClick={() => navigate('/payment-plans/bulk')}
+        // className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+      >
+        <CreditCard className="mr-2 h-5 w-5" />
+        Criar Cobrança em Lote
+      </Button> 
+      {/* Using Button component with size="sm" */}
+      <Button 
+        size="sm"
+        onClick={handleCreateOrder}
+        // className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+      >
+        <Plus className="-ml-1 mr-2 h-5 w-5" />
+        Novo Pedido
+      </Button> {/* Ensured closing tag */}
+    </div>
+  );
+
   return (
     <>
-      <Header title="Pedidos" />
+      <Header title="Pedidos" actions={orderActions} />
       <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 bg-white rounded-lg overflow-hidden">
-        <div className="flex justify-end items-center gap-2">
-          <button
-            onClick={() => navigate('/payment-plans/bulk')}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            <CreditCard className="mr-2 h-5 w-5" />
-            Criar Cobrança em Lote
-          </button>
-          <button
-            onClick={handleCreateOrder}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Novo Pedido
-          </button>
-        </div>
+        {/* Buttons moved to Header actions */}
+        {/* <div className="flex justify-end items-center gap-2"> ... </div> */}
 
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <Table>
