@@ -1,6 +1,5 @@
-import { User, Customer, Order, DashboardStats, PaymentPlan, Installment } from '../types'; // Consolidate imports
+import { User, Customer, Order, DashboardStats, PaymentPlan, Installment } from '../types';
 import { supabase } from './supabase';
-// Remove duplicate import: import { Customer, PaymentPlan, Installment } from '../types';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -185,7 +184,6 @@ export async function getCustomers(): Promise<Customer[]> {
   return data;
 }
 
-// Function to get a single customer by ID
 export async function getCustomerById(id: string): Promise<Customer | null> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
@@ -196,35 +194,31 @@ export async function getCustomerById(id: string): Promise<Customer | null> {
     .from('customers')
     .select('*')
     .eq('id', id)
-    .eq('user_id', user.id) // Ensure user can only fetch their own customers
-    .single(); // Fetch a single record
+    .eq('user_id', user.id)
+    .single();
 
   if (error) {
-    // Handle cases where the customer is not found gracefully
     if (error.code === 'PGRST116') { 
       console.warn(`Customer with ID ${id} not found or access denied.`);
       return null;
     }
-    // Add type check for error before accessing properties
     if (error instanceof Error) {
       console.error(`Error fetching customer ${id}:`, error.message);
     } else {
       console.error(`An unknown error occurred while fetching customer ${id}:`, error);
     }
-    throw error; // Re-throw other errors
+    throw error;
   }
 
   return data;
 }
 
-// Update the type to include certificado_validade, but still omit id, created_at, certificado
 export async function createCustomer(customer: Omit<Customer, 'id' | 'created_at' | 'certificado'>): Promise<Customer> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     throw new Error('User not authenticated');
   }
 
-  // First verify if the user exists in our users table
   const { data: userData, error: userCheckError } = await supabase
     .from('users')
     .select('id')
@@ -287,10 +281,8 @@ export async function uploadCertificate(file: File, customerId: string): Promise
     throw new Error('User not authenticated');
   }
 
-  // Create a safe filename by removing special characters
   const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
 
-  // Upload to storage bucket
   const { data, error } = await supabase.storage
     .from('certificates')
     .upload(`${user.id}/${customerId}/${safeFileName}`, file, {
@@ -300,15 +292,12 @@ export async function uploadCertificate(file: File, customerId: string): Promise
 
   if (error) throw error;
 
-  // Get public URL
   const { data: { publicUrl } } = await supabase.storage
     .from('certificates')
     .getPublicUrl(data.path);
 
-  // Ensure the URL is using HTTPS
   const secureUrl = publicUrl.replace('http://', 'https://');
 
-  // Update customer record with certificate info
   await updateCustomer(customerId, {
     certificado: {
       url: secureUrl,
@@ -327,10 +316,8 @@ export async function uploadOrderPDF(file: File, orderId: string, type: 'situaca
     throw new Error('User not authenticated');
   }
 
-  // Create a safe filename
   const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
 
-  // Upload to storage bucket
   const { data, error } = await supabase.storage
     .from('order-pdfs')
     .upload(`${user.id}/${orderId}/${type}/${safeFileName}`, file, {
@@ -340,15 +327,12 @@ export async function uploadOrderPDF(file: File, orderId: string, type: 'situaca
 
   if (error) throw error;
 
-  // Get public URL
   const { data: { publicUrl } } = await supabase.storage
     .from('order-pdfs')
     .getPublicUrl(data.path);
 
-  // Ensure HTTPS URL
   const secureUrl = publicUrl.replace('http://', 'https://');
 
-  // Update order record with PDF info
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .select('documentos')
@@ -378,7 +362,6 @@ export async function uploadOrderPDF(file: File, orderId: string, type: 'situaca
   return { url: secureUrl };
 }
 
-// TODO: Update these functions to use Supabase
 export async function getOrders() {
   const { data, error } = await supabase
     .from('orders')
@@ -417,7 +400,6 @@ export async function createOrder(order: any) {
 
   if (error) throw error;
 
-  // Upload PDFs if they exist
   let documentos = {};
   if (order.documentos) {
     if (order.documentos.situacaoFiscal) {
@@ -445,7 +427,6 @@ export async function createOrder(order: any) {
       };
     }
 
-    // Update order with document info
     const { error: updateError } = await supabase
       .from('orders')
       .update({ documentos })
@@ -495,7 +476,6 @@ export async function updateOrder(orderId: string, order: any) {
 
   if (fetchError) throw fetchError;
 
-  // Upload PDFs if they exist
   let documentos = existingOrder.documentos || {};
   if (order.documentos) {
     if (order.documentos.situacaoFiscal?.file) {
@@ -580,7 +560,6 @@ export async function updateOrder(orderId: string, order: any) {
 
       if (itemsError) throw itemsError;
     } catch (error) {
-      // Add type check for error
       if (error instanceof Error) {
         throw new Error(`Failed to update order items: ${error.message}`);
       } else {
@@ -592,9 +571,8 @@ export async function updateOrder(orderId: string, order: any) {
   return data;
 }
 
-function formatDateForDB(dateStr: string): string | null { // Update return type
+function formatDateForDB(dateStr: string): string | null {
   if (!dateStr) return null;
-  // Handle dates that are already in YYYY-MM-DD format
   if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
     return dateStr;
   }
@@ -607,7 +585,6 @@ function formatDateForDB(dateStr: string): string | null { // Update return type
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
 
-// Helper function to read file as ArrayBuffer
 async function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -617,7 +594,6 @@ async function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
   });
 }
 
-// Helper function to convert ArrayBuffer to Base64
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   let binary = '';
   const bytes = new Uint8Array(buffer);
@@ -627,7 +603,6 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   }
   return btoa(binary);
 }
-
 
 export async function validateCertificateApi(pfxFile: File, password: string): Promise<{ isValid: boolean; expirationDate?: string; error?: string }> {
   try {
@@ -639,33 +614,27 @@ export async function validateCertificateApi(pfxFile: File, password: string): P
     });
 
     if (error) {
-      // Try to parse Supabase Edge Function error response
       let errorMessage = error.message;
       try {
-         // Supabase wraps errors, try to get the inner message
          const contextError = (error as any).context?.error;
          if (contextError?.message) {
             errorMessage = contextError.message;
          } else if (typeof data?.error === 'string') {
-            // Sometimes the error is in the data payload
             errorMessage = data.error;
          }
       } catch (parseError) {
          console.error("Could not parse Supabase error:", parseError);
       }
-      // Use specific message for password errors
       if (errorMessage.toLowerCase().includes('senha') || errorMessage.toLowerCase().includes('password')) {
           return { isValid: false, error: 'Senha do certificado inválida.' };
       }
       return { isValid: false, error: `Erro na validação: ${errorMessage}` };
     }
 
-    // Check if the function returned a validation error in the body
     if (data?.error) {
         return { isValid: false, error: data.error };
     }
     
-    // Check if the function returned the expected validation result
     if (typeof data?.isValid !== 'boolean') {
         console.error("Unexpected response from validation function:", data);
         return { isValid: false, error: 'Resposta inesperada da função de validação.' };

@@ -18,7 +18,7 @@ import { format as formatDateFn } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '../components/ui/textarea'; // Corrigido o caminho do import
 
 interface FormData {
   customer: string;
@@ -196,113 +196,49 @@ export default function CreateOrder() {
     setIsSituacaoFiscalModalOpen(true);
   };
 
-  const handleDarfImport = async (file: File) => {
-    try {
-      const darfItems = await processDarfPDF(file);
-      if (!darfItems || darfItems.length === 0) {
-        toast.error('Falha ao extrair dados do DARF');
-        return;
-      }
-
-      // Store file info in form state
-      setFormData(prev => ({
-        ...prev,
-        documentos: {
-          ...prev.documentos,
-          darf: {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            url: URL.createObjectURL(file)
-          }
-        }
-      }));
-
-      // Processa cada item do DARF
-      let updatedCount = 0;
-      const updatedItems = [...itens_pedido];
-
-      for (const darfData of darfItems) {
-        // Encontra todos os itens com o mesmo código base (removendo sufixos)
-        const matchingCodeItems = itens_pedido.filter((item: OrderItem) => {
-          const itemBaseCode = item.code.split('-')[0];
-          const darfBaseCode = darfData.code.split('-')[0];
-          return itemBaseCode === darfBaseCode;
-        });
-
-        if (matchingCodeItems.length === 0) {
-          console.log(`Nenhum item encontrado para código ${darfData.code}`);
-          continue;
-        }
-
-        // Para CP-PATRONAL, usa CNO como chave de correspondência
-        let matchingItem: OrderItem | undefined;
-        if (darfData.code === '1646' && darfData.cno) {
-          matchingItem = matchingCodeItems.find((item: OrderItem) => 
-            item.cno === darfData.cno && 
-            item.start_period.includes(darfData.period)
-          );
-          
-          if (!matchingItem) {
-            console.log(`Nenhum item CP-PATRONAL encontrado com CNO ${darfData.cno} e período ${darfData.period}`);
-            continue;
-          }
-
-          // Para CP-PATRONAL, atualiza também o valor original
-          const itemIndex = updatedItems.findIndex((item: OrderItem) => item.id === matchingItem!.id);
-          if (itemIndex !== -1) {
-            updatedItems[itemIndex] = {
-              ...matchingItem,
-              original_value: darfData.principal, // Atualiza o valor original
-              fine: darfData.fine,
-              interest: darfData.interest,
-              current_balance: darfData.totalValue
-            };
-            updatedCount++;
-            console.log(`Item CP-PATRONAL atualizado: CNO ${darfData.cno}, período ${darfData.period}`);
-          }
-        } else {
-          // Para outros tipos, usa o valor principal
-          matchingItem = matchingCodeItems.find((item: OrderItem) => 
-            Math.abs(item.current_balance - darfData.principal) < 0.01
-          );
-
-          if (!matchingItem) {
-            console.log(`Nenhum item encontrado com valor ${darfData.principal} para código ${darfData.code}`);
-            continue;
-          }
-
-          // Para outros tipos, mantém o valor original e atualiza apenas multa, juros e total
-          const itemIndex = updatedItems.findIndex((item: OrderItem) => item.id === matchingItem!.id);
-          if (itemIndex !== -1) {
-            updatedItems[itemIndex] = {
-              ...matchingItem,
-              fine: darfData.fine,
-              interest: darfData.interest,
-              current_balance: darfData.totalValue
-            };
-            updatedCount++;
-            console.log(`Item atualizado: código ${darfData.code}, valor ${darfData.principal}`);
-          }
+  const handleDarfImport = (items: OrderItem[], file: File) => {
+    // Store file info in form state
+    setFormData(prev => ({
+      ...prev,
+      documentos: {
+        ...prev.documentos,
+        darf: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          url: URL.createObjectURL(file)
         }
       }
+    }));
 
-      if (updatedCount === 0) {
-        toast.error('Nenhum débito correspondente encontrado para os itens do DARF');
-        return;
+    // Atualiza os itens existentes com os dados do DARF
+    const updatedItems = itens_pedido.map(item => {
+      const matchingDarfItem = items.find(darfItem => 
+        darfItem.code === item.code && 
+        (darfItem.cno ? darfItem.cno === item.cno : true)
+      );
+
+      if (matchingDarfItem) {
+        return {
+          ...item,
+          fine: matchingDarfItem.fine,
+          interest: matchingDarfItem.interest,
+          current_balance: matchingDarfItem.current_balance,
+          ...(matchingDarfItem.cno && { original_value: matchingDarfItem.original_value }) // Atualiza valor original apenas para itens com CNO
+        };
       }
 
-      setItensPedido(updatedItems);
-      toast.success(`${updatedCount} item(s) atualizado(s) com sucesso`);
-      setIsImportModalOpen(false);
-    } catch (error) {
-      console.error('Erro ao processar DARF:', error);
-      toast.error('Falha ao importar DARF');
-    }
+      return item;
+    });
+
+    setItensPedido(updatedItems);
+    toast.success(`Dados do DARF importados com sucesso`);
+    setIsImportModalOpen(false);
   };
 
-  const handleSituacaoFiscalImport = (importedItems: OrderItem[], file: File) => {
-    // Store file info in form state
+  // Novo: handler recebe também o JSON completo da situação fiscal
+  const handleSituacaoFiscalImport = (importedItems: OrderItem[], file: File, rawSituacaoFiscalData?: any) => {
+    // Salva o arquivo e o JSON completo da situação fiscal no estado
     setFormData(prev => ({
       ...prev,
       documentos: {
@@ -311,7 +247,8 @@ export default function CreateOrder() {
           name: file.name,
           type: file.type,
           size: file.size,
-          url: URL.createObjectURL(file)
+          url: URL.createObjectURL(file),
+          ...(rawSituacaoFiscalData ? rawSituacaoFiscalData : {})
         }
       }
     }));
@@ -328,13 +265,12 @@ export default function CreateOrder() {
       'IRRF': '15'
     };
 
+    // Os itens já devem vir com as chaves corretas (snake_case) do pdfProcessor
     const newItems = importedItems.map(item => ({
       ...item,
-      // Create ID based on tax type and code
       id: taxTypeIds[item.tax_type] || item.tax_type
     }));
-    
-    // Add imported items to the existing items list
+
     setItensPedido(prevItems => [...prevItems, ...newItems]);
     toast.success(`${importedItems.length} itens importados com sucesso`);
   };
@@ -645,12 +581,132 @@ export default function CreateOrder() {
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
-        <OrderItemsTable
-          itens_pedido={itens_pedido}
-          onAddItem={handleAddItem}
-          onImportDarf={handleImportDarf}
-          onImportSituacaoFiscal={handleImportSituacaoFiscal}
-        />
+        <h3 className="text-lg font-medium mb-4">Itens do Pedido</h3>
+        <div className="flex space-x-4 mb-6">
+          <button
+            type="button"
+            onClick={handleImportSituacaoFiscal}
+            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            Importar Situação Fiscal
+          </button>
+          <button
+            type="button"
+            onClick={handleImportDarf}
+            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            Importar DARF
+          </button>
+          <button
+            type="button"
+            onClick={handleAddItem}
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            Adicionar Item
+          </button>
+        </div>
+        {/* Agrupamento por tax_type */}
+        {(() => {
+          const grouped = itens_pedido.reduce((acc, item) => {
+            const key = item.tax_type || 'OUTROS';
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+            return acc;
+          }, {} as Record<string, typeof itens_pedido>);
+          const friendlyTitles: Record<string, string> = {
+            'DEBITO': 'Débitos SIEF',
+            'DEBITO_EXIG_SUSPENSA_SIEF': 'Débitos Exig. Suspensa',
+            // Adicione outros tipos conforme necessário
+            'OUTROS': 'Outros'
+          };
+          const hasItens = Object.entries(grouped).length > 0;
+          return (
+            <>
+              {!hasItens && (
+                <p className="text-center text-gray-500 py-4">Nenhum item adicionado ainda.</p>
+              )}
+              {Object.entries(grouped).map(([taxType, items]) => (
+                <div
+                  key={taxType}
+                  className="border border-gray-400 rounded-lg p-4 mb-6 bg-white"
+                >
+                  <h4 className="text-md font-semibold mb-2">{friendlyTitles[taxType] || taxType}</h4>
+                  <OrderItemsTable
+                    itens_pedido={items}
+                    onAddItem={() => {}}
+                    onImportDarf={() => {}}
+                    onImportSituacaoFiscal={() => {}}
+                    isEditing={false}
+                  />
+                </div>
+              ))}
+
+              {/* Seção Parcelamentos Siefpar */}
+              {formData.documentos?.situacaoFiscal?.parcelamentosSiefpar?.length > 0 && (
+                <div className="border border-gray-200 rounded-lg p-4 mb-6 bg-white">
+                  <h4 className="text-md font-semibold mb-2">Parcelamentos SIEFPar</h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr>
+                          <th className="px-2 py-1 text-left">CNPJ</th>
+                          <th className="px-2 py-1 text-left">Parcelamento</th>
+                          <th className="px-2 py-1 text-right">Valor Suspenso</th>
+                          <th className="px-2 py-1 text-left">Tipo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formData.documentos.situacaoFiscal.parcelamentosSiefpar.map((item: any, idx: number) => (
+                          <tr key={idx}>
+                            <td className="px-2 py-1">{item.cnpj}</td>
+                            <td className="px-2 py-1">{item.parcelamento}</td>
+                            <td className="px-2 py-1 text-right">{item.valor_suspenso?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                            <td className="px-2 py-1">{item.tipo}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Seção Pendências de Inscrição */}
+              {formData.documentos?.situacaoFiscal?.pendenciasInscricao?.length > 0 && (
+                <div className="border border-gray-400 rounded-lg p-4 mb-6 bg-white">
+                  <h4 className="text-md font-semibold mb-2">Pendências de Inscrição</h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr>
+                          <th className="px-2 py-1 text-left">CNPJ</th>
+                          <th className="px-2 py-1 text-left">Inscrição</th>
+                          <th className="px-2 py-1 text-left">Receita</th>
+                          <th className="px-2 py-1 text-left">Data Inscrição</th>
+                          <th className="px-2 py-1 text-left">Processo</th>
+                          <th className="px-2 py-1 text-left">Tipo Devedor</th>
+                          <th className="px-2 py-1 text-left">Situação</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formData.documentos.situacaoFiscal.pendenciasInscricao.map((item: any, idx: number) => (
+                          <tr key={idx}>
+                            <td className="px-2 py-1">{item.cnpj}</td>
+                            <td className="px-2 py-1">{item.inscricao}</td>
+                            <td className="px-2 py-1">{item.receita}</td>
+                            <td className="px-2 py-1">{item.data_inscricao}</td>
+                            <td className="px-2 py-1">{item.processo}</td>
+                            <td className="px-2 py-1">{item.tipo_devedor}</td>
+                            <td className="px-2 py-1">{item.situacao}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
 
     </div>

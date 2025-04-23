@@ -14,12 +14,15 @@ RUN npm install
 COPY . .
 
 # Build the application
-# Pass Supabase env vars as build arguments
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_EXTRACTION_API_URL
 ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
-RUN npm run build
+# Definir a variável de ambiente diretamente no comando de build do Vite
+RUN VITE_SUPABASE_URL=$VITE_SUPABASE_URL \
+    VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY \
+    VITE_EXTRACTION_API_URL=$VITE_EXTRACTION_API_URL npm run build
 
 # Stage 2: Serve the application with Nginx
 FROM nginx:stable-alpine
@@ -33,5 +36,11 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port 80
 EXPOSE 80
 
-# Start Nginx when the container launches
+# Copiar o script de entrypoint
+COPY docker/nginx-entrypoint.sh /usr/local/bin/nginx-entrypoint.sh
+RUN chmod +x /usr/local/bin/nginx-entrypoint.sh
+
+# Usar o script como entrypoint
+ENTRYPOINT ["/usr/local/bin/nginx-entrypoint.sh"]
+# O CMD original do Nginx será executado pelo script
 CMD ["nginx", "-g", "daemon off;"]

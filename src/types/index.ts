@@ -51,6 +51,14 @@ export interface Order {
       name: string;
       type: string;
       size: number;
+      // Dados completos da situação fiscal extraídos pela IA
+      debitosExigSuspensaSief?: any[];
+      parcelamentosSipade?: any[];
+      pendenciasDebito?: any[];
+      processosFiscais?: any[];
+      parcelamentosSiefpar?: any[];
+      debitosSicob?: any[];
+      pendenciasInscricao?: any[];
     };
     darf?: {
       url: string;
@@ -77,6 +85,7 @@ export interface OrderItem {
   interest: number;
   status: string;
   cno?: string;
+  saldo_devedor_consolidado?: number; // Novo campo para Sdo. Dev. Cons
   created_at: string;
   updated_at: string;
 }
