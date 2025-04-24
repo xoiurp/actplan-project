@@ -9,9 +9,10 @@ export interface SituacaoFiscalData {
   debitosSicob: any[];
   pendenciasInscricao: any[];
   debitosExigSuspensaSief: any[]; // Adicionado para compatibilidade com backend/IA
+  pendenciasParcelamentoSispar: any[]; // Novo campo para SISPAR
 }
 
-/** 
+/**
  * Envia o PDF para o backend FastAPI e retorna o texto extraído.
  */
 export async function processSituacaoFiscalPDF(file: File): Promise<SituacaoFiscalData> {
@@ -39,6 +40,7 @@ export async function processSituacaoFiscalPDF(file: File): Promise<SituacaoFisc
     debitosSicob: data.debitosSicob || [],
     pendenciasInscricao: data.pendenciasInscricao || [],
     debitosExigSuspensaSief: data.debitosExigSuspensaSief || [],
+    pendenciasParcelamentoSispar: data.pendenciasParcelamentoSispar || [], // Adiciona o novo campo
   };
 }
 
@@ -99,8 +101,9 @@ export function convertToOrderItems(data: SituacaoFiscalData): any[] {
     current_balance: item.valor_suspenso || 0, // Assumindo saldo = valor suspenso
     fine: 0, // Não disponível
     interest: 0, // Não disponível
-    status: item.tipo || "", // Usando 'tipo' como status
+    status: item.modalidade || "", // Usando 'modalidade' como status (corrigido de 'tipo')
     cno: "", // Não disponível
+    cnpj: item.cnpj || "", // Adicionando CNPJ
     created_at: now,
     updated_at: now,
   }));
@@ -126,10 +129,35 @@ export function convertToOrderItems(data: SituacaoFiscalData): any[] {
     due_date: "", 
     original_value: 0, 
     current_balance: 0, 
-    fine: 0, 
-    interest: 0, 
-    cno: "", 
+    fine: 0,
+    interest: 0,
+    cno: "", // CNO não parece relevante aqui, mas mantemos se necessário
+    cnpj: item.cnpj || "", // Adicionando CNPJ
     saldo_devedor_consolidado: 0,
+    created_at: now,
+    updated_at: now,
+  }));
+
+  // Mapeia Pendências de Parcelamento (SISPAR)
+  const pendenciasParcelamentoSispar = (data.pendenciasParcelamentoSispar || []).map((item: any) => ({
+    id: crypto.randomUUID(),
+    order_id: "",
+    code: item.conta || "", // Usando 'conta' como código
+    tax_type: "PENDENCIA_PARCELAMENTO_SISPAR", // Novo tipo
+    start_period: "", // Não disponível
+    end_period: "", // Não disponível
+    due_date: "", // Não disponível
+    original_value: 0, // Não disponível
+    current_balance: 0, // Não disponível
+    fine: 0, // Não disponível
+    interest: 0, // Não disponível
+    status: item.modalidade || item.descricao || "", // Usando modalidade ou descrição como status
+    cno: item.cnpj || "", // Mapeando CNPJ para CNO (verificar se é o ideal)
+    saldo_devedor_consolidado: 0, // Não disponível
+    // Campos específicos SISPAR (se necessário adicionar colunas extras na tabela)
+    sispar_conta: item.conta || "",
+    sispar_descricao: item.descricao || "",
+    sispar_modalidade: item.modalidade || "",
     created_at: now,
     updated_at: now,
   }));
@@ -137,9 +165,10 @@ export function convertToOrderItems(data: SituacaoFiscalData): any[] {
 
   // Retorna todos os itens juntos, incluindo os novos tipos
   return [
-      ...debitos, 
+      ...debitos,
       ...debitosExigSuspensa,
       ...parcelamentosSiefpar,
-      ...pendenciasInscricao
+      ...pendenciasInscricao,
+      ...pendenciasParcelamentoSispar // Adiciona os novos itens
     ];
 }

@@ -74,9 +74,10 @@ export interface Order {
 export interface OrderItem {
   id: string;
   order_id: string;
-  tax_type: 'DEBITO' | 'DEBITO_EXIG_SUSPENSA_SIEF' | 'PARCELAMENTO_SIEFPAR' | 'PENDENCIA_INSCRICAO_SIDA' | string; // Tipo mais específico
+  tax_type: 'DEBITO' | 'DEBITO_EXIG_SUSPENSA_SIEF' | 'PARCELAMENTO_SIEFPAR' | 'PENDENCIA_INSCRICAO_SIDA' | 'PENDENCIA_PARCELAMENTO_SISPAR' | string; // Tipo mais específico
   // Campos comuns/Débito SIEF
-  code?: string; // Código da Receita ou Inscrição
+  cnpj?: string; // Adicionado CNPJ como opcional geral
+  code?: string; // Código da Receita ou Inscrição ou Conta ou Parcelamento
   start_period?: string; // Período Apuração ou Data Inscrição
   end_period?: string; // Geralmente igual a start_period para débitos
   due_date?: string; // Vencimento (não aplicável a SIDA)
@@ -98,7 +99,11 @@ export interface OrderItem {
   // Campos específicos SIEFPAR
   parcelamento?: string; // Número do Parcelamento
   valor_suspenso?: number; // Valor Suspenso
-  modalidade?: string; // Modalidade do Parcelamento
+  modalidade?: string; // Modalidade do Parcelamento SIEFPAR
+  // Campos específicos SISPAR
+  sispar_conta?: string;
+  sispar_descricao?: string;
+  sispar_modalidade?: string; // Modalidade do Parcelamento SISPAR
   // Timestamps
   created_at: string;
   updated_at: string;
