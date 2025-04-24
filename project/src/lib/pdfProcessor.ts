@@ -102,8 +102,8 @@ export function convertToOrderItems(data: SituacaoFiscalData): any[] {
     fine: 0, // Não disponível
     interest: 0, // Não disponível
     status: item.modalidade || "", // Usando 'modalidade' como status (corrigido de 'tipo')
-    cno: "", // Não disponível
-    cnpj: item.cnpj || "", // Adicionando CNPJ
+    cno: "", // CNO não disponível para SIEFPAR
+    cnpj: item.cnpj || "", // Mapeando CNPJ corretamente
     created_at: now,
     updated_at: now,
   }));
@@ -131,8 +131,8 @@ export function convertToOrderItems(data: SituacaoFiscalData): any[] {
     current_balance: 0, 
     fine: 0,
     interest: 0,
-    cno: "", // CNO não parece relevante aqui, mas mantemos se necessário
-    cnpj: item.cnpj || "", // Adicionando CNPJ
+    cno: "", // CNO não disponível para SIDA
+    cnpj: item.cnpj || "", // Mapeando CNPJ corretamente
     saldo_devedor_consolidado: 0,
     created_at: now,
     updated_at: now,
@@ -152,7 +152,8 @@ export function convertToOrderItems(data: SituacaoFiscalData): any[] {
     fine: 0, // Não disponível
     interest: 0, // Não disponível
     status: item.modalidade || item.descricao || "", // Usando modalidade ou descrição como status
-    cno: item.cnpj || "", // Mapeando CNPJ para CNO (verificar se é o ideal)
+    cno: "", // CNO não disponível para SISPAR
+    cnpj: item.cnpj || "", // Mapeando CNPJ corretamente
     saldo_devedor_consolidado: 0, // Não disponível
     // Campos específicos SISPAR (se necessário adicionar colunas extras na tabela)
     sispar_conta: item.conta || "",

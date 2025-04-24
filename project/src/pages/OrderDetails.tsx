@@ -22,6 +22,12 @@ import {
 } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { OrderItem } from '@/types';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'; // Importar Card
 
 type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
 
@@ -96,14 +102,20 @@ export default function OrderDetails() {
     </div>
   );
 
-  const calculateTotal = (items: OrderItem[], selector: (item: OrderItem) => number): number => {
-    return items.reduce((sum: number, item) => sum + selector(item), 0);
+  // Helper para garantir que o valor seja um número ou 0
+  const ensureNumber = (value: number | undefined | null): number => value || 0;
+
+  const calculateTotal = (items: OrderItem[], selector: (item: OrderItem) => number | undefined | null): number => {
+    // Usa ensureNumber dentro do reduce para tratar valores indefinidos
+    return items.reduce((sum: number, item) => sum + ensureNumber(selector(item)), 0);
   };
 
+  // Agora as chamadas usam ensureNumber implicitamente através do calculateTotal modificado
   const originalTotal = calculateTotal(order.itens_pedido, item => item.original_value);
-  const fineTotal = calculateTotal(order.itens_pedido, item => item.fine || 0);
-  const interestTotal = calculateTotal(order.itens_pedido, item => item.interest || 0);
+  const fineTotal = calculateTotal(order.itens_pedido, item => item.fine);
+  const interestTotal = calculateTotal(order.itens_pedido, item => item.interest);
   const currentTotal = calculateTotal(order.itens_pedido, item => item.current_balance);
+
 
   const taxSummary = order.itens_pedido.reduce((acc: TaxSummaryMap, item: OrderItem) => {
     const key = item.tax_type;
@@ -114,8 +126,9 @@ export default function OrderDetails() {
         count: 0,
       };
     }
-    acc[key].originalTotal += item.original_value;
-    acc[key].currentTotal += item.current_balance;
+    // Usa ensureNumber para somar valores potencialmente indefinidos
+    acc[key].originalTotal += ensureNumber(item.original_value);
+    acc[key].currentTotal += ensureNumber(item.current_balance);
     acc[key].count += 1;
     return acc;
   }, {});
@@ -340,53 +353,143 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        {/* Order Items */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold mb-4">Itens do Pedido</h2>
-          <div className="bg-white rounded-lg border border-shadow-dark overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Tipo de Tributo</TableHead>
-                  <TableHead>Período Inicial</TableHead>
-                  <TableHead>Período Final</TableHead>
-                  <TableHead>Vencimento</TableHead>
-                  <TableHead className="text-right">Vl. Original</TableHead>
-                  <TableHead className="text-right">Multa</TableHead>
-                  <TableHead className="text-right">Juros</TableHead>
-                  <TableHead className="text-right">Sdo. Devedor</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {order.itens_pedido.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={10} className="text-center py-4 text-gray-500">
-                      Nenhum item encontrado
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  order.itens_pedido.map((item: OrderItem) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.code}</TableCell>
-                      <TableCell>{item.tax_type}</TableCell>
-                      <TableCell>{item.start_period}</TableCell>
-                      <TableCell>{item.end_period}</TableCell>
-                      <TableCell>{item.due_date}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.original_value)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.fine || 0)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.interest || 0)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.current_balance)}</TableCell>
-                      <TableCell>{item.status}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+        {/* Order Items - Agrupados por Tipo */}
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold">Itens do Pedido</h2>
+          {(Object.entries(
+            // Adiciona tipos explícitos aos parâmetros do reduce
+            order.itens_pedido.reduce((acc: Record<string, OrderItem[]>, item: OrderItem) => {
+              const type = item.tax_type || 'OUTROS';
+              if (!acc[type]) acc[type] = [];
+              acc[type].push(item);
+              return acc;
+            }, {} as Record<string, OrderItem[]>)
+          ) as [string, OrderItem[]][]).map(([type, items]) => {
+            // Mapeia os tipos para títulos mais legíveis (pode mover para fora se preferir)
+            const typeTitles: Record<string, string> = {
+              DEBITO: 'Pendências - Débito (SIEF)',
+              DEBITO_EXIG_SUSPENSA_SIEF: 'Débitos com Exigibilidade Suspensa (SIEF)',
+              PARCELAMENTO_SIEFPAR: 'Parcelamentos com Exigibilidade Suspensa (SIEFPAR)',
+              PENDENCIA_INSCRICAO_SIDA: 'Pendências - Inscrição em Dívida Ativa (SIDA)',
+              PENDENCIA_PARCELAMENTO_SISPAR: 'Pendências - Parcelamento (SISPAR)',
+              DARF: 'DARF',
+              GPS: 'GPS',
+              FGTS: 'FGTS',
+              OUTROS: 'Outros Itens'
+            };
 
-          {/* Tax Summary */}
+            return (
+              <Card key={type}>
+                <CardHeader>
+                  <CardTitle>{typeTitles[type] || type}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        {/* Cabeçalhos dinâmicos */}
+                        {type === 'PENDENCIA_INSCRICAO_SIDA' ? (
+                          <TableRow>
+                            <TableHead>CNPJ</TableHead>
+                            <TableHead>Inscrição</TableHead>
+                            <TableHead>Receita</TableHead>
+                            <TableHead>Inscrito em</TableHead>
+                            <TableHead>Ajuizado em</TableHead>
+                            <TableHead>Processo</TableHead>
+                            <TableHead>Tipo Devedor</TableHead>
+                            <TableHead>Devedor Principal</TableHead>
+                            <TableHead>Situação</TableHead>
+                          </TableRow>
+                        ) : type === 'PENDENCIA_PARCELAMENTO_SISPAR' ? (
+                          <TableRow>
+                            <TableHead>CNPJ</TableHead>
+                            <TableHead>Conta</TableHead>
+                            <TableHead>Descrição</TableHead>
+                            <TableHead>Modalidade</TableHead>
+                          </TableRow>
+                        ) : type === 'PARCELAMENTO_SIEFPAR' ? (
+                          <TableRow>
+                            <TableHead>CNPJ</TableHead>
+                            <TableHead>Parcelamento</TableHead>
+                            <TableHead className="text-right whitespace-nowrap">Valor Suspenso</TableHead>
+                            <TableHead>Modalidade</TableHead>
+                          </TableRow>
+                        ) : ( // Padrão para Débitos e outros
+                          <TableRow>
+                            <TableHead>Código/Receita</TableHead>
+                            <TableHead>Período Apuração</TableHead>
+                            <TableHead>Vencimento</TableHead>
+                            <TableHead className="text-right whitespace-nowrap">Vl. Original</TableHead>
+                            <TableHead className="text-right whitespace-nowrap">Multa</TableHead>
+                            <TableHead className="text-right whitespace-nowrap">Juros</TableHead>
+                            <TableHead className="text-right whitespace-nowrap">Sdo. Devedor</TableHead>
+                            <TableHead className="text-right whitespace-nowrap">Sdo. Dev. Cons</TableHead>
+                            <TableHead>Situação</TableHead>
+                          </TableRow>
+                        )}
+                      </TableHeader>
+                      <TableBody>
+                        {items.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={10} className="text-center py-4 text-gray-500"> {/* Ajustar colSpan se necessário */}
+                              Nenhum item deste tipo.
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          items.map((item: OrderItem) => (
+                            <TableRow key={item.id}>
+                              {/* Células dinâmicas */}
+                              {type === 'PENDENCIA_INSCRICAO_SIDA' ? (
+                                <>
+                                  <TableCell>{item.cnpj}</TableCell>
+                                  <TableCell>{item.inscricao}</TableCell>
+                                  <TableCell>{item.receita}</TableCell>
+                                  <TableCell>{item.inscrito_em}</TableCell>
+                                  <TableCell>{item.ajuizado_em || '-'}</TableCell>
+                                  <TableCell>{item.processo}</TableCell>
+                                  <TableCell>{item.tipo_devedor}</TableCell>
+                                  <TableCell>{item.devedor_principal || '-'}</TableCell>
+                                  <TableCell>{item.status}</TableCell>
+                                </>
+                              ) : type === 'PENDENCIA_PARCELAMENTO_SISPAR' ? (
+                                <>
+                                  <TableCell>{item.cnpj}</TableCell>
+                                  <TableCell>{item.sispar_conta}</TableCell>
+                                  <TableCell>{item.sispar_descricao}</TableCell>
+                                  <TableCell>{item.sispar_modalidade}</TableCell>
+                                </>
+                              ) : type === 'PARCELAMENTO_SIEFPAR' ? (
+                                <>
+                                  <TableCell>{item.cnpj}</TableCell>
+                                  <TableCell>{item.code}</TableCell> {/* code é o número do parcelamento */}
+                                  <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.original_value || 0)}</TableCell> {/* original_value é o valor suspenso */}
+                                  <TableCell>{item.status}</TableCell> {/* status é a modalidade */}
+                                </>
+                              ) : ( // Padrão para Débitos e outros
+                                <>
+                                  <TableCell>{item.code}</TableCell> {/* code é a receita */}
+                                  <TableCell>{item.start_period}</TableCell>
+                                  <TableCell>{item.due_date}</TableCell>
+                                  <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.original_value || 0)}</TableCell>
+                                  <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.fine || 0)}</TableCell>
+                                  <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.interest || 0)}</TableCell>
+                                  <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.current_balance || 0)}</TableCell>
+                                  <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.saldo_devedor_consolidado || 0)}</TableCell>
+                                  <TableCell>{item.status}</TableCell>
+                                </>
+                              )}
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+
+          {/* Tax Summary Geral (mantido por enquanto) */}
           {order.itens_pedido.length > 0 && (
             <div className="mt-6 bg-white rounded-lg border border-shadow-dark p-4">
               <h3 className="text-sm font-medium mb-3">Resumo por Tipo de Imposto</h3>

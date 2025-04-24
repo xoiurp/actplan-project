@@ -131,8 +131,16 @@ export function OrderItemsTable({
                 <TableBody>
                   {items.length === 0 ? (
                     <TableRow>
-                      {/* Ajustar colSpan dinamicamente */}
-                      <TableCell colSpan={10} className="text-center py-4 text-gray-500">
+                      {/* Ajustar colSpan dinamicamente com base no tipo */}
+                      <TableCell 
+                        colSpan={
+                          type === 'PENDENCIA_INSCRICAO_SIDA' ? (isEditing ? 10 : 9) :
+                          type === 'PENDENCIA_PARCELAMENTO_SISPAR' ? (isEditing ? 5 : 4) :
+                          type === 'PARCELAMENTO_SIEFPAR' ? (isEditing ? 5 : 4) :
+                          (isEditing ? 10 : 9) // Padrão para débitos
+                        } 
+                        className="text-center py-4 text-gray-500"
+                      >
                         Nenhum item deste tipo.
                       </TableCell>
                     </TableRow>
