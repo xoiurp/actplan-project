@@ -36,44 +36,17 @@ export function OrderItemsTable({
   onDeleteItem,
   isEditing = false
 }: OrderItemsTableProps) {
+  // console.log('--- OrderItemsTable: Dados RECEBIDOS (props) ---'); // Log removido
+  // console.log(JSON.stringify(itens_pedido, null, 2)); // Log removido
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Itens do Pedido</h3>
-        <div className="space-x-2">
-          <button
-            type="button"
-            onClick={onImportSituacaoFiscal}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Importar Situação Fiscal
-          </button>
-          <button
-            type="button"
-            onClick={onImportDarf}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Importar DARF
-          </button>
-          <button
-            type="button"
-            onClick={onAddItem}
-            className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Adicionar Item
-          </button>
-        </div>
-      </div>
 
       <div className="bg-white rounded-lg border border-shadow-dark overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Código</TableHead>
-              <TableHead>Tipo de Tributo</TableHead>
               <TableHead>Período Inicial</TableHead>
               <TableHead>Período Final</TableHead>
               <TableHead>Vencimento</TableHead>
@@ -81,6 +54,7 @@ export function OrderItemsTable({
               <TableHead className="text-right whitespace-nowrap">Multa</TableHead>
               <TableHead className="text-right whitespace-nowrap">Juros</TableHead>
               <TableHead className="text-right whitespace-nowrap">Sdo. Devedor</TableHead>
+              <TableHead className="text-right whitespace-nowrap">Sdo. Dev. Cons</TableHead>
               <TableHead>Status</TableHead>
               {isEditing && <TableHead className="w-16">Ações</TableHead>}
             </TableRow>
@@ -88,7 +62,7 @@ export function OrderItemsTable({
           <TableBody>
             {itens_pedido.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isEditing ? 11 : 10} className="text-center py-4 text-gray-500">
+                <TableCell colSpan={isEditing ? 12 : 11} className="text-center py-4 text-gray-500">
                   Nenhum item adicionado ainda
                 </TableCell>
               </TableRow>
@@ -96,7 +70,6 @@ export function OrderItemsTable({
               itens_pedido.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.code}</TableCell>
-                  <TableCell>{item.tax_type}</TableCell>
                   <TableCell>{item.start_period}</TableCell>
                   <TableCell>{item.end_period}</TableCell>
                   <TableCell>{item.due_date}</TableCell>
@@ -104,6 +77,7 @@ export function OrderItemsTable({
                   <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.fine || 0)}</TableCell>
                   <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.interest || 0)}</TableCell>
                   <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.current_balance)}</TableCell>
+                  <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.saldo_devedor_consolidado || 0)}</TableCell>
                   <TableCell>{item.status}</TableCell>
                   {isEditing && (
                     <TableCell>

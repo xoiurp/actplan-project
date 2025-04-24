@@ -7,9 +7,20 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Customer } from '@/types';
 
+// Helper function to format date YYYY-MM-DD to DD/MM/YYYY
+const formatDate = (dateString: string | undefined | null): string => {
+  if (!dateString) return '-';
+  try {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  } catch (e) {
+    console.error("Error formatting date:", e);
+    return dateString; // Return original string if formatting fails
+  }
+};
+
 // Remove placeholder function
 // const getCustomerById = async (id: string): Promise<Customer | null> => { ... };
-
 
 export default function CustomerDetails() {
   const { id } = useParams<{ id: string }>();
@@ -121,6 +132,12 @@ export default function CustomerDetails() {
                     </a>
                   ) : (
                     <p className="text-sm text-gray-500 italic">Não cadastrado</p>
+                  )}
+                  {/* Display certificate validity */}
+                  {customer.certificado_validade && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Validade: {formatDate(customer.certificado_validade)}
+                    </p>
                   )}
                 </div>
               </div>

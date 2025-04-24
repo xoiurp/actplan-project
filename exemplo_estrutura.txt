@@ -1,0 +1,170 @@
+🧾 1. Parcelamento com Exigibilidade Suspensa (SIPADE)
+Campos:
+
+cnpj
+
+processo
+
+receita
+
+situacao
+
+Exemplo:
+
+json
+Copy
+Edit
+{
+  "cnpj": "03.367.118/0001-40",
+  "processo": "10675.725.438/2022-39",
+  "receita": "7500-OUTROS",
+  "situacao": "ATIVO"
+}
+💰 2. Pendência - Débito (SIEF)
+Campos:
+
+cnpj
+
+receita
+
+periodo_apuracao
+
+vencimento
+
+valor_original
+
+saldo_devedor
+
+multa
+
+juros
+
+saldo_devedor_consolidado
+
+situacao
+
+Exemplo:
+
+json
+Copy
+Edit
+{
+  "cnpj": "03.367.118/0001-40",
+  "receita": "8109-02 - PIS",
+  "periodo_apuracao": "01/2025",
+  "vencimento": "25/02/2025",
+  "valor_original": 42739.17,
+  "saldo_devedor": 42739.17,
+  "multa": 7051.96,
+  "juros": 837.68,
+  "saldo_devedor_consolidado": 50628.81,
+  "situacao": "DEVEDOR"
+}
+🧾 3. Processo Fiscal com Exigibilidade Suspensa (SIEF)
+Campos:
+
+cnpj
+
+processo
+
+situacao
+
+localizacao
+
+Exemplo:
+
+json
+Copy
+Edit
+{
+  "cnpj": "03.367.118/0001-40",
+  "processo": "17227.738.910/2024-92",
+  "situacao": "SUSPENSO-JULGAMENTO DA IMPUGNACAO",
+  "localizacao": "CENTRO NAC GESTAO DE PROCESSO-DRJ-RPO-SP"
+}
+🧾 4. Parcelamento com Exigibilidade Suspensa (SIEFPAR)
+Campos:
+
+cnpj
+
+parcelamento
+
+valor_suspenso
+
+tipo
+
+Exemplo:
+
+json
+Copy
+Edit
+[
+  {
+    "cnpj": "03.367.118/0001-40",
+    "parcelamento": "02110001200427120172473",
+    "valor_suspenso": 100483.71,
+    "tipo": "Parcelamento Simplificado"
+  },
+  {
+    "cnpj": "03.367.118/0001-40",
+    "parcelamento": "02110001200441717712488",
+    "valor_suspenso": 498820.11,
+    "tipo": "Parcelamento Simplificado"
+  }
+]
+💳 5. Débito com Exigibilidade Suspensa (SICOB)
+Campos:
+
+cnpj
+
+parcelamento
+
+situacao
+
+tipo
+
+Exemplo:
+
+json
+Copy
+Edit
+{
+  "cnpj": "03.367.118/0001-40",
+  "parcelamento": "64254196-5",
+  "situacao": "ATIVO/EM DIA",
+  "tipo": "RFB LEI 10522/02 - SIMP. EMPRESA GERAL"
+}
+📄 6. Pendência - Inscrição (SIDA)
+Campos:
+
+cnpj
+
+inscricao
+
+receita
+
+data_inscricao
+
+processo
+
+tipo_devedor
+
+situacao
+
+Exemplo:
+
+json
+Copy
+Edit
+{
+  "cnpj": "03.367.118/0001-40",
+  "inscricao": "60.2.23.018921-50",
+  "receita": "3551-IRPJ",
+  "data_inscricao": "27/09/2023",
+  "processo": "19414.106.645/2019-30",
+  "tipo_devedor": "PRINCIPAL",
+  "situacao": "ATIVA A SER AJUIZADA"
+}
+📄 7. Pendência - Parcelamento (SISPAR)
+(essa seção específica não foi encontrada nas primeiras páginas analisadas, mas caso apareça deve seguir o padrão dos demais parcelamentos, com os campos: parcelamento, valor_suspenso, situacao, tipo).
+

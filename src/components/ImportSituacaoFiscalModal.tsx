@@ -3,13 +3,15 @@ import { Modal } from './ui/modal';
 import { Dropzone } from './ui/dropzone';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { processSituacaoFiscalPDF } from '@/lib/pdfProcessor';
 import { formatCurrency } from '@/lib/utils';
+import { processSituacaoFiscalPDF, convertToOrderItems } from '@/lib/pdfProcessor';
+import type { SituacaoFiscalData } from '@/lib/pdfProcessor';
+import type { OrderItem } from '@/types';
 
 interface ImportSituacaoFiscalModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (items: any[], file: File) => void;
+  onImport: (items: OrderItem[], file: File) => void;
 }
 
 export function ImportSituacaoFiscalModal({ 
@@ -20,7 +22,7 @@ export function ImportSituacaoFiscalModal({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [extractedItems, setExtractedItems] = useState<any[]>([]);
+  const [extractedData, setExtractedData] = useState<SituacaoFiscalData | null>(null);
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file);
@@ -32,35 +34,31 @@ export function ImportSituacaoFiscalModal({
 
     setIsProcessing(true);
     setError(null);
-    setExtractedItems([]);
-    
+    setExtractedData(null);
+
     try {
-      const items = await processSituacaoFiscalPDF(selectedFile);
-      
-      if (items.length === 0) {
-        throw new Error('Nenhum item encontrado no arquivo');
-      }
-      
-      setExtractedItems(items);
-    } catch (error) {
-      setError('Falha ao processar o arquivo. Por favor, tente novamente.');
-      toast.error('Falha ao processar arquivo');
+      const data = await processSituacaoFiscalPDF(selectedFile);
+      setExtractedData(data);
+    } catch (error: any) {
+      console.error('Erro no processamento:', error);
+      setError(`Falha ao processar o arquivo: ${error.message}`);
+      toast.error(`Falha ao processar arquivo: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleConfirm = () => {
-    if (!selectedFile) return;
-    onImport(extractedItems, selectedFile);
+    if (!selectedFile || !extractedData) return;
+    const orderItems = convertToOrderItems(extractedData);
+    onImport(orderItems, selectedFile);
     onClose();
-    setSelectedFile(null);
-    setExtractedItems([]);
+    handleReset();
   };
 
   const handleReset = () => {
     setSelectedFile(null);
-    setExtractedItems([]);
+    setExtractedData(null);
     setError(null);
   };
 
@@ -71,7 +69,7 @@ export function ImportSituacaoFiscalModal({
       title="Importar Situação Fiscal"
     >
       <div className="space-y-4">
-        {!extractedItems.length && (
+        {!extractedData && (
           <Dropzone
             onFileSelect={handleFileSelect}
             selectedFile={selectedFile}
@@ -98,67 +96,170 @@ export function ImportSituacaoFiscalModal({
           </div>
         )}
 
-        {extractedItems.length > 0 && (
+        {extractedData && (
           <div className="space-y-4">
             <div className="bg-white rounded-lg border border-shadow-dark p-4">
-              <h3 className="text-sm font-medium mb-2">
-                {extractedItems.length} itens encontrados
-              </h3>
-              <div className="max-h-60 overflow-y-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Código
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Tipo
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Período
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Vencimento
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Vl. Original
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Sdo. Devedor
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {extractedItems.map((item, index) => (
-                      <tr key={`${item.code}-${item.startPeriod}-${item.dueDate}-${index}`}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {item.code}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {item.taxType}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {item.startPeriod} - {item.endPeriod}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {item.dueDate}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatCurrency(item.originalValue)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatCurrency(item.currentBalance)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {item.status}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <h3 className="text-sm font-medium mb-4">Dados Extraídos</h3>
+              <div className="max-h-[400px] overflow-y-auto space-y-6">
+                {/* Pendências de Débito */}
+                {extractedData.pendenciasDebito.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Pendências - Débito (SIEF)</h4>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Receita</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Período</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Vencimento</th>
+                          <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">Vl. Original</th>
+                          <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">Sdo. Devedor</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Situação</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {extractedData.pendenciasDebito.map((item, index) => (
+                          <tr key={index}>
+                            <td className="px-3 py-2 text-sm">{item.receita}</td>
+                            <td className="px-3 py-2 text-sm">{item.periodo_apuracao}</td>
+                            <td className="px-3 py-2 text-sm">{item.vencimento}</td>
+                            <td className="px-3 py-2 text-sm text-right">{formatCurrency(item.valor_original)}</td>
+                            <td className="px-3 py-2 text-sm text-right">{formatCurrency(item.saldo_devedor)}</td>
+                            <td className="px-3 py-2 text-sm">{item.situacao}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Parcelamentos SIPADE */}
+                {extractedData.parcelamentosSipade.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Parcelamentos com Exigibilidade Suspensa (SIPADE)</h4>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Processo</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Receita</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Situação</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {extractedData.parcelamentosSipade.map((item, index) => (
+                          <tr key={index}>
+                            <td className="px-3 py-2 text-sm">{item.processo}</td>
+                            <td className="px-3 py-2 text-sm">{item.receita}</td>
+                            <td className="px-3 py-2 text-sm">{item.situacao}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Processos Fiscais */}
+                {extractedData.processosFiscais.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Processos Fiscais com Exigibilidade Suspensa (SIEF)</h4>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Processo</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Situação</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Localização</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {extractedData.processosFiscais.map((item, index) => (
+                          <tr key={index}>
+                            <td className="px-3 py-2 text-sm">{item.processo}</td>
+                            <td className="px-3 py-2 text-sm">{item.situacao}</td>
+                            <td className="px-3 py-2 text-sm">{item.localizacao}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Parcelamentos SIEFPAR */}
+                {extractedData.parcelamentosSiefpar.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Parcelamentos com Exigibilidade Suspensa (SIEFPAR)</h4>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Parcelamento</th>
+                          <th className="px-3 py-2 text-right text-xs font-medium text-gray-500">Valor Suspenso</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Tipo</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {extractedData.parcelamentosSiefpar.map((item, index) => (
+                          <tr key={index}>
+                            <td className="px-3 py-2 text-sm">{item.parcelamento}</td>
+                            <td className="px-3 py-2 text-sm text-right">{formatCurrency(item.valor_suspenso)}</td>
+                            <td className="px-3 py-2 text-sm">{item.tipo}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Débitos SICOB */}
+                {extractedData.debitosSicob.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Débitos com Exigibilidade Suspensa (SICOB)</h4>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Parcelamento</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Situação</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Tipo</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {extractedData.debitosSicob.map((item, index) => (
+                          <tr key={index}>
+                            <td className="px-3 py-2 text-sm">{item.parcelamento}</td>
+                            <td className="px-3 py-2 text-sm">{item.situacao}</td>
+                            <td className="px-3 py-2 text-sm">{item.tipo}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Pendências de Inscrição */}
+                {extractedData.pendenciasInscricao.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Pendências - Inscrição (SIDA)</h4>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Inscrição</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Receita</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Data Inscrição</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Processo</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Situação</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {extractedData.pendenciasInscricao.map((item, index) => (
+                          <tr key={index}>
+                            <td className="px-3 py-2 text-sm">{item.inscricao}</td>
+                            <td className="px-3 py-2 text-sm">{item.receita}</td>
+                            <td className="px-3 py-2 text-sm">{item.data_inscricao}</td>
+                            <td className="px-3 py-2 text-sm">{item.processo}</td>
+                            <td className="px-3 py-2 text-sm">{item.situacao}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -172,7 +273,7 @@ export function ImportSituacaoFiscalModal({
           >
             Cancelar
           </button>
-          {selectedFile && !extractedItems.length && !isProcessing && (
+          {selectedFile && !extractedData && !isProcessing && (
             <button
               type="button"
               onClick={handleProcess}
@@ -181,7 +282,7 @@ export function ImportSituacaoFiscalModal({
               Processar
             </button>
           )}
-          {extractedItems.length > 0 && (
+          {extractedData && (
             <button
               type="button"
               onClick={handleConfirm}

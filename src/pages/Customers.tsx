@@ -105,20 +105,23 @@ export default function Customers() {
     return <div className="animate-pulse">Carregando...</div>;
   }
 
+  const customerActions = (
+    <Button
+      size="sm" // Added size="sm"
+      onClick={() => navigate('/customers/new')} 
+      className="inline-flex items-center"
+    >
+      <Plus className="-ml-1 mr-2 h-5 w-5" />
+      Novo Cliente
+    </Button>
+  );
+
   return (
     <>
-      <Header title="Clientes" />
+      <Header title="Clientes" actions={customerActions} />
       <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 bg-white rounded-lg overflow-hidden">
-        <div className="flex justify-end">
-          {/* Update button to navigate */}
-          <Button
-            onClick={() => navigate('/customers/new')} 
-            className="inline-flex items-center"
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Novo Cliente
-          </Button> {/* Ensure Button tag is closed */}
-        </div>
+        {/* Button moved to Header actions */}
+        {/* <div className="flex justify-end"> ... </div> */}
 
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <Table>

@@ -14,6 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
 import { OrderItem } from '@/types';
 
 type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
@@ -119,10 +126,10 @@ export default function OrderDetails() {
         title={`Pedido #${order.order_year}/${order.order_number.toString().padStart(4, '0')}`}
         actions={headerActions}
       />
-      <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
-        <div className="space-y-6">
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Customer Details Card */}
-          <div className="bg-white rounded-lg shadow-md">
+          <div className="bg-white rounded-lg shadow-md p-6">
             <button
               onClick={() => setIsCustomerExpanded(!isCustomerExpanded)}
               className="w-full px-6 py-4 flex items-center justify-between text-left"
@@ -189,28 +196,34 @@ export default function OrderDetails() {
           {/* Order Details Card */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold mb-4">Detalhes do Pedido</h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Status</p>
-                  <span
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1"
-                    style={{
-                      backgroundColor: orderStatusMap[order.status as OrderStatus]?.bg || '#FBE6F2',
-                      color: orderStatusMap[order.status as OrderStatus]?.color || '#E71A4B',
-                    }}
-                  >
-                    {orderStatusMap[order.status as OrderStatus]?.label || order.status}
-                  </span>
+            <Tabs defaultValue="summary" className="w-full">
+              <TabsList className="w-full justify-start">
+                <TabsTrigger value="summary">Resumo do Pedido</TabsTrigger>
+                <TabsTrigger value="financial">Financeiro</TabsTrigger>
+                <TabsTrigger value="attachments">Anexos</TabsTrigger>
+                <TabsTrigger value="notes">Observações</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="summary" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label>Status</Label>
+                    <span
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1"
+                      style={{
+                        backgroundColor: orderStatusMap[order.status as OrderStatus]?.bg || '#FBE6F2',
+                        color: orderStatusMap[order.status as OrderStatus]?.color || '#E71A4B',
+                      }}
+                    >
+                      {orderStatusMap[order.status as OrderStatus]?.label || order.status}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Data do Pedido</Label>
+                    <p className="font-medium">{order.data_pedido}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Data do Pedido</p>
-                  <p className="font-medium">{order.data_pedido}</p>
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-3">Detalhes Financeiros</h3>
+                
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Total Original</span>
@@ -229,10 +242,9 @@ export default function OrderDetails() {
                     <span className="font-bold">{formatCurrency(currentTotal)}</span>
                   </div>
                 </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-3">Detalhes da Comissão</h3>
+              </TabsContent>
+              
+              <TabsContent value="financial" className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Taxa de Comissão</span>
@@ -255,10 +267,9 @@ export default function OrderDetails() {
                     </span>
                   </div>
                 </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-3">Anexos</h3>
+              </TabsContent>
+              
+              <TabsContent value="attachments" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 border border-shadow-dark rounded-lg">
                     <div className="flex items-center justify-between mb-2">
@@ -316,15 +327,16 @@ export default function OrderDetails() {
                     )}
                   </div>
                 </div>
-              </div>
-
-              {order.notas && (
-                <div className="border-t pt-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">Observações</h3>
+              </TabsContent>
+              
+              <TabsContent value="notes" className="space-y-4">
+                {order.notas ? (
                   <p className="text-sm text-gray-600">{order.notas}</p>
-                </div>
-              )}
-            </div>
+                ) : (
+                  <p className="text-sm text-gray-500">Nenhuma observação disponível</p>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
 

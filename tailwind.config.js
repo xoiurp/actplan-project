@@ -6,7 +6,7 @@ export default {
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
+        ring: "#514E89",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
@@ -41,7 +41,9 @@ export default {
         shadow: {
           DEFAULT: '#F5F5F5',
           dark: '#E5E5E5'
-        }
+        },
+        'content-background': 'hsl(var(--content-background))', // Added for main content areas
+        'sidebar-bg': 'hsl(var(--sidebar-bg))', // Custom color for the sidebar background - NOTE: --sidebar-bg CSS var was removed, this might be unused now
       },
       fontFamily: {
         mono: ['Geist Mono', 'monospace'],

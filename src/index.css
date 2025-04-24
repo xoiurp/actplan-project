@@ -4,9 +4,11 @@
  
 @layer base {
   :root {
-    --background: 244 100% 98%; /* Updated to #F4F3FF (approx HSL) */
-    /* Alternatively, could use --background: #F4F3FF; if preferred */
+    --background: 240 33% 98%; /* Site background #F9F8FB */
+    --content-background: 0 0% 100%; /* White for main content areas */
     --foreground: 240 10% 3.9%;
+    /* --sidebar-bg removed */
+    --whitebg: 244 28% 98%; /* Keeping this for now, might be unused */
 
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -14,8 +16,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
  
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 355.7 100% 97.3%;
+    --primary: 244 28% 12%; /* Updated to #171629 */
+    --primary-foreground: 0 0% 100%; /* White text for contrast */
  
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -34,7 +36,7 @@
     --ring: 142.1 76.2% 36.3%;
     --radius: 0.5rem;
 
-    --sidebar: 0 0% 100%;
+    --sidebar: 244 28% 98%; /* Set to the desired light purple/blue */
     --sidebar-foreground: 240 10% 3.9%;
     --sidebar-border: 240 5.9% 90%;
     --sidebar-accent: 240 4.8% 95.9%;
@@ -43,8 +45,11 @@
   }
  
   .dark {
-    --background: 20 14.3% 4.1%;
+    /* Assuming dark mode needs adjustments too - setting content to dark */
+    --background: 20 14.3% 4.1%; /* Dark site background */
+    --content-background: 24 9.8% 10%; /* Darker content background */
     --foreground: 0 0% 95%;
+    /* --sidebar-bg removed */
  
     --card: 24 9.8% 10%;
     --card-foreground: 0 0% 95%;
@@ -52,8 +57,8 @@
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
  
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
+    --primary: 244 28% 12%; /* Updated to #171629 */
+    --primary-foreground: 0 0% 100%; /* White text for contrast */
  
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;

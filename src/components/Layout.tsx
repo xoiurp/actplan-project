@@ -91,11 +91,7 @@ export default function Layout() {
     { title: 'Ajuda', url: '/help', icon: Users },
   ];
 
-  const userData = {
-    name: 'Usuário',
-    email: 'usuario@exemplo.com',
-    avatar: '/placeholder-user.jpg'
-  };
+  // Removed userData constant
 
   return (
     <div className="relative flex min-h-screen">
@@ -118,10 +114,10 @@ export default function Layout() {
             <NavSecondary items={secondaryItems} className="mt-auto" />
           </SidebarContent>
           <SidebarFooter className="p-2">
-            <NavUser user={userData} />
+            <NavUser /> {/* Removed user prop */}
           </SidebarFooter>
         </Sidebar>
-        {/* Removed redundant background class, as it's now handled globally in index.css */}
+        {/* SidebarInset uses bg-content-background internally now */}
         <SidebarInset> 
           <Outlet />
         </SidebarInset>
