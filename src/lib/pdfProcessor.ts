@@ -18,7 +18,7 @@ export async function processSituacaoFiscalPDF(file: File): Promise<SituacaoFisc
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch('http://localhost:8000/extract', {
+  const response = await fetch('https://api.actplanconsultoria.com/api/extraction/extract', {
     method: 'POST',
     body: formData,
   });
