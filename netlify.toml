@@ -8,8 +8,8 @@
   # e onde o package.json está localizado
   base = "project/" 
   
-  # Diretório que contém os arquivos estáticos após o build
-  publish = "project/dist/"
+  # Diretório que contém os arquivos estáticos após o build (relativo ao 'base')
+  publish = "dist/"
 
 # Opcional: Redirecionamento para lidar com roteamento de Single Page Application (SPA)
 # Descomente se seu projeto React usa react-router-dom ou similar
