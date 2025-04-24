@@ -1,0 +1,19 @@
+# Configurações de build para Netlify
+
+[build]
+  # Comando para construir o projeto
+  command = "npm run build"
+  
+  # Diretório base onde o comando de build será executado
+  # e onde o package.json está localizado
+  base = "project/" 
+  
+  # Diretório que contém os arquivos estáticos após o build
+  publish = "project/dist/"
+
+# Opcional: Redirecionamento para lidar com roteamento de Single Page Application (SPA)
+# Descomente se seu projeto React usa react-router-dom ou similar
+# [[redirects]]
+#  from = "/*"
+#  to = "/index.html"
+#  status = 200
