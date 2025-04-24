@@ -109,27 +109,18 @@ export function convertToOrderItems(data: SituacaoFiscalData): any[] {
   const pendenciasInscricao = (data.pendenciasInscricao || []).map((item: any) => ({
     id: crypto.randomUUID(),
     order_id: "",
-    // Campos específicos SIDA
-    inscricao: item.inscricao || "",
-    receita: item.receita || "",
-    inscrito_em: item.inscrito_em || "", // Mapeado para start_period visualmente? Ou coluna nova?
-    ajuizado_em: item.ajuizado_em || "",
-    processo: item.processo || "",
-    tipo_devedor: item.tipo_devedor || "",
-    devedor_principal: item.devedor_principal || "",
+    code: item.inscricao || "", // Usando 'inscricao' como código
+    tax_type: "PENDENCIA_INSCRICAO", // Novo tipo
+    start_period: item.data_inscricao || "", // Usando 'data_inscricao' como período inicial
+    end_period: "", // Não disponível
+    due_date: "", // Não disponível (data_inscricao pode ser usada aqui se fizer sentido)
+    original_value: 0, // Não disponível
+    current_balance: 0, // Não disponível
+    fine: 0, // Não disponível
+    interest: 0, // Não disponível
     status: item.situacao || "", // Usando 'situacao' como status
-    // Campos genéricos (alguns podem não se aplicar)
-    tax_type: "PENDENCIA_INSCRICAO_SIDA", // Tipo mais específico
-    code: item.inscricao || "", // Mantendo code como inscrição por ora
-    start_period: item.inscrito_em || "", // Mapeando inscrito_em para start_period
-    end_period: "", 
-    due_date: "", 
-    original_value: 0, 
-    current_balance: 0, 
-    fine: 0, 
-    interest: 0, 
-    cno: "", 
-    saldo_devedor_consolidado: 0,
+    cno: "", // Não disponível
+    // Poderíamos adicionar outros campos como 'receita' ou 'processo' em 'notas' se necessário
     created_at: now,
     updated_at: now,
   }));

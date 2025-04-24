@@ -12,6 +12,38 @@ import sys # Importar sys
 import pandas as pd # Importar pandas
 # httpx não é mais necessário se não chamarmos a OpenRouter
 
+# Função de pré-processamento sugerida
+def preprocess_text(text):
+    # Remove cabeçalhos e rodapés repetitivos
+    lines = text.split('\n')
+    cleaned_lines = []
+
+    skip_patterns = [
+        "MINISTÉRIO DA FAZENDA",
+        "Por meio do e-CAC",
+        "SECRETARIA ESPECIAL",
+        "PROCURADORIA-GERAL",
+        "Página:",
+        "INFORMAÇÕES DE APOIO"
+    ]
+
+    for line in lines:
+        if not any(pattern in line for pattern in skip_patterns):
+            cleaned_lines.append(line)
+
+    # Remove linhas vazias consecutivas
+    result_lines = []
+    prev_empty = False
+    for line in cleaned_lines:
+        if not line.strip():
+            if not prev_empty:
+                result_lines.append(line)
+            prev_empty = True
+        else:
+            result_lines.append(line)
+            prev_empty = False
+    return '\n'.join(result_lines)
+
 # --- Funções Helper Globais ---
 def parse_br_currency(value_str):
     """Converte string de moeda BR (com . e ,) para float."""
@@ -53,37 +85,6 @@ def format_periodo(periodo_str):
     return ""
 # -----------------------------
 
-# Função de pré-processamento sugerida
-def preprocess_text(text):
-    # Remove cabeçalhos e rodapés repetitivos
-    lines = text.split('\n')
-    cleaned_lines = []
-
-    skip_patterns = [
-        "MINISTÉRIO DA FAZENDA",
-        "Por meio do e-CAC",
-        "SECRETARIA ESPECIAL",
-        "PROCURADORIA-GERAL",
-        "Página:",
-        "INFORMAÇÕES DE APOIO"
-    ]
-
-    for line in lines:
-        if not any(pattern in line for pattern in skip_patterns):
-            cleaned_lines.append(line)
-
-    # Remove linhas vazias consecutivas
-    result_lines = []
-    prev_empty = False
-    for line in cleaned_lines:
-        if not line.strip():
-            if not prev_empty:
-                result_lines.append(line)
-            prev_empty = True
-        else:
-            result_lines.append(line)
-            prev_empty = False
-    return '\n'.join(result_lines)
 
 # Função de extração de PDF simplificada para diagnóstico
 def extract_pdf_text(pdf_bytes):
@@ -462,20 +463,19 @@ def extract_parcelamentos_siefpar(text):
         if parcelamento_match and current_cnpj:
             parcelamento_num = parcelamento_match.group(1).strip()
             print(f"\nPossível início de registro SIEFPAR encontrado: '{line}'", file=sys.stdout)
-
+            
             # Verifica as próximas duas linhas
             if i + 2 < len(lines):
                 linha_valor = lines[i+1].strip()
                 linha_modalidade = lines[i+2].strip()
-
+                
                 valor_match = re.match(r"Valor Suspenso:\s*([\d.,]+)", linha_valor, re.IGNORECASE)
-                # Modalidade pode ou não ter o prefixo "Modalidade:"
-                modalidade_texto = linha_modalidade.replace("Modalidade:", "").strip()
+                modalidade_match = re.match(r"(?:Modalidade:)?\s*(.*)", linha_modalidade, re.IGNORECASE) # Modalidade pode ou não ter o prefixo
 
-                if valor_match: # Apenas valida se encontrou o valor
+                if valor_match and modalidade_match:
                     valor_suspenso = parse_br_currency(valor_match.group(1))
-                    modalidade = modalidade_texto # Pega o que estiver na linha
-
+                    modalidade = modalidade_match.group(1).strip()
+                    
                     parcelamento_data = {
                         "cnpj": current_cnpj,
                         "parcelamento": parcelamento_num,
@@ -490,7 +490,7 @@ def extract_parcelamentos_siefpar(text):
                     print(f"Linhas seguintes não correspondem ao padrão Valor/Modalidade. Linha Valor: '{linha_valor}', Linha Modalidade: '{linha_modalidade}'", file=sys.stdout)
             else:
                 print("Não há linhas suficientes após 'Parcelamento:' para Valor e Modalidade.", file=sys.stdout)
-
+        
         # Se não deu match ou falhou em encontrar as linhas seguintes, ignora a linha atual e avança
         print(f"Linha ignorada (SIEFPAR): '{line}'", file=sys.stdout)
         i += 1
@@ -519,7 +519,7 @@ def extract_pendencias_inscricao_sida(text):
     print("\n--- Iniciando busca pela seção 'Inscrição com Exigibilidade Suspensa (SIDA)' ---", file=sys.stdout)
 
     i = 0
-    # header_skipped = False # Removido - não vamos mais depender de pular cabeçalho
+    header_skipped = False
     current_inscricao_data = {}
 
     while i < len(lines):
@@ -529,7 +529,7 @@ def extract_pendencias_inscricao_sida(text):
         if not in_section and re.search(start_pattern, line, re.IGNORECASE):
             in_section = True
             current_cnpj = "" # Reseta CNPJ
-            # header_skipped = False # Removido
+            header_skipped = False # Reseta cabeçalho
             print(f"Seção 'Inscrição SIDA' encontrada na linha {i+1}: '{line}'", file=sys.stdout)
             i += 1
             continue
@@ -555,16 +555,21 @@ def extract_pendencias_inscricao_sida(text):
             print(f"CNPJ definido para (SIDA): {current_cnpj}", file=sys.stdout)
             i += 1
             continue
-
-        # Pula linhas de título de coluna individuais (mantido por segurança)
-        header_titles = ["Inscrição", "Receita", "Inscrito em", "Ajuizado em", "Processo", "Tipo de Devedor"]
-        if line in header_titles:
-             print(f"Linha de título de coluna SIDA pulada: '{line}'", file=sys.stdout)
-             i+=1
+            
+        # Pula linha de cabeçalho
+        if not header_skipped and "Inscrição" in line and "Receita" in line and "Inscrito em" in line:
+            print(f"Linha de cabeçalho SIDA pulada: '{line}'", file=sys.stdout)
+            header_skipped = True
+            i += 1
+            continue
+            
+        # Se não pulou cabeçalho ainda, ignora
+        if not header_skipped:
+             print(f"Linha ignorada (SIDA - esperando cabeçalho): '{line}'", file=sys.stdout)
+             i += 1
              continue
 
         # Tenta identificar o início de um registro pela Inscrição (formato XX.X.XX.XXXXXX-XX)
-        # Esta linha pode conter outros campos também
         inscricao_match = re.match(r"(\d{2}\.\d{1}\.\d{2}\.\d{6}-\d{2})", line)
         if inscricao_match:
             # Se já tinha dados de inscrição sendo coletados, salva antes de começar o novo
@@ -575,20 +580,20 @@ def extract_pendencias_inscricao_sida(text):
                      print(f"Item SIDA extraído (fim por nova inscrição): {current_inscricao_data}", file=sys.stdout)
                  else:
                       print(f"AVISO: Dados SIDA incompletos descartados: {current_inscricao_data}", file=sys.stdout)
-
+            
             # Inicia novo registro
             current_inscricao_data = {"cnpj": current_cnpj} # Usa o último CNPJ encontrado
             current_inscricao_data["inscricao"] = inscricao_match.group(1)
             print(f"\nInício de registro SIDA encontrado: '{line}'", file=sys.stdout)
-
+            
             # Tenta extrair outros campos da mesma linha, se houver (formato pode variar)
             parts = re.split(r'\s{2,}', line) # Divide por 2+ espaços
             if len(parts) > 1: current_inscricao_data["receita"] = parts[1].strip()
             if len(parts) > 2: current_inscricao_data["inscrito_em"] = format_date(parts[2])
-            if len(parts) > 3: current_inscricao_data["ajuizado_em"] = format_date(parts[3]) if parts[3].strip() else "" # Ajuizado pode estar vazio
+            if len(parts) > 3: current_inscricao_data["ajuizado_em"] = format_date(parts[3])
             if len(parts) > 4: current_inscricao_data["processo"] = parts[4].strip()
             if len(parts) > 5: current_inscricao_data["tipo_devedor"] = parts[5].strip()
-
+            
             print(f"Dados parciais SIDA (linha inscrição): {current_inscricao_data}", file=sys.stdout)
             i += 1
             continue
@@ -617,22 +622,9 @@ def extract_pendencias_inscricao_sida(text):
                  print(f"Devedor Principal SIDA encontrado: '{current_inscricao_data['devedor_principal']}'", file=sys.stdout)
                  i += 1
                  continue
-
+                 
             # Se não for Situação nem Devedor Principal, pode ser um campo que faltou na linha da inscrição
             # (Lógica simplificada: assume que campos faltantes não são essenciais ou virão depois)
-            # Tenta capturar campos que podem ter ficado na linha seguinte
-            if not current_inscricao_data.get("receita") and re.match(r'\d{4}-', line): # Parece receita
-                 current_inscricao_data["receita"] = line
-                 print(f"Receita SIDA encontrada (linha seguinte): '{line}'", file=sys.stdout)
-                 i += 1
-                 continue
-            if not current_inscricao_data.get("inscrito_em") and re.match(r'\d{2}/\d{2}/\d{4}', line): # Parece data
-                 current_inscricao_data["inscrito_em"] = format_date(line)
-                 print(f"Inscrito em SIDA encontrado (linha seguinte): '{line}'", file=sys.stdout)
-                 i += 1
-                 continue
-            # Adicionar mais lógicas se necessário para outros campos
-                 
             print(f"Linha ignorada (SIDA - dentro de registro, não reconhecida): '{line}'", file=sys.stdout)
             i += 1
             continue
@@ -640,7 +632,7 @@ def extract_pendencias_inscricao_sida(text):
         # Se não está na seção, não é CNPJ, não é cabeçalho, não é início de inscrição, ignora
         print(f"Linha ignorada (SIDA - geral): '{line}'", file=sys.stdout)
         i += 1
-
+        
     # Salva o último registro se houver dados pendentes ao sair do loop
     if current_inscricao_data.get("inscricao") and current_inscricao_data.get("receita") and current_inscricao_data.get("inscrito_em"):
         result.append(current_inscricao_data)
@@ -659,11 +651,6 @@ def extract_pendencias_inscricao_sida(text):
 # def extract_debitos_sicob(text): return [] # Implementar
 # def extract_parcelamentos_sipade(text): return [] # Implementar
 # def extract_parcelamentos_sipade(text): return [] # Implementar
-# def extract_processos_fiscais(text): return [] # Implementar
-# -------------------------------------------------
-
-# Cria a instância do FastAPI ANTES de usá-la
-app = FastAPI()
 
 # CORS middleware deve ser aplicado logo após a criação do app
 app.add_middleware(
@@ -703,6 +690,15 @@ async def extract_pdf(file: UploadFile = File(...)):
         match_count_sief = sum(1 for _ in matches_sief)
         print(f"Encontradas {match_count_sief} ocorrências do padrão 'Pendência - Débito (SIEF)'", file=sys.stdout)
         # Adicionar logs para outros padrões se necessário
+
+        # Chama a função específica para extrair pendências de débito
+        pendencias_debito_data = extract_pendencias_debito(cleaned_text)
+        # print(f"Dados extraídos (Pendências Débito SIEF): {len(pendencias_debito_data)} itens", file=sys.stdout) # Movido para depois
+        # if len(pendencias_debito_data) == 0 and match_count_sief > 0:
+        #      print("AVISO: Seção 'Pendência - Débito (SIEF)' encontrada, mas nenhum item foi parseado.", file=sys.stdout)
+        # elif len(pendencias_debito_data) == 0:
+        #      print("Seção 'Pendência - Débito (SIEF)' não encontrada ou vazia.", file=sys.stdout)
+
 
         # --- Chamar funções extratoras ---
         pendencias_debito_data = extract_pendencias_debito(cleaned_text)

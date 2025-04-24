@@ -519,7 +519,7 @@ def extract_pendencias_inscricao_sida(text):
     print("\n--- Iniciando busca pela seção 'Inscrição com Exigibilidade Suspensa (SIDA)' ---", file=sys.stdout)
 
     i = 0
-    # header_skipped = False # Removido - não vamos mais depender de pular cabeçalho
+    header_skipped = False
     current_inscricao_data = {}
 
     while i < len(lines):
@@ -529,7 +529,7 @@ def extract_pendencias_inscricao_sida(text):
         if not in_section and re.search(start_pattern, line, re.IGNORECASE):
             in_section = True
             current_cnpj = "" # Reseta CNPJ
-            # header_skipped = False # Removido
+            header_skipped = False # Reseta cabeçalho
             print(f"Seção 'Inscrição SIDA' encontrada na linha {i+1}: '{line}'", file=sys.stdout)
             i += 1
             continue
@@ -556,15 +556,20 @@ def extract_pendencias_inscricao_sida(text):
             i += 1
             continue
 
-        # Pula linhas de título de coluna individuais (mantido por segurança)
-        header_titles = ["Inscrição", "Receita", "Inscrito em", "Ajuizado em", "Processo", "Tipo de Devedor"]
-        if line in header_titles:
-             print(f"Linha de título de coluna SIDA pulada: '{line}'", file=sys.stdout)
-             i+=1
+        # Pula linha de cabeçalho
+        if not header_skipped and "Inscrição" in line and "Receita" in line and "Inscrito em" in line:
+            print(f"Linha de cabeçalho SIDA pulada: '{line}'", file=sys.stdout)
+            header_skipped = True
+            i += 1
+            continue
+
+        # Se não pulou cabeçalho ainda, ignora
+        if not header_skipped:
+             print(f"Linha ignorada (SIDA - esperando cabeçalho): '{line}'", file=sys.stdout)
+             i += 1
              continue
 
         # Tenta identificar o início de um registro pela Inscrição (formato XX.X.XX.XXXXXX-XX)
-        # Esta linha pode conter outros campos também
         inscricao_match = re.match(r"(\d{2}\.\d{1}\.\d{2}\.\d{6}-\d{2})", line)
         if inscricao_match:
             # Se já tinha dados de inscrição sendo coletados, salva antes de começar o novo
@@ -620,19 +625,6 @@ def extract_pendencias_inscricao_sida(text):
 
             # Se não for Situação nem Devedor Principal, pode ser um campo que faltou na linha da inscrição
             # (Lógica simplificada: assume que campos faltantes não são essenciais ou virão depois)
-            # Tenta capturar campos que podem ter ficado na linha seguinte
-            if not current_inscricao_data.get("receita") and re.match(r'\d{4}-', line): # Parece receita
-                 current_inscricao_data["receita"] = line
-                 print(f"Receita SIDA encontrada (linha seguinte): '{line}'", file=sys.stdout)
-                 i += 1
-                 continue
-            if not current_inscricao_data.get("inscrito_em") and re.match(r'\d{2}/\d{2}/\d{4}', line): # Parece data
-                 current_inscricao_data["inscrito_em"] = format_date(line)
-                 print(f"Inscrito em SIDA encontrado (linha seguinte): '{line}'", file=sys.stdout)
-                 i += 1
-                 continue
-            # Adicionar mais lógicas se necessário para outros campos
-                 
             print(f"Linha ignorada (SIDA - dentro de registro, não reconhecida): '{line}'", file=sys.stdout)
             i += 1
             continue

@@ -1,0 +1,278 @@
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046542-74', 'devedor_principal': '49.559.724/0001-69', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.4.25.046543-55'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046543-55'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4282-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SENAI'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '27/01/2025'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '14966.104.056/2025-03'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CORRESPONSÁVEL'
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046543-55', 'devedor_principal': '49.559.724/0001-69', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.20.038626-00'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.20.038626-00'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18/05/2020'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.528.204/2020-81'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.20.038626-00', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.20.038627-90'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.20.038627-90'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18/05/2020'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.528.203/2020-36'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.20.038627-90', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034639-62'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034639-62'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.418.709/2021-05'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034639-62', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  | Linha ignorada (SIDA - geral): '16/04/2025 11:07:15'
+pdf-processor-1  | Linha ignorada (SIDA - geral): 'CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA'
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034640-04'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034640-04'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.418.709/2021-05'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034640-04', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034641-87'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034641-87'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.412.515/2021-98'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034641-87', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034642-68'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034642-68'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.405.002/2020-40'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034642-68', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034643-49'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034643-49'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.405.002/2020-40'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034643-49', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.010185-23'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010185-23'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.918.850/2023-11'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010185-23', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.010186-04'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010186-04'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.915.407/2023-80'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010186-04', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.010187-95'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010187-95'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.915.407/2023-80'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010187-95', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019239-43'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019239-43'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.062/2023-31'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019239-43', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019242-49'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019242-49'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.011/2023-17'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019242-49', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019243-20'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019243-20'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.011/2023-17'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019243-20', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019253-00'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019253-00'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.224/2023-31'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019253-00', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019263-73'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019263-73'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.051.987/2023-64'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019263-73', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019264-54'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019264-54'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.051.987/2023-64'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019264-54', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019311-05'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019311-05'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '4493-COFINS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.207.240/2024-37'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019311-05', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019315-39'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019315-39'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.207.239/2024-11'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019315-39', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.20.008713-03'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.20.008713-03'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18/05/2020'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.528.206/2020-70'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '16/04/2025 11:07:15'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.20.008713-03', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.22.011216-46'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.22.011216-46'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.418.709/2021-05'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.22.011216-46', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.22.011217-27'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.22.011217-27'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.405.002/2020-40'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.22.011217-27', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.002915-76'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.002915-76'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.918.850/2023-11'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.002915-76', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.002916-57'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.002916-57'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.915.407/2023-80'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.002916-57', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.005251-51'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005251-51'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.207.238/2024-68'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005251-51', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.005255-85'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005255-85'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.062/2023-31'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005255-85', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.005256-66'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005256-66'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.011/2023-17'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005256-66', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.005262-04'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005262-04'}
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '0810-PIS'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.051.987/2023-64'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | AVISO: Dados SIDA incompletos descartados (faltando campos obrigatórios): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005262-04', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  | Fim da seção 'Inscrição SIDA' detectado na linha 982: 'Pendência - Parcelamento (SISPAR) _______________________________________________________________________________'
+pdf-processor-1  | Nenhum item de Inscrição SIDA parseado.
+pdf-processor-1  | Dados extraídos FINAL (Pendências Débito SIEF): 6 itens
+pdf-processor-1  | Dados extraídos FINAL (Débitos Exig. Suspensa SIEF): 79 itens
+pdf-processor-1  | Dados extraídos FINAL (Parcelamentos SIEFPAR): 2 itens
+pdf-processor-1  | Dados extraídos FINAL (Pendências Inscrição SIDA): 0 itens
+pdf-processor-1  | Extração local concluída.
+pdf-processor-1  | INFO:     172.18.0.4:53446 - "POST /api/extraction/extract HTTP/1.1" 200 OK
+nginx-proxy-1    | 177.60.68.91 - - [24/Apr/2025:15:49:14 +0000] "POST /api/extraction/extract HTTP/1.1" 200 19524 "https://app.actplanconsultoria.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" "-"

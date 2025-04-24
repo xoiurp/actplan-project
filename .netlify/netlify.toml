@@ -1,0 +1,27 @@
+plugins = []
+headers = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "E:\\OST\\Webscrapper\\sistema_actplan\\sistema_actplan2\\project\\dist"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "cd project && npm install && npm run build"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]

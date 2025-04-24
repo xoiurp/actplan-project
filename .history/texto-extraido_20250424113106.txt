@@ -1,0 +1,33 @@
+nginx-proxy-1    | 2025/04/24 14:30:46 [warn] 21#21: *1 a client request body is buffered to a temporary file /var/cache/nginx/client_temp/0000000001, client: 177.60.68.91, server: api.actplanconsultoria.com, request: "POST /api/extraction/extract HTTP/1.1", host: "api.actplanconsultoria.com", referrer: "https://app.actplanconsultoria.com/"
+pdf-processor-1  | Recebido PDF para extração
+pdf-processor-1  | PDF aberto com 10 páginas.
+pdf-processor-1  | Texto extraído da página 1 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 2 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 3 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 4 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 5 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 6 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 7 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 8 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 9 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 10 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  |
+pdf-processor-1  | ---
+pdf-processor-1  | Texto extraído (primeiros 1000 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIAL DA RECEITA FEDERAL DO BRASIL PROCURADORIA-GERAL DA FAZENDA NACIONAL 16/04/2025 11:07:15 INFORMAÇÕES DE APOIO PARA EMISSÃO DE CERTIDÃO CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA Dados Cadastrais da Matriz ______________________________________________________________________________________ CNPJ: 08.697.901/0001-96 UA de Domicílio: DRF BELO HORIZONTE-MG Código da UA: 06.101.00 Endereço: AV AMAZONAS,2280 - SALA  04 Bairro: BARRO PRETO CEP: 30180-012 Município: BELO HORIZONTE UF: MG Responsável: 006.488.636-03 - CRISTIANO MENDONCA DE NOVAES Situação: ATIVA Natureza Jurídica: 206-2 - SOCIEDADE EMPRESARIA LIMITADA Data de Abertura: 23/02/2007 CNAE: 4120-4/00 - Construção de edifícios Porte da Empresa: DEMAIS Sócios e Administradores ________________________________________________________________________________________ CPF/CNPJ Nome Qualificação Situação Cadastral Cap. Soci
+pdf-processor-1  |
+pdf-processor-1  | ---
+pdf-processor-1  |
+pdf-processor-1  |
+pdf-processor-1  | ---
+pdf-processor-1  | Texto pré-processado (primeiros 1000 chars): 16/04/2025 11:07:15 CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA Dados Cadastrais da Matriz ______________________________________________________________________________________ CNPJ: 08.697.901/0001-96 UA de Domicílio: DRF BELO HORIZONTE-MG Código da UA: 06.101.00 Endereço: AV AMAZONAS,2280 - SALA  04 Bairro: BARRO PRETO CEP: 30180-012 Município: BELO HORIZONTE UF: MG Responsável: 006.488.636-03 - CRISTIANO MENDONCA DE NOVAES Situação: ATIVA Natureza Jurídica: 206-2 - SOCIEDADE EMPRESARIA LIMITADA Data de Abertura: 23/02/2007 CNAE: 4120-4/00 - Construção de edifícios Porte da Empresa: DEMAIS Sócios e Administradores ________________________________________________________________________________________ CPF/CNPJ Nome Qualificação Situação Cadastral Cap. Social Cap. Votante 006.488.636-03 CRISTIANO MENDONCA DE NOVAES ADMINISTRADOR REGULAR 40.362.851/0001-07 C2JA NEGOCIOS & EMPREENDIMENTOS S/A SOCIO ATIVA 100,00% CPF Representante Legal: 006.488.636-03 Qualif. Resp.: ADMI
+pdf-processor-1  |
+pdf-processor-1  | ---
+pdf-processor-1  |
+pdf-processor-1  | Procurando por padrões de título...
+pdf-processor-1  | Encontradas 1 ocorrências do padrão 'Pendência - Débito (SIEF)'
+pdf-processor-1  | Nenhum item de débito SIEF parseado com sucesso na função.
+pdf-processor-1  | Dados extraídos (Pendências Débito SIEF): 0 itens
+pdf-processor-1  | AVISO: Seção 'Pendência - Débito (SIEF)' encontrada, mas nenhum item foi parseado.
+pdf-processor-1  | Extração local concluída.
+pdf-processor-1  | INFO:     172.18.0.4:38330 - "POST /api/extraction/extract HTTP/1.1" 200 OK
+nginx-proxy-1    | 177.60.68.91 - - [24/Apr/2025:14:30:46 +0000] "POST /api/extraction/extract HTTP/1.1" 200 168 "https://app.actplanconsultoria.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" "-"

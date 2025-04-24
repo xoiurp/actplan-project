@@ -15,19 +15,21 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the application code first
-COPY . .
+# Copy dependency definition files
+COPY pyproject.toml poetry.lock* ./
 
 # Install poetry and project dependencies
 # virtualenvs.create false: Install dependencies in the system site-packages
 RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi --no-root && \
     poetry install --no-interaction --no-ansi
+
+# Copy the rest of the application code into the container's WORKDIR
+COPY . ./
 
 # Criar diretório de cache para armazenar resultados processados
 RUN mkdir -p /app/cache && chmod 777 /app/cache
 
 # Command to run the application using Uvicorn
 # Assumes your FastAPI app instance is named 'app' in 'app/main.py'
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
