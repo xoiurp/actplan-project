@@ -1,0 +1,17 @@
+sida
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+# Changes to be committed:
+#	modified:   .env.production
+#	modified:   .gitignore
+#	new file:   .netlify/state.json
+#	modified:   index.html
+#	deleted:    netlify.toml
+#	modified:   nginx.conf
+#	deleted:    src/lib/exemplo_parsing.json
+#	deleted:    src/lib/exemplo_parsing.txt
+#	modified:   src/lib/pdfProcessor.ts
+#
