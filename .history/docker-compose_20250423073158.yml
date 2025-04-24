@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # Frontend existente
+  frontend:
+    build: ./project # Assumes Dockerfile is in ./project
+    ports:
+      - "80:80" # Maps host port 80 to container port 80 (Nginx default)
+    build:
+      args:
+        - VITE_EXTRACTION_API_URL=http://pdf-extractor-service:8001 # Passar a URL do serviço de extração
+    # Add volume if nginx.conf needs to be mounted or other static files
+    # volumes:
+    #   - ./project/nginx.conf:/etc/nginx/conf.d/default.conf # Example
+
+  # Novo serviço de extração de PDF com tabula-py
+  pdf-extractor-service:
+    build:
+      context: ./pdf-extractor-service # Use the service directory as context
+      dockerfile: Dockerfile # Specify Dockerfile location relative to context
+    ports:
+      - "8001:8001" # Maps host port 8001 to container port 8001
+    volumes:
+      - ./pdf-extractor-service:/app # Mount the source code for development
+    environment:
+      - PYTHONUNBUFFERED=1 # Ensure Python output is not buffered
+    # deploy: # Resource limits (optional, good practice)
+    #   resources:
+    #     limits:
+    #       memory: 1G
+    #     reservations:
+    #       memory: 512M
+
+volumes:
+  pdf-cache: # Defines the named volume used by pdf-processor

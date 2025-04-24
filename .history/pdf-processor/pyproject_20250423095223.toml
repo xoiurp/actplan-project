@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "pdf-processor"
+version = "0.1.0"
+description = "API service for processing PDF documents using Docling"
+authors = ["Your Name <you@example.com>"] # Placeholder - update if needed
+# readme = "README.md" # Optional README for the service - Not needed for non-package mode
+package-mode = false # Tell Poetry this is not a package to be built/installed
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.111.0" # For building the API
+uvicorn = {extras = ["standard"], version = "^0.29.0"} # ASGI server to run FastAPI
+python-multipart = "^0.0.9" # Para processamento de formulários multipart
+pymupdf = "^1.23.26" # Para extração de texto de PDFs (PyMuPDF)
+# Docling dependencies
+docling = "*" # Add base docling package
+docling-core = {version = "^2.26.0", extras = ["chunking"]}
+docling-parse = "^4.0.0"
+docling-table = "^2.0.0" # Para melhor detecção de tabelas
+docling-form = "^1.0.0" # Para extração de campos de formulário
+docling-ocr = "^2.0.0" # Para OCR aprimorado
+# Dependências adicionais
+pytesseract = "^0.3.10" # OCR engine
+pdf2image = "^1.17.0" # Converter PDF para imagens
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

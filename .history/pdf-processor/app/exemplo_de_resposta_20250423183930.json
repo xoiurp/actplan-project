@@ -1,0 +1,724 @@
+{
+    "debitosExigSuspensaSief": [
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "0561-07 - IRRF",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 6222.6,
+            "saldo_devedor": 6222.6,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 6222.6,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1138-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 4339.23,
+            "saldo_devedor": 4339.23,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 4339.23,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1138-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 41405.02,
+            "saldo_devedor": 35173.2,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 35173.2,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1138-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 21380.07,
+            "saldo_devedor": 21380.07,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 21380.07,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1138-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 1820.41,
+            "saldo_devedor": 1820.41,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 1820.41,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1138-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 27279.76,
+            "saldo_devedor": 27279.76,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 27279.76,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1138-04 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 423.6,
+            "saldo_devedor": 423.6,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 423.6,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 3923.54,
+            "saldo_devedor": 3923.54,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 3923.54,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 1216.59,
+            "saldo_devedor": 1216.59,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 1216.59,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 2552.04,
+            "saldo_devedor": 2552.04,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 2552.04,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 1107.22,
+            "saldo_devedor": 1107.22,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 1107.22,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 10565.11,
+            "saldo_devedor": 10565.11,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 10565.11,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 2268.92,
+            "saldo_devedor": 2268.92,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 2268.92,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 1749.24,
+            "saldo_devedor": 1749.24,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 1749.24,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 5455.44,
+            "saldo_devedor": 5455.44,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 5455.44,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 938.01,
+            "saldo_devedor": 938.01,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 938.01,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 464.5,
+            "saldo_devedor": 464.5,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 464.5,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 143.79,
+            "saldo_devedor": 143.79,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 143.79,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1646-01 - CP-PATRONAL",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 6960.84,
+            "saldo_devedor": 6960.84,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 6960.84,
+            "situacao": "A ANALISAR-A VENCER"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "1170-01 - CP-TERCEIROS",
+            "periodo_apuracao": "03/2025",
+            "vencimento": "17/04/2025",
+            "valor_original": 595.98,
+            "saldo_devedor": 595.98,
+            "multa": 0,
+            "juros": 0,
+            "saldo_devedor_consolidado": 595.98,
+            "situacao": "A ANALISAR-A VENCER"
+        }
+    ],
+    "parcelamentosSipade": [],
+    "pendenciasDebito": [
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "8109-02 - PIS",
+            "periodo_apuracao": "01/2025",
+            "vencimento": "25/02/2025",
+            "valor_original": 20440.08,
+            "saldo_devedor": 20440.08,
+            "multa": 3372.61,
+            "juros": 400.62,
+            "saldo_devedor_consolidado": 24213.31,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "8109-02 - PIS",
+            "periodo_apuracao": "02/2025",
+            "vencimento": "25/03/2025",
+            "valor_original": 24718.49,
+            "saldo_devedor": 24718.49,
+            "multa": 1794.56,
+            "juros": 247.18,
+            "saldo_devedor_consolidado": 26760.23,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "2172-01 - COFINS",
+            "periodo_apuracao": "01/2025",
+            "vencimento": "25/02/2025",
+            "valor_original": 94338.82,
+            "saldo_devedor": 94338.82,
+            "multa": 15565.9,
+            "juros": 1849.04,
+            "saldo_devedor_consolidado": 111753.76,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "2172-01 - COFINS",
+            "periodo_apuracao": "02/2025",
+            "vencimento": "25/03/2025",
+            "valor_original": 114085.32,
+            "saldo_devedor": 114085.32,
+            "multa": 8282.59,
+            "juros": 1140.85,
+            "saldo_devedor_consolidado": 123508.76,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "3373-01 - IRPJ",
+            "periodo_apuracao": "1º TRIM/2024",
+            "vencimento": "30/04/2024",
+            "valor_original": 265367.18,
+            "saldo_devedor": 146346.86,
+            "multa": 29269.37,
+            "juros": 15878.63,
+            "saldo_devedor_consolidado": 191494.86,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "3373-01 - IRPJ",
+            "periodo_apuracao": "2º TRIM/2024",
+            "vencimento": "31/07/2024",
+            "valor_original": 238774.05,
+            "saldo_devedor": 91909.61,
+            "multa": 18381.92,
+            "juros": 7646.87,
+            "saldo_devedor_consolidado": 117938.4,
+            "situacao": "DEVEDOR"
+        }
+    ],
+    "processosFiscais": [],
+    "parcelamentosSiefpar": [
+        {
+            "cnpj": "08.697.901/0001-96",
+            "parcelamento": "02110001200485149612402",
+            "valor_suspenso": 40732.15,
+            "tipo": "Parcelamento Simplificado"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "parcelamento": "02110001201181366232492",
+            "valor_suspenso": 76723.95,
+            "tipo": "Parcelamento Simplificado"
+        }
+    ],
+    "debitosSicob": [],
+    "pendenciasInscricao": [
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.20.016795-74",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "18/05/2020",
+            "processo": "10136.528.205/2020-25",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.22.014441-39",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.418.709/2021-05",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.22.014442-10",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.405.002/2020-40",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.24.004756-11",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "18/03/2024",
+            "processo": "10680.918.850/2023-11",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.24.004757-00",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "18/03/2024",
+            "processo": "10680.915.407/2023-80",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.24.009815-84",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.052.062/2023-31",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.24.009817-46",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.052.011/2023-17",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.24.009825-56",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.051.987/2023-64",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.2.24.009865-43",
+            "receita": "3551-IRPJ",
+            "data_inscricao": "13/05/2024",
+            "processo": "10136.207.241/2024-81",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.4.25.046524-92",
+            "receita": "4133-CONTR. SEGURADOS",
+            "data_inscricao": "27/01/2025",
+            "processo": "14966.104.055/2025-51",
+            "tipo_devedor": "CORRESPONSÁVEL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.4.25.046538-98",
+            "receita": "4156-CONTR. EMPREGADOR",
+            "data_inscricao": "27/01/2025",
+            "processo": "14966.104.056/2025-03",
+            "tipo_devedor": "CORRESPONSÁVEL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.4.25.046539-79",
+            "receita": "4201-CONTRIB.SAL.EDUCAC",
+            "data_inscricao": "27/01/2025",
+            "processo": "14966.104.056/2025-03",
+            "tipo_devedor": "CORRESPONSÁVEL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.4.25.046540-02",
+            "receita": "4299-CONTRIBUICAO SESI",
+            "data_inscricao": "27/01/2025",
+            "processo": "14966.104.056/2025-03",
+            "tipo_devedor": "CORRESPONSÁVEL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.4.25.046541-93",
+            "receita": "4162-RI.AMB. AP.ESPECIAL",
+            "data_inscricao": "27/01/2025",
+            "processo": "14966.104.056/2025-03",
+            "tipo_devedor": "CORRESPONSÁVEL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.4.25.046542-74",
+            "receita": "4338-CONTRIBUICAO SEBRAE",
+            "data_inscricao": "27/01/2025",
+            "processo": "14966.104.056/2025-03",
+            "tipo_devedor": "CORRESPONSÁVEL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.4.25.046543-55",
+            "receita": "4282-CONTRIBUICAO SENAI",
+            "data_inscricao": "27/01/2025",
+            "processo": "14966.104.056/2025-03",
+            "tipo_devedor": "CORRESPONSÁVEL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.20.038626-00",
+            "receita": "1804-CONTRIBUICAO SOCIAL",
+            "data_inscricao": "18/05/2020",
+            "processo": "10136.528.204/2020-81",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.20.038627-90",
+            "receita": "4493-COFINS",
+            "data_inscricao": "18/05/2020",
+            "processo": "10136.528.203/2020-36",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.22.034639-62",
+            "receita": "1804-CONTRIBUICAO SOCIAL",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.418.709/2021-05",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.22.034640-04",
+            "receita": "4493-COFINS",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.418.709/2021-05",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.22.034641-87",
+            "receita": "4493-COFINS",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.412.515/2021-98",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.22.034642-68",
+            "receita": "1804-CONTRIBUICAO SOCIAL",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.405.002/2020-40",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.22.034643-49",
+            "receita": "4493-COFINS",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.405.002/2020-40",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.010185-23",
+            "receita": "4493-COFINS",
+            "data_inscricao": "18/03/2024",
+            "processo": "10680.918.850/2023-11",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.010186-04",
+            "receita": "4493-COFINS",
+            "data_inscricao": "18/03/2024",
+            "processo": "10680.915.407/2023-80",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.010187-95",
+            "receita": "1804-CONTRIBUICAO SOCIAL",
+            "data_inscricao": "18/03/2024",
+            "processo": "10680.915.407/2023-80",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.019239-43",
+            "receita": "4493-COFINS",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.052.062/2023-31",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.019242-49",
+            "receita": "1804-CONTRIBUICAO SOCIAL",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.052.011/2023-17",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.019243-20",
+            "receita": "4493-COFINS",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.052.011/2023-17",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.019253-00",
+            "receita": "1804-CONTRIBUICAO SOCIAL",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.052.224/2023-31",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.019263-73",
+            "receita": "4493-COFINS",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.051.987/2023-64",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.019264-54",
+            "receita": "1804-CONTRIBUICAO SOCIAL",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.051.987/2023-64",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.019311-05",
+            "receita": "4493-COFINS",
+            "data_inscricao": "13/05/2024",
+            "processo": "10136.207.240/2024-37",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.6.24.019315-39",
+            "receita": "1804-CONTRIBUICAO SOCIAL",
+            "data_inscricao": "13/05/2024",
+            "processo": "10136.207.239/2024-11",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.20.008713-03",
+            "receita": "0810-PIS",
+            "data_inscricao": "18/05/2020",
+            "processo": "10136.528.206/2020-70",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.22.011216-46",
+            "receita": "0810-PIS",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.418.709/2021-05",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.22.011217-27",
+            "receita": "0810-PIS",
+            "data_inscricao": "21/12/2022",
+            "processo": "15504.405.002/2020-40",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.24.002915-76",
+            "receita": "0810-PIS",
+            "data_inscricao": "18/03/2024",
+            "processo": "10680.918.850/2023-11",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.24.002916-57",
+            "receita": "0810-PIS",
+            "data_inscricao": "18/03/2024",
+            "processo": "10680.915.407/2023-80",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.24.005251-51",
+            "receita": "0810-PIS",
+            "data_inscricao": "13/05/2024",
+            "processo": "10136.207.238/2024-68",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.24.005255-85",
+            "receita": "0810-PIS",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.052.062/2023-31",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.24.005256-66",
+            "receita": "0810-PIS",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.052.011/2023-17",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "inscricao": "60.7.24.005262-04",
+            "receita": "0810-PIS",
+            "data_inscricao": "13/05/2024",
+            "processo": "18208.051.987/2023-64",
+            "tipo_devedor": "DEVEDOR PRINCIPAL",
+            "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+        }
+    ]
+}
