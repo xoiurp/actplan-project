@@ -31,15 +31,18 @@ echo "Gerando certificado SSL com Let's Encrypt..."
 sudo certbot certonly --standalone \
     --non-interactive \
     --agree-tos \
-    --email admin@actplanconsultoria.com \
-    -d api.actplanconsultoria.com \
+    --email admin@actplan.com.br \
+    -d 185.213.26.203 \
     --http-01-port=80
 
 # Copiar certificados para o diretório do Certbot
-mkdir -p certbot/conf/live/api.actplanconsultoria.com
-sudo cp /etc/letsencrypt/live/api.actplanconsultoria.com/privkey.pem certbot/conf/live/api.actplanconsultoria.com/
-sudo cp /etc/letsencrypt/live/api.actplanconsultoria.com/fullchain.pem certbot/conf/live/api.actplanconsultoria.com/
-sudo chown -R $USER:$USER certbot/conf/live/api.actplanconsultoria.com/
+mkdir -p certbot/conf/live/185.213.26.203
+sudo cp /etc/letsencrypt/live/185.213.26.203/privkey.pem certbot/conf/live/185.213.26.203/
+sudo cp /etc/letsencrypt/live/185.213.26.203/fullchain.pem certbot/conf/live/185.213.26.203/
+sudo chown -R $USER:$USER certbot/conf/live/185.213.26.203/
+
+# Atualizar nginx-vps.conf com o IP correto
+sed -i 's/your-domain/185.213.26.203/g' nginx-vps.conf
 
 # Iniciar os serviços
 docker-compose -f docker-compose.vps.yml up -d

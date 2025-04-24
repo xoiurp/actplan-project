@@ -26,20 +26,23 @@ sudo apt-get install -y certbot
 # Parar containers existentes
 docker-compose -f docker-compose.vps.yml down
 
-# Gerar certificado SSL usando Let's Encrypt
-echo "Gerando certificado SSL com Let's Encrypt..."
-sudo certbot certonly --standalone \
-    --non-interactive \
-    --agree-tos \
-    --email admin@actplanconsultoria.com \
-    -d api.actplanconsultoria.com \
-    --http-01-port=80
+# Criar diretório para certificados
+mkdir -p certbot/conf/live/185.213.26.203
 
-# Copiar certificados para o diretório do Certbot
-mkdir -p certbot/conf/live/api.actplanconsultoria.com
-sudo cp /etc/letsencrypt/live/api.actplanconsultoria.com/privkey.pem certbot/conf/live/api.actplanconsultoria.com/
-sudo cp /etc/letsencrypt/live/api.actplanconsultoria.com/fullchain.pem certbot/conf/live/api.actplanconsultoria.com/
-sudo chown -R $USER:$USER certbot/conf/live/api.actplanconsultoria.com/
+# Gerar chave privada e certificado auto-assinado
+echo "Gerando certificado SSL auto-assinado..."
+openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
+    -keyout certbot/conf/live/185.213.26.203/privkey.pem \
+    -out certbot/conf/live/185.213.26.203/fullchain.pem \
+    -subj "/C=BR/ST=Bahia/L=Salvador/O=Actplan/CN=185.213.26.203" \
+    -addext "subjectAltName = IP:185.213.26.203"
+
+# Ajustar permissões
+chmod 600 certbot/conf/live/185.213.26.203/privkey.pem
+chmod 644 certbot/conf/live/185.213.26.203/fullchain.pem
+
+# Atualizar nginx-vps.conf com o IP correto
+sed -i 's/your-domain/185.213.26.203/g' nginx-vps.conf
 
 # Iniciar os serviços
 docker-compose -f docker-compose.vps.yml up -d

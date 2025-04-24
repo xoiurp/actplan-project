@@ -3,7 +3,6 @@ name = "pdf-processor"
 version = "0.1.0"
 description = "API service for processing PDF documents using Docling"
 authors = ["Your Name <you@example.com>"]
-package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -14,6 +13,10 @@ pymupdf = "^1.23.26"
 pandas = "^2.2.2"
 pytesseract = "^0.3.10"
 pdf2image = "^1.17.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [build-system]
 requires = ["poetry-core"]

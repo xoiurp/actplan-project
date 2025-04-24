@@ -41,6 +41,9 @@ sudo cp /etc/letsencrypt/live/api.actplanconsultoria.com/privkey.pem certbot/con
 sudo cp /etc/letsencrypt/live/api.actplanconsultoria.com/fullchain.pem certbot/conf/live/api.actplanconsultoria.com/
 sudo chown -R $USER:$USER certbot/conf/live/api.actplanconsultoria.com/
 
+# Atualizar nginx-vps.conf com o IP correto
+sed -i 's/your-domain/185.213.26.203/g' nginx-vps.conf
+
 # Iniciar os serviços
 docker-compose -f docker-compose.vps.yml up -d
 

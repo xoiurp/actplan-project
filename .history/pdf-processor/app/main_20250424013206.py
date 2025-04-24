@@ -144,8 +144,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "https://app.actplanconsultoria.com",
-        "https://actplan-consult.netlify.app",
-        "https://api.actplanconsultoria.com"
+        "https://actplan-consult.netlify.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
