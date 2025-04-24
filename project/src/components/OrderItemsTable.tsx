@@ -54,6 +54,7 @@ export function OrderItemsTable({
                 <TableHead>Ajuizado em</TableHead>
                 <TableHead>Processo</TableHead>
                 <TableHead>Tipo Devedor</TableHead>
+                <TableHead>Devedor Principal</TableHead>
                 <TableHead>Situação</TableHead>
                 {isEditing && <TableHead className="w-16">Ações</TableHead>}
               </TableRow>
@@ -78,7 +79,8 @@ export function OrderItemsTable({
             {itens_pedido.length === 0 ? (
               <TableRow>
                 {/* Ajustar colSpan para o máximo possível (11 ou 8) */}
-                <TableCell colSpan={isEditing ? 11 : 10} className="text-center py-4 text-gray-500">
+                {/* Ajustar colSpan para o número correto de colunas SIDA (8 ou 9) ou padrão (10 ou 11) */}
+                <TableCell colSpan={itens_pedido.length > 0 && itens_pedido[0].tax_type === 'PENDENCIA_INSCRICAO_SIDA' ? (isEditing ? 9 : 8) : (isEditing ? 11 : 10)} className="text-center py-4 text-gray-500">
                   Nenhum item adicionado ainda
                 </TableCell>
               </TableRow>
@@ -93,6 +95,7 @@ export function OrderItemsTable({
                       <TableCell>{item.ajuizado_em || '-'}</TableCell> 
                       <TableCell>{item.processo}</TableCell>
                       <TableCell>{item.tipo_devedor}</TableCell>
+                      <TableCell>{item.devedor_principal || '-'}</TableCell>
                       <TableCell>{item.status}</TableCell>
                     </>
                   ) : (
