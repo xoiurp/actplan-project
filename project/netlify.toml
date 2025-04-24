@@ -1,6 +1,8 @@
 [build]
+  base = "project"
   publish = "dist"
   command = "npm run build"
+  ignore = "git submodule status"
 
 [[redirects]]
   from = "/*"
