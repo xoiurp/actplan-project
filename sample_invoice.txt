@@ -1,0 +1,9 @@
+This is a sample invoice text.
+Invoice Number: INV-2024-001
+Date: 2024-07-30
+Total Amount: $123.45
+This text is used for testing the invoice extraction script.
+It simulates the output that would come from pdfminer.six.
+The content is intentionally kept under 1000 characters.
+Another line for the invoice.
+Final line of invoice sample.
