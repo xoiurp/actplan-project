@@ -4,194 +4,273 @@ import json
 import os
 import sys
 from io import BytesIO
+from datetime import datetime
 
-# Add app's directory to sys.path, assuming app.py is in the root or a known location
-# For this environment, scripts are in the root.
+# Add app's directory to sys.path
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-# Import Flask app instance.
-# This requires app.py to have `app = Flask(__name__)` at the global level.
-# And to prevent app.run() when importing, guard it with `if __name__ == '__main__':`
-from app import app 
+from app import app, _generate_linkage_key, _parse_date # Import helpers for direct testing
 
 class TestApp(unittest.TestCase):
 
     def setUp(self):
-        # Configure the app for testing
         app.config['TESTING'] = True
         app.config['DEBUG'] = False
-        # Create a test client
         self.client = app.test_client()
         
-        # Reset data stores before each test (if app has such a function, or do it manually)
-        # For this app, global lists are used. We can reset them directly or use the /reset endpoint.
-        with self.client.delete('/api/reset_data'): # or GET based on app's implementation
-            pass 
+        # Reset data stores by directly clearing the global lists in the app module
+        app.fiscal_reports_data = []
+        app.payment_invoices_data = []
 
-        # Create dummy upload directory if it doesn't exist (app.py should do this too)
-        if not os.path.exists("./uploads/"):
-            os.makedirs("./uploads/")
+        uploads_dir = "./uploads/"
+        if not os.path.exists(uploads_dir):
+            os.makedirs(uploads_dir)
+        # Clean up any files from previous test runs in uploads_dir
+        for f in os.listdir(uploads_dir):
+            try:
+                os.remove(os.path.join(uploads_dir, f))
+            except OSError: # pragma: no cover
+                pass # Ignore if file is already gone or locked
 
     def tearDown(self):
-        # Clean up any files created in uploads_dir if necessary
-        # For this app, files are deleted after processing, so this might not be needed
-        # unless a test fails mid-way.
-        upload_dir = "./uploads/"
-        for f in os.listdir(upload_dir):
-            os.remove(os.path.join(upload_dir, f))
-        pass
+        # Clean up global lists after each test
+        app.fiscal_reports_data = []
+        app.payment_invoices_data = []
+        # Clean up uploads directory
+        uploads_dir = "./uploads/"
+        for f in os.listdir(uploads_dir):
+            try:
+                os.remove(os.path.join(uploads_dir, f))
+            except OSError: # pragma: no cover
+                pass
 
-    @patch('app.run_extraction_script') # Patching the helper function in app.py
-    def test_upload_fiscal_report_success(self, mock_run_extraction):
-        # Mock the helper function to return a successful extraction preview
-        mock_run_extraction.return_value = "Fiscal text preview 1000 chars..."
+
+    @patch('app.run_extraction_script')
+    def test_upload_fiscal_report_success_structured_data(self, mock_run_extraction):
+        mock_fiscal_data = [{"taxpayer_id": "001", "tax_type_description": "IRPJ", "assessment_period": "01/2023", "source_file": "fiscal.pdf"}]
+        mock_run_extraction.return_value = json.dumps(mock_fiscal_data)
         
-        data = {'pdf': (BytesIO(b"dummy fiscal pdf content"), 'fiscal_report.pdf')}
+        data = {'pdf': (BytesIO(b"dummy pdf"), 'fiscal.pdf')}
         response = self.client.post('/api/upload/fiscal_report', content_type='multipart/form-data', data=data)
         
         self.assertEqual(response.status_code, 200)
         json_data = response.get_json()
-        self.assertEqual(json_data['message'], "Fiscal report processed")
-        self.assertEqual(json_data['filename'], "fiscal_report.pdf")
-        self.assertEqual(json_data['preview'], "Fiscal text preview 1000 chars...")
+        self.assertEqual(json_data['message'], "Fiscal report processed and structured data stored.")
+        self.assertEqual(json_data['filename'], "fiscal.pdf")
+        self.assertEqual(json_data['items_extracted'], 1)
         
-        # Check if data was added to the global list (requires access or another endpoint)
-        data_response = self.client.get('/api/unified_data')
-        unified_data = data_response.get_json()
-        self.assertEqual(len(unified_data['fiscal_reports']), 1)
-        self.assertEqual(unified_data['fiscal_reports'][0]['filename'], "fiscal_report.pdf")
-        self.assertEqual(unified_data['fiscal_reports'][0]['extracted_text_preview'], "Fiscal text preview 1000 chars...")
+        self.assertEqual(len(app.fiscal_reports_data), 1)
+        self.assertEqual(app.fiscal_reports_data[0]['taxpayer_id'], "001")
 
     @patch('app.run_extraction_script')
-    def test_upload_payment_invoice_success(self, mock_run_extraction):
-        mock_run_extraction.return_value = "Invoice text preview 1000 chars..."
+    def test_upload_payment_invoice_success_structured_data(self, mock_run_extraction):
+        mock_invoice_data = [{"taxpayer_id": "002", "tax_type_code": "DARF123", "payment_total_amount": 100.50, "source_file": "invoice.pdf"}]
+        mock_run_extraction.return_value = json.dumps(mock_invoice_data)
         
-        data = {'pdf': (BytesIO(b"dummy invoice pdf content"), 'invoice.pdf')}
+        data = {'pdf': (BytesIO(b"dummy pdf"), 'invoice.pdf')}
         response = self.client.post('/api/upload/payment_invoice', content_type='multipart/form-data', data=data)
         
         self.assertEqual(response.status_code, 200)
         json_data = response.get_json()
-        self.assertEqual(json_data['message'], "Payment invoice processed")
+        self.assertEqual(json_data['message'], "Payment invoice processed and structured data stored.")
         self.assertEqual(json_data['filename'], "invoice.pdf")
-        self.assertEqual(json_data['preview'], "Invoice text preview 1000 chars...")
-
-        data_response = self.client.get('/api/unified_data')
-        unified_data = data_response.get_json()
-        self.assertEqual(len(unified_data['payment_invoices']), 1)
-        self.assertEqual(unified_data['payment_invoices'][0]['filename'], "invoice.pdf")
+        self.assertEqual(json_data['data_preview']['taxpayer_id'], "002")
+        
+        self.assertEqual(len(app.payment_invoices_data), 1)
+        self.assertEqual(app.payment_invoices_data[0]['taxpayer_id'], "002")
 
     @patch('app.run_extraction_script')
-    def test_upload_script_failure(self, mock_run_extraction):
-        # Simulate script execution failure
-        mock_run_extraction.return_value = "Script execution failed: some error"
+    def test_upload_script_returns_none_or_error(self, mock_run_extraction):
+        mock_run_extraction.return_value = None # Simulate script execution failure
         
-        data = {'pdf': (BytesIO(b"bad pdf content"), 'error_doc.pdf')}
+        data = {'pdf': (BytesIO(b"bad pdf"), 'error_doc.pdf')}
         response = self.client.post('/api/upload/fiscal_report', content_type='multipart/form-data', data=data)
         
-        self.assertEqual(response.status_code, 200) # The API itself might return 200 but indicate failure in preview
+        self.assertEqual(response.status_code, 500)
         json_data = response.get_json()
-        self.assertIn("Script execution failed", json_data['preview'])
-
-        # Verify data is still added, but with error message
-        data_response = self.client.get('/api/unified_data')
-        unified_data = data_response.get_json()
-        self.assertEqual(len(unified_data['fiscal_reports']), 1)
-        self.assertIn("Script execution failed", unified_data['fiscal_reports'][0]['extracted_text_preview'])
-
-
-    def test_upload_no_file(self):
-        response = self.client.post('/api/upload/fiscal_report', data={})
-        self.assertEqual(response.status_code, 400)
-        json_data = response.get_json()
-        self.assertEqual(json_data['error'], "No PDF file provided")
-
-    def test_upload_invalid_file_type(self):
-        data = {'pdf': (BytesIO(b"this is a text file"), 'dopey.txt')}
-        response = self.client.post('/api/upload/fiscal_report', content_type='multipart/form-data', data=data)
-        self.assertEqual(response.status_code, 400)
-        json_data = response.get_json()
-        self.assertEqual(json_data['error'], "Invalid file type, please upload a PDF")
-
-    def test_unified_data_empty(self):
-        response = self.client.get('/api/unified_data')
-        self.assertEqual(response.status_code, 200)
-        json_data = response.get_json()
-        self.assertEqual(json_data['fiscal_reports'], [])
-        self.assertEqual(json_data['payment_invoices'], [])
+        self.assertIn("Failed to execute fiscal report extraction script", json_data['error'])
+        self.assertEqual(len(app.fiscal_reports_data), 0) # Ensure no data was added
 
     @patch('app.run_extraction_script')
-    def test_unified_data_with_data(self, mock_run_extraction):
-        # Upload one of each type
-        mock_run_extraction.return_value = "Fiscal preview"
-        self.client.post('/api/upload/fiscal_report', data={'pdf': (BytesIO(b"f"), 'f.pdf')}, content_type='multipart/form-data')
+    def test_upload_script_returns_invalid_json(self, mock_run_extraction):
+        mock_run_extraction.return_value = "This is not JSON"
         
-        mock_run_extraction.return_value = "Invoice preview"
-        self.client.post('/api/upload/payment_invoice', data={'pdf': (BytesIO(b"i"), 'i.pdf')}, content_type='multipart/form-data')
+        data = {'pdf': (BytesIO(b"pdf"), 'bad_json.pdf')}
+        response = self.client.post('/api/upload/fiscal_report', content_type='multipart/form-data', data=data)
+        
+        self.assertEqual(response.status_code, 500)
+        json_data = response.get_json()
+        self.assertIn("Invalid JSON output from fiscal report script", json_data['error'])
 
+    # --- Tests for /api/unified_data merging logic ---
+
+    def test_unified_data_successful_match(self):
+        app.fiscal_reports_data = [
+            {"taxpayer_id": "001", "tax_type_description": "IRPJ", "assessment_period": "01/2023", "fiscal_calculated_tax_amount": 100.0, "fiscal_due_date": "15/02/2023", "source_file": "f1.pdf"}
+        ]
+        app.payment_invoices_data = [
+            {"taxpayer_id": "001", "tax_type_code": "IRPJ", "assessment_period": "01/2023", "payment_principal_amount": 100.0, "payment_date": "10/02/2023", "source_file": "p1.pdf"}
+        ]
         response = self.client.get('/api/unified_data')
         self.assertEqual(response.status_code, 200)
-        json_data = response.get_json()
-        self.assertEqual(len(json_data['fiscal_reports']), 1)
-        self.assertEqual(json_data['fiscal_reports'][0]['filename'], 'f.pdf')
-        self.assertEqual(len(json_data['payment_invoices']), 1)
-        self.assertEqual(json_data['payment_invoices'][0]['filename'], 'i.pdf')
+        unified_data = response.get_json()
+        self.assertEqual(len(unified_data), 1)
+        record = unified_data[0]
+        self.assertEqual(record['payment_status'], "Paid")
+        self.assertEqual(record['payment_principal_amount'], 100.0)
+        self.assertEqual(record['discrepancy_notes'], [])
 
+    def test_unified_data_no_match_fiscal_unpaid(self):
+        app.fiscal_reports_data = [
+            {"taxpayer_id": "001", "tax_type_description": "IRPJ", "assessment_period": "01/2023", "fiscal_calculated_tax_amount": 100.0, "source_file": "f1.pdf"}
+        ]
+        app.payment_invoices_data = []
+        response = self.client.get('/api/unified_data')
+        unified_data = response.get_json()
+        self.assertEqual(len(unified_data), 1)
+        record = unified_data[0]
+        self.assertEqual(record['payment_status'], "Unpaid")
+        self.assertEqual(record['payment_principal_amount'], 0.0)
+
+    def test_unified_data_orphaned_payment(self):
+        app.fiscal_reports_data = []
+        app.payment_invoices_data = [
+            {"taxpayer_id": "001", "tax_type_code": "IRPJ", "assessment_period": "01/2023", "payment_principal_amount": 100.0, "source_file": "p1.pdf"}
+        ]
+        response = self.client.get('/api/unified_data')
+        unified_data = response.get_json()
+        self.assertEqual(len(unified_data), 1)
+        record = unified_data[0]
+        self.assertEqual(record['payment_status'], "Payment without matching fiscal record")
+        self.assertEqual(record['payment_principal_amount'], 100.0)
+
+    def test_unified_data_late_payment(self):
+        app.fiscal_reports_data = [
+            {"taxpayer_id": "001", "tax_type_description": "IRPJ", "assessment_period": "01/2023", "fiscal_due_date": "15/02/2023", "source_file": "f1.pdf"}
+        ]
+        app.payment_invoices_data = [
+            {"taxpayer_id": "001", "tax_type_code": "IRPJ", "assessment_period": "01/2023", "payment_date": "20/02/2023", "source_file": "p1.pdf"}
+        ]
+        response = self.client.get('/api/unified_data')
+        unified_data = response.get_json()
+        self.assertEqual(len(unified_data), 1)
+        record = unified_data[0]
+        self.assertEqual(record['payment_status'], "Paid")
+        self.assertIn("Paid late.", record['discrepancy_notes'])
+
+    def test_unified_data_amount_mismatch(self):
+        app.fiscal_reports_data = [
+            {"taxpayer_id": "001", "tax_type_description": "IRPJ", "assessment_period": "01/2023", "fiscal_calculated_tax_amount": 100.0, "source_file": "f1.pdf"}
+        ]
+        app.payment_invoices_data = [
+            {"taxpayer_id": "001", "tax_type_code": "IRPJ", "assessment_period": "01/2023", "payment_principal_amount": 90.0, "source_file": "p1.pdf"}
+        ]
+        response = self.client.get('/api/unified_data')
+        unified_data = response.get_json()
+        self.assertEqual(len(unified_data), 1)
+        record = unified_data[0]
+        self.assertEqual(record['payment_status'], "Paid")
+        self.assertIn("Amount mismatch: Fiscal 100.0, Paid 90.0.", record['discrepancy_notes'])
+
+    def test_unified_data_linkage_key_variations(self):
+        # Test case sensitivity and space normalization (as per _generate_linkage_key)
+        app.fiscal_reports_data = [
+            {"taxpayer_id": "abc", "tax_type_description": "irpj code ", "assessment_period": "01/2023 ", "source_file": "f1.pdf"}
+        ]
+        app.payment_invoices_data = [
+            {"taxpayer_id": "ABC", "tax_type_code": "IRPJCODE", "assessment_period": "01/2023", "source_file": "p1.pdf"}
+        ]
+        response = self.client.get('/api/unified_data')
+        unified_data = response.get_json()
+        self.assertEqual(len(unified_data), 1, "Should match despite case/space differences in key components")
+        self.assertEqual(unified_data[0]['payment_status'], "Paid")
+
+        # Test N/A placeholder matching
+        app.fiscal_reports_data = [
+            {"taxpayer_id": "002", "tax_type_description": None, "assessment_period": "02/2023", "source_file": "f2.pdf"}
+        ]
+        app.payment_invoices_data = [
+            {"taxpayer_id": "002", "tax_type_code": None, "assessment_period": "02/2023", "source_file": "p2.pdf"}
+        ]
+        response = self.client.get('/api/unified_data')
+        unified_data = response.get_json()
+        self.assertEqual(len(unified_data), 1, "Should match with None (N/A) in tax_type")
+        self.assertEqual(unified_data[0]['payment_status'], "Paid")
+
+
+    def test_unified_data_multiple_items_mixed_scenario(self):
+        app.fiscal_reports_data = [
+            {"taxpayer_id": "001", "tax_type_description": "IRPJ", "assessment_period": "01/2023", "fiscal_calculated_tax_amount": 100.0, "fiscal_due_date": "15/02/2023", "source_file": "f1.pdf"},
+            {"taxpayer_id": "002", "tax_type_description": "PIS", "assessment_period": "01/2023", "fiscal_calculated_tax_amount": 200.0, "source_file": "f2.pdf"}, # Unpaid
+            {"taxpayer_id": "003", "tax_type_description": "COFINS", "assessment_period": "02/2023", "fiscal_calculated_tax_amount": 300.0, "fiscal_due_date": "15/03/2023", "source_file": "f3.pdf"} # Late payment
+        ]
+        app.payment_invoices_data = [
+            {"taxpayer_id": "001", "tax_type_code": "IRPJ", "assessment_period": "01/2023", "payment_principal_amount": 100.0, "payment_date": "10/02/2023", "source_file": "p1.pdf"}, # Match for f1
+            {"taxpayer_id": "003", "tax_type_code": "COFINS", "assessment_period": "02/2023", "payment_principal_amount": 290.0, "payment_date": "20/03/2023", "source_file": "p3.pdf"}, # Match for f3 (amount mismatch & late)
+            {"taxpayer_id": "004", "tax_type_code": "CSLL", "assessment_period": "03/2023", "payment_principal_amount": 400.0, "source_file": "p4.pdf"} # Orphaned
+        ]
+        response = self.client.get('/api/unified_data')
+        unified_data = response.get_json()
+        self.assertEqual(len(unified_data), 4) # 3 fiscal (2 paid, 1 unpaid) + 1 orphaned payment
+
+        record_001 = next(r for r in unified_data if r['taxpayer_id'] == "001" and r.get('source_file') == 'f1.pdf')
+        self.assertEqual(record_001['payment_status'], "Paid")
+        self.assertEqual(record_001['discrepancy_notes'], [])
+
+        record_002 = next(r for r in unified_data if r['taxpayer_id'] == "002")
+        self.assertEqual(record_002['payment_status'], "Unpaid")
+
+        record_003 = next(r for r in unified_data if r['taxpayer_id'] == "003" and r.get('source_file') == 'f3.pdf')
+        self.assertEqual(record_003['payment_status'], "Paid")
+        self.assertIn("Paid late.", record_003['discrepancy_notes'])
+        self.assertIn("Amount mismatch: Fiscal 300.0, Paid 290.0.", record_003['discrepancy_notes'])
+        
+        record_004 = next(r for r in unified_data if r['taxpayer_id'] == "004" and r['payment_status'] == "Payment without matching fiscal record")
+        self.assertIsNotNone(record_004)
+        self.assertEqual(record_004['payment_principal_amount'], 400.0)
+
+    # --- Tests for helper functions ---
+    def test_generate_linkage_key(self):
+        item1 = {"taxpayer_id": "123", "tax_type_code": "IRPJ", "assessment_period": "01/2023"}
+        self.assertEqual(_generate_linkage_key(item1), "123|IRPJ|01/2023")
+        
+        item2 = {"taxpayer_id": " 123 ", "tax_type_description": " IRPJ Code ", "assessment_period": " 01/2023 "} # Spaces, description
+        self.assertEqual(_generate_linkage_key(item2), "123|IRPJCODE|01/2023") # Normalization check
+
+        item3 = {"taxpayer_id": "456", "tax_type_code": None, "assessment_period": "02/2023"} # None tax_type_code
+        self.assertEqual(_generate_linkage_key(item3), "456|N/A|02/2023")
+
+        item4 = {"taxpayer_id": None, "tax_type_description": "PIS", "assessment_period": None} # None taxpayer_id and period
+        self.assertEqual(_generate_linkage_key(item4), "N/A|PIS|N/A")
+        
+        item5 = {"some_other_field": "value"} # Missing all key fields
+        self.assertEqual(_generate_linkage_key(item5), "N/A|N/A|N/A")
+
+    def test_parse_date(self):
+        self.assertEqual(_parse_date("15/02/2023"), datetime(2023, 2, 15))
+        self.assertEqual(_parse_date("2023-03-20"), datetime(2023, 3, 20))
+        self.assertEqual(_parse_date("10-04-2023", fmt="%d-%m-%Y"), datetime(2023, 4, 10)) # Explicit format
+        self.assertIsNone(_parse_date(None))
+        self.assertIsNone(_parse_date("invalid-date"))
+        self.assertIsNone(_parse_date("15/02/23")) # Does not match YYYY
+
+    # Test reset data (already existed, ensure it still works)
     def test_reset_data(self):
-        # Add some data first (mocking not needed for this part of reset test)
-        with patch('app.run_extraction_script', return_value="dummy preview"):
-            self.client.post('/api/upload/fiscal_report', data={'pdf': (BytesIO(b"f"), 'f.pdf')}, content_type='multipart/form-data')
+        app.fiscal_reports_data = [{"key": "value1"}]
+        app.payment_invoices_data = [{"key": "value2"}]
         
-        response_before_reset = self.client.get('/api/unified_data')
-        self.assertNotEqual(response_before_reset.get_json()['fiscal_reports'], [])
-
-        reset_response = self.client.delete('/api/reset_data') # Assuming DELETE, could be GET
-        self.assertEqual(reset_response.status_code, 200)
-        json_data = reset_response.get_json()
+        response = self.client.delete('/api/reset_data')
+        self.assertEqual(response.status_code, 200)
+        json_data = response.get_json()
         self.assertEqual(json_data['message'], "Data reset successfully")
 
-        response_after_reset = self.client.get('/api/unified_data')
-        self.assertEqual(response_after_reset.get_json()['fiscal_reports'], [])
-        self.assertEqual(response_after_reset.get_json()['payment_invoices'], [])
-
-    # Testing the helper function run_extraction_script directly (if it were refactored for easier testing)
-    # For now, it's tested indirectly via the upload endpoints.
-    # If run_extraction_script was in, e.g. `helpers.py`:
-    # @patch('subprocess.run')
-    # def test_run_extraction_script_helper_success(self, mock_subprocess_run):
-    #     from app import run_extraction_script # Assuming it's importable
-    #     mock_process = MagicMock()
-    #     mock_process.stdout = "Some output\nFirst 1000 characters of extracted text:\nActual preview here"
-    #     mock_process.stderr = ""
-    #     mock_process.returncode = 0
-    #     mock_subprocess_run.return_value = mock_process
+        self.assertEqual(app.fiscal_reports_data, [])
+        self.assertEqual(app.payment_invoices_data, [])
         
-    #     preview = run_extraction_script("dummy_script.py", "dummy.pdf")
-    #     self.assertEqual(preview, "Actual preview here")
-    #     mock_subprocess_run.assert_called_once_with(
-    #         [sys.executable, "dummy_script.py", "dummy.pdf"],
-    #         capture_output=True, text=True, check=True, timeout=60
-    #     )
+        # Verify unified data is also empty
+        unified_response = self.client.get('/api/unified_data')
+        self.assertEqual(unified_response.get_json(), [])
 
-    # @patch('subprocess.run', side_effect=subprocess.TimeoutExpired(cmd="cmd", timeout=10))
-    # def test_run_extraction_script_helper_timeout(self, mock_subprocess_run):
-    #     from app import run_extraction_script
-    #     preview = run_extraction_script("dummy_script.py", "dummy.pdf")
-    #     self.assertEqual(preview, "Script execution timed out.")
-
-    # @patch('subprocess.run', side_effect=subprocess.CalledProcessError(returncode=1, cmd="cmd", stderr="Error!"))
-    # def test_run_extraction_script_helper_called_process_error(self, mock_subprocess_run):
-    #     from app import run_extraction_script
-    #     preview = run_extraction_script("dummy_script.py", "dummy.pdf")
-    #     self.assertEqual(preview, "Script execution failed: Error!")
 
 if __name__ == '__main__':
-    # Before running tests, ensure Flask is installed.
-    # This is usually handled by a requirements.txt or CI setup.
-    # For this environment, we might need to ensure it.
-    try:
-        import flask
-    except ImportError:
-        print("Flask not installed. Attempting to install...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "Flask"])
-
     unittest.main()

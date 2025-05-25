@@ -1,15 +1,54 @@
-This is a sample fiscal report text.
-It contains various details about fiscal operations.
-Line 3.
-Line 4.
-Line 5.
-End of fiscal sample.
-Ensure this text is less than 1000 characters for easy preview testing.
-The quick brown fox jumps over the lazy dog.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-This should be plenty for the 1000 character preview.
-Final line of fiscal sample.
+MINISTÉRIO DA FAZENDA
+SECRETARIA ESPECIAL DA RECEITA FEDERAL DO BRASIL
+PROCURADORIA-GERAL DA FAZENDA NACIONAL
+
+Comprovante de Inscrição e de Situação Cadastral
+CNPJ: 03.367.118/0001-40 - CONSTRUTORA SINARCO LTDA
+Nome Empresarial: CONSTRUTORA SINARCO LTDA
+Data da Consulta: 16/04/2025
+
+Período de Apuração: 01/01/2023 a 31/12/2023
+
+Situação Cadastral: ATIVA
+
+Débitos na Natureza Tributária
+--------------------------------------------------
+
+Tributo: IRPJ - IMPOSTO DE RENDA PESSOA JURIDICA
+Código: 1234
+PA: 31/03/2023
+Vencimento: 30/04/2023
+Saldo Devedor Originário: 10.500,75
+Valor Base de Cálculo: 50000,00
+Situação: DEVEDOR
+
+Tributo: CSLL - CONTRIBUICAO SOCIAL SOBRE O LUCRO LIQUIDO
+Código: 5678
+PA: 31/03/2023
+Vencimento: 30/04/2023
+Principal: 5.250,00
+Juros: 120,50
+Multa: 250,00
+Total do Débito: 5.620,50
+
+Tributo: PIS - PROGRAMA DE INTEGRACAO SOCIAL
+PA: 03/2023
+Vencimento: 25/04/2023
+Saldo Devedor Originário: 1.800,20
+
+Débitos Declarados Pendentes de Inscrição em Dívida Ativa da União
+--------------------------------------------------
+
+Tributo: COFINS - CONTRIBUIÇÃO PARA FINS SOCIAIS
+Período de Apuração do Débito: 01/2023
+Vcto: 20/02/2023
+Valor Original: 3.300,00
+Identificador do Débito: DEBC123456
+
+Outras Informações
+--------------------------------------------------
+Este é um relatório de exemplo.
+As informações aqui são fictícias.
+Total de Débitos Consolidados: 26.671,45
+Data de Emissão: 16/04/2025 02:23:11
+Página: 1 / 1
