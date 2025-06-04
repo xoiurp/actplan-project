@@ -1,0 +1,27 @@
+# Diretórios a serem ignorados
+actplan/
+node_modules/
+.next/
+dist/
+build/
+
+# Arquivos de configuração local
+.env*
+.DS_Store
+*.log
+
+# Cache
+.cache/
+.npm/
+
+# IDEs
+.vscode/
+.idea/
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Arquivos de sistema
+Thumbs.db
+desktop.ini 
