@@ -12,8 +12,9 @@
   publish = "dist/"
 
 # Configuração do scanner de segurança para permitir variáveis específicas
+# Estas variáveis VITE_ são intencionalmente expostas no build do frontend
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "VITE_EXTRACTION_API_URL"
+  SECRETS_SCAN_OMIT_KEYS = "VITE_EXTRACTION_API_URL,VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
 
 # Redirecionamento para lidar com roteamento de Single Page Application (SPA)
 # Necessário para o React Router funcionar corretamente
