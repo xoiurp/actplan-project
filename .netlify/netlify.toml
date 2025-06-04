@@ -8,8 +8,8 @@ redirects = []
 
 [build]
 publish = "E:\\OST\\Webscrapper\\sistema_actplan\\sistema_actplan2\\project\\dist"
-publishOrigin = "config"
-commandOrigin = "config"
+publishOrigin = "ui"
+commandOrigin = "ui"
 command = "cd project && npm install && npm run build"
 
 [build.environment]

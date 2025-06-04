@@ -1087,8 +1087,8 @@ def extract_darf_data(text):
                     i += 1
                     continue
                 
-                # Extrai período de apuração (formato pode ser DD/MM/YYYY ou MM/YYYY)
-                periodo_match = re.search(r"PA\s+(\d{2}/\d{2}/\d{4}|\d{2}/\d{4})", periodo_vencimento)
+                # Extrai período de apuração
+                periodo_match = re.search(r"PA\s+(\d{2}/\d{4})", periodo_vencimento)
                 periodo = periodo_match.group(1) if periodo_match else ""
                 
                 # Extrai data de vencimento

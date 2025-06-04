@@ -1043,159 +1043,81 @@ def extract_darf_data(text):
             if not line or line.startswith("Total do Documento") or line.startswith("VENCIMENTO") or line.startswith("AUTENTICAÇÃO"):
                 print(f"Fim da seção {section_idx + 1} detectado na linha {i+1}: '{line}'", file=sys.stdout)
                 break
-                
-            # Tenta detectar início de item DARF por dois padrões diferentes
             
-            # Padrão 1: linha só com 4 dígitos (formato original)
-            codigo_only_match = re.match(r"^(\d{4})$", line)
+        # Tenta detectar início de item DARF pelo código (linha só com 4 dígitos)
+        codigo_match = re.match(r"^(\d{4})$", line)
+        if codigo_match:
+            codigo = codigo_match.group(1)
+            print(f"\n🎯 Código DARF encontrado: {codigo} na linha {i+1}", file=sys.stdout)
             
-            # Padrão 2: código + denominação + valores na mesma linha
-            codigo_inline_match = re.match(r"^(\d{4})\s+(.+?)\s+([\d.,]+)\s+([\d.,]+)\s+([\d.,]+)\s+([\d.,]+)$", line)
-            
-            if codigo_only_match:
-                # FORMATO 1: Código sozinho
-                codigo = codigo_only_match.group(1)
-                print(f"\n🎯 Código DARF (Formato 1) encontrado: {codigo} na linha {i+1} (Seção {section_idx + 1})", file=sys.stdout)
-                
-                # Verifica se temos linhas suficientes para um item completo dentro desta seção
-                if i + 7 >= section_end:
-                    print(f"❌ Não há linhas suficientes após código {codigo} na seção {section_idx + 1}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                # Extrai dados nas próximas linhas conforme o padrão observado
-                denominacao = lines[i+1].strip()  # denominação
-                principal_str = lines[i+2].strip()  # principal
-                multa_str = lines[i+3].strip()      # multa
-                juros_str = lines[i+4].strip()      # juros
-                total_str = lines[i+5].strip()      # total
-                descricao_completa = lines[i+6].strip()  # descrição completa
-                periodo_vencimento = lines[i+7].strip()  # PA + vencimento
-                
-                print(f"Denominação: '{denominacao}'", file=sys.stdout)
-                print(f"Valores: {principal_str}, {multa_str}, {juros_str}, {total_str}", file=sys.stdout)
-                print(f"Período/Vencimento: '{periodo_vencimento}'", file=sys.stdout)
-                
-                # Converte valores monetários
-                try:
-                    principal = parse_br_currency(principal_str)
-                    multa = parse_br_currency(multa_str)
-                    juros = parse_br_currency(juros_str)
-                    total = parse_br_currency(total_str)
-                except Exception as e:
-                    print(f"❌ Erro ao converter valores monetários: {e}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                # Extrai período de apuração (formato pode ser DD/MM/YYYY ou MM/YYYY)
-                periodo_match = re.search(r"PA\s+(\d{2}/\d{2}/\d{4}|\d{2}/\d{4})", periodo_vencimento)
-                periodo = periodo_match.group(1) if periodo_match else ""
-                
-                # Extrai data de vencimento
-                vencimento_match = re.search(r"Vencimento\s+(\d{2}/\d{2}/\d{4})", periodo_vencimento)
-                vencimento = vencimento_match.group(1) if vencimento_match else ""
-                
-                print(f"Período extraído: '{periodo}'", file=sys.stdout)
-                print(f"Vencimento extraído: '{vencimento}'", file=sys.stdout)
-                
-                # Validação básica
-                if not denominacao or not periodo or not vencimento:
-                    print(f"❌ Dados incompletos para código {codigo} na seção {section_idx + 1}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                darf_item = {
-                    "codigo": codigo,
-                    "denominacao": denominacao,
-                    "periodo_apuracao": periodo,
-                    "vencimento": vencimento,
-                    "principal": principal,
-                    "multa": multa,
-                    "juros": juros,
-                    "total": total
-                }
-                
-                result.append(darf_item)
-                print(f"✅ Item DARF (Formato 1) extraído da seção {section_idx + 1}: {darf_item}", file=sys.stdout)
-                
-                # Pula para depois das 8 linhas processadas (código + 7 linhas de dados)
-                i += 8
-                continue
-                
-            elif codigo_inline_match:
-                # FORMATO 2: Código + denominação + valores na mesma linha
-                codigo = codigo_inline_match.group(1)
-                denominacao = codigo_inline_match.group(2).strip()
-                principal_str = codigo_inline_match.group(3)
-                multa_str = codigo_inline_match.group(4)
-                juros_str = codigo_inline_match.group(5)
-                total_str = codigo_inline_match.group(6)
-                
-                print(f"\n🎯 Código DARF (Formato 2) encontrado: {codigo} na linha {i+1} (Seção {section_idx + 1})", file=sys.stdout)
-                print(f"Denominação: '{denominacao}'", file=sys.stdout)
-                print(f"Valores: {principal_str}, {multa_str}, {juros_str}, {total_str}", file=sys.stdout)
-                
-                # Verifica se temos linhas suficientes para descrição e período
-                if i + 2 >= section_end:
-                    print(f"❌ Não há linhas suficientes após código {codigo} na seção {section_idx + 1}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                # Próximas linhas contêm descrição e período/vencimento
-                descricao_completa = lines[i+1].strip()  # descrição completa
-                periodo_vencimento = lines[i+2].strip()  # PA + vencimento
-                
-                print(f"Período/Vencimento: '{periodo_vencimento}'", file=sys.stdout)
-                
-                # Converte valores monetários
-                try:
-                    principal = parse_br_currency(principal_str)
-                    multa = parse_br_currency(multa_str)
-                    juros = parse_br_currency(juros_str)
-                    total = parse_br_currency(total_str)
-                except Exception as e:
-                    print(f"❌ Erro ao converter valores monetários: {e}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                # Extrai período de apuração (formato pode ser DD/MM/YYYY ou MM/YYYY)
-                periodo_match = re.search(r"PA\s+(\d{2}/\d{2}/\d{4}|\d{2}/\d{4})", periodo_vencimento)
-                periodo = periodo_match.group(1) if periodo_match else ""
-                
-                # Extrai data de vencimento
-                vencimento_match = re.search(r"Vencimento\s+(\d{2}/\d{2}/\d{4})", periodo_vencimento)
-                vencimento = vencimento_match.group(1) if vencimento_match else ""
-                
-                print(f"Período extraído: '{periodo}'", file=sys.stdout)
-                print(f"Vencimento extraído: '{vencimento}'", file=sys.stdout)
-                
-                # Validação básica
-                if not denominacao or not periodo or not vencimento:
-                    print(f"❌ Dados incompletos para código {codigo} na seção {section_idx + 1}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                darf_item = {
-                    "codigo": codigo,
-                    "denominacao": denominacao,
-                    "periodo_apuracao": periodo,
-                    "vencimento": vencimento,
-                    "principal": principal,
-                    "multa": multa,
-                    "juros": juros,
-                    "total": total
-                }
-                
-                result.append(darf_item)
-                print(f"✅ Item DARF (Formato 2) extraído da seção {section_idx + 1}: {darf_item}", file=sys.stdout)
-                
-                # Pula 3 linhas (linha atual + descrição + período)
-                i += 3
+            # Verifica se temos linhas suficientes para um item completo
+            if i + 7 >= len(lines):
+                print(f"❌ Não há linhas suficientes após código {codigo}", file=sys.stdout)
+                i += 1
                 continue
             
-            i += 1
+            # Extrai dados nas próximas linhas conforme o padrão observado
+            denominacao = lines[i+1].strip()  # Linha 26: denominação
+            principal_str = lines[i+2].strip()  # Linha 27: principal
+            multa_str = lines[i+3].strip()      # Linha 28: multa
+            juros_str = lines[i+4].strip()      # Linha 29: juros
+            total_str = lines[i+5].strip()      # Linha 30: total
+            descricao_completa = lines[i+6].strip()  # Linha 31: descrição completa
+            periodo_vencimento = lines[i+7].strip()  # Linha 32: PA + vencimento
+            
+            print(f"Denominação: '{denominacao}'", file=sys.stdout)
+            print(f"Valores: {principal_str}, {multa_str}, {juros_str}, {total_str}", file=sys.stdout)
+            print(f"Período/Vencimento: '{periodo_vencimento}'", file=sys.stdout)
+            
+            # Converte valores monetários
+            try:
+                principal = parse_br_currency(principal_str)
+                multa = parse_br_currency(multa_str)
+                juros = parse_br_currency(juros_str)
+                total = parse_br_currency(total_str)
+            except Exception as e:
+                print(f"❌ Erro ao converter valores monetários: {e}", file=sys.stdout)
+                i += 1
+                continue
+            
+            # Extrai período de apuração
+            periodo_match = re.search(r"PA\s+(\d{2}/\d{4})", periodo_vencimento)
+            periodo = periodo_match.group(1) if periodo_match else ""
+            
+            # Extrai data de vencimento
+            vencimento_match = re.search(r"Vencimento\s+(\d{2}/\d{2}/\d{4})", periodo_vencimento)
+            vencimento = vencimento_match.group(1) if vencimento_match else ""
+            
+            print(f"Período extraído: '{periodo}'", file=sys.stdout)
+            print(f"Vencimento extraído: '{vencimento}'", file=sys.stdout)
+            
+            # Validação básica
+            if not denominacao or not periodo or not vencimento:
+                print(f"❌ Dados incompletos para código {codigo}", file=sys.stdout)
+                i += 1
+                continue
+            
+            darf_item = {
+                "codigo": codigo,
+                "denominacao": denominacao,
+                "periodo_apuracao": periodo,
+                "vencimento": vencimento,
+                "principal": principal,
+                "multa": multa,
+                "juros": juros,
+                "total": total
+            }
+            
+            result.append(darf_item)
+            print(f"✅ Item DARF extraído: {darf_item}", file=sys.stdout)
+            
+            # Pula para depois das 8 linhas processadas (código + 7 linhas de dados)
+            i += 8
+            continue
+        
+        i += 1
     
-    print(f"Extração DARF finalizada. {len(result)} itens encontrados em {len(composition_sections)} seções.", file=sys.stdout)
+    print(f"Extração DARF finalizada. {len(result)} itens encontrados.", file=sys.stdout)
     return result
 
 @app.post("/api/extraction/extract-darf")

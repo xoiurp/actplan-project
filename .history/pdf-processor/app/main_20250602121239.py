@@ -113,7 +113,7 @@ def extract_pdf_text(pdf_bytes):
         print("AVISO: NENHUM TEXTO FOI EXTRAÍDO DO PDF.", file=sys.stdout)
     return text
 
-# Função específica para extrair "Pendência - Débito (SIEF)" - Lógica v5 (Flexível por Conteúdo)
+# Função específica para extrair "Pendência - Débito (SIEF)" - Lógica v4 (Iteração por Linhas)
 def extract_pendencias_debito(text):
     result = []
     lines = text.split('\n')
@@ -129,20 +129,24 @@ def extract_pendencias_debito(text):
         r"^\s*_{10,}\s*$" # Linha de underscores
     ]
 
-    print("\n--- Iniciando busca pela seção 'Pendência - Débito (SIEF)' (v5 - Flexível) ---", file=sys.stdout)
+    # Funções helper agora são globais
+
+    print("\n--- Iniciando busca pela seção 'Pendência - Débito (SIEF)' ---", file=sys.stdout)
 
     i = 0
+    # O loop agora itera diretamente sobre as linhas do texto completo
     while i < len(lines):
         line = lines[i].strip()
 
         # Verifica se entramos na seção correta
         if not in_section and re.search(start_pattern, line, re.IGNORECASE):
             in_section = True
-            current_cnpj = ""
+            current_cnpj = "" # Reseta CNPJ ao entrar na seção
             print(f"Seção 'Pendência - Débito (SIEF)' encontrada na linha {i+1}: '{line}'", file=sys.stdout)
             i += 1
             continue
 
+        # Se não estamos na seção, apenas avança
         if not in_section:
             i += 1
             continue
@@ -151,9 +155,10 @@ def extract_pendencias_debito(text):
         if any(re.search(ep, line, re.IGNORECASE) for ep in end_patterns):
             print(f"Fim da seção 'Pendência - Débito (SIEF)' detectado na linha {i+1}: '{line}'", file=sys.stdout)
             in_section = False
-            break
+            break # Sai do loop principal ao encontrar o fim da seção
 
-        if not line:
+        # Dentro da seção, processa a linha
+        if not line: # Pula linhas vazias
             i += 1
             continue
 
@@ -165,11 +170,12 @@ def extract_pendencias_debito(text):
             i += 1
             continue
 
-        # Ignora linhas de cabeçalho
+        # Ignora linhas de cabeçalho explícitas (agora mais simples)
         if "Receita" in line and "PA/Exerc" in line and "Vcto" in line:
              print(f"Linha de cabeçalho pulada: '{line}'", file=sys.stdout)
              i += 1
              continue
+        # Pula linhas que são apenas os títulos dos campos
         if line in ["Dt. Vcto", "Vl. Original", "Sdo. Devedor", "Multa", "Juros", "Sdo. Dev. Cons.", "Situação"]:
              print(f"Linha de título de campo pulada: '{line}'", file=sys.stdout)
              i += 1
@@ -180,111 +186,91 @@ def extract_pendencias_debito(text):
         if receita_match and current_cnpj:
             print(f"\nInício de registro de débito encontrado: '{line}'", file=sys.stdout)
             debito_data = {"cnpj": current_cnpj, "receita": receita_match.group(1).strip()}
-            
-            # Coleta as próximas linhas até encontrar outro código de receita ou fim da seção
+            campos_encontrados = 0
+            linhas_consumidas = 0
+
+            # Tenta ler os próximos campos linha a linha
             j = i + 1
-            collected_lines = []
-            
-            # Coleta linhas até encontrar próximo registro ou fim
-            while j < len(lines):
-                next_line = lines[j].strip()
-                
-                # Para se encontrar outro código de receita (início de novo registro)
-                if re.match(r"(\d{4}-\d{2}\s+-\s+.*)", next_line):
-                    print(f"Próximo registro encontrado na linha {j+1}, parando coleta", file=sys.stdout)
-                    break
-                    
-                # Para se encontrar fim da seção
-                if any(re.search(ep, next_line, re.IGNORECASE) for ep in end_patterns):
-                    print(f"Fim da seção encontrado na linha {j+1}, parando coleta", file=sys.stdout)
-                    break
-                    
-                # Para se encontrar CNPJ (novo grupo)
-                if re.search(r"CNPJ:\s*(\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2})", next_line):
-                    print(f"Novo CNPJ encontrado na linha {j+1}, parando coleta", file=sys.stdout)
-                    break
-                
-                # Para se encontrar cabeçalho
-                if "Receita" in next_line and "PA/Exerc" in next_line:
-                    print(f"Cabeçalho encontrado na linha {j+1}, parando coleta", file=sys.stdout)
-                    break
-                
-                if next_line:  # Só adiciona linhas não vazias
-                    collected_lines.append(next_line)
-                    print(f"Coletada linha {j+1}: '{next_line}'", file=sys.stdout)
-                
-                j += 1
-            
-            # Agora analisa as linhas coletadas por tipo de conteúdo
-            print(f"Analisando {len(collected_lines)} linhas coletadas para o registro", file=sys.stdout)
-            
-            # Inicializa campos opcionais
-            debito_data.update({
-                "periodo_apuracao": "",
-                "vencimento": "",
-                "valor_original": 0.0,
-                "saldo_devedor": 0.0,
-                "multa": 0.0,
-                "juros": 0.0,
-                "saldo_devedor_consolidado": 0.0,
-                "situacao": ""
-            })
-            
-            for line_content in collected_lines:
-                # Identifica PERÍODO (MM/YYYY ou N TRIM/YYYY)
-                if re.match(r'(\d{2})/(\d{4})', line_content) or re.match(r'(\d{1,2})(?:º|o|ª|\s)?\s*TRIM/(\d{4})', line_content, re.IGNORECASE):
-                    if not debito_data["periodo_apuracao"]:  # Só pega o primeiro
-                        debito_data["periodo_apuracao"] = format_periodo(line_content)
-                        print(f"✅ Período identificado: '{line_content}' -> '{debito_data['periodo_apuracao']}'", file=sys.stdout)
-                
-                # Identifica DATA (DD/MM/YYYY) 
-                elif re.match(r'(\d{2})/(\d{2})/(\d{4})', line_content):
-                    if not debito_data["vencimento"]:  # Primeira data é vencimento
-                        debito_data["vencimento"] = format_date(line_content)
-                        print(f"✅ Vencimento identificado: '{line_content}' -> '{debito_data['vencimento']}'", file=sys.stdout)
-                
-                # Identifica VALORES MONETÁRIOS (números com vírgula/ponto)
-                elif re.match(r'^[\d.,]+$', line_content) and (',' in line_content or '.' in line_content):
-                    valor = parse_br_currency(line_content)
-                    if valor > 0:
-                        if not debito_data["valor_original"]:
-                            debito_data["valor_original"] = valor
-                            print(f"✅ Valor Original identificado: '{line_content}' -> {valor}", file=sys.stdout)
-                        elif not debito_data["saldo_devedor"]:
-                            debito_data["saldo_devedor"] = valor
-                            print(f"✅ Saldo Devedor identificado: '{line_content}' -> {valor}", file=sys.stdout)
-                        elif not debito_data["saldo_devedor_consolidado"]:
-                            debito_data["saldo_devedor_consolidado"] = valor
-                            print(f"✅ Saldo Consolidado identificado: '{line_content}' -> {valor}", file=sys.stdout)
-                        elif not debito_data["multa"]:
-                            debito_data["multa"] = valor
-                            print(f"✅ Multa identificada: '{line_content}' -> {valor}", file=sys.stdout)
-                        elif not debito_data["juros"]:
-                            debito_data["juros"] = valor
-                            print(f"✅ Juros identificados: '{line_content}' -> {valor}", file=sys.stdout)
-                        else:
-                            print(f"⚠️ Valor monetário extra ignorado: '{line_content}' -> {valor}", file=sys.stdout)
-                
-                # Identifica SITUAÇÃO (texto que não é data nem valor)
+            temp_data = {}
+
+            # 1. Período (pode ocupar 1 ou 2 linhas)
+            if j < len(lines):
+                periodo_str = lines[j]
+                # Verifica se a próxima linha também faz parte do período (TRIM/YYYY)
+                if j + 1 < len(lines) and re.match(r'TRIM/\d{4}', lines[j+1], re.IGNORECASE):
+                    periodo_str += " " + lines[j+1]
+                    linhas_consumidas = 2
+                    print(f"Período detectado em 2 linhas: '{lines[j]}' e '{lines[j+1]}'", file=sys.stdout)
                 else:
-                    if not debito_data["situacao"] and line_content:
-                        # Ignora textos que parecem ser códigos de receita ou períodos mal formatados
-                        if not re.match(r'\d{4}-\d{2}', line_content) and not re.match(r'\d{2}/\d{4}', line_content):
-                            debito_data["situacao"] = line_content
-                            print(f"✅ Situação identificada: '{line_content}'", file=sys.stdout)
-            
-            # Validação: precisa pelo menos de receita, período e vencimento
-            if debito_data["receita"] and debito_data["periodo_apuracao"] and debito_data["vencimento"]:
+                    linhas_consumidas = 1
+                    print(f"Período detectado em 1 linha: '{lines[j]}'", file=sys.stdout)
+
+                temp_data["periodo_apuracao"] = format_periodo(periodo_str)
+                if temp_data["periodo_apuracao"]: campos_encontrados += 1
+                j += linhas_consumidas
+
+            # 2. Vencimento (1 linha)
+            if j < len(lines):
+                print(f"Tentando ler Vencimento na linha: '{lines[j]}'", file=sys.stdout)
+                temp_data["vencimento"] = format_date(lines[j])
+                if temp_data["vencimento"]: campos_encontrados += 1
+                j += 1
+
+            # 3. Valor Original (1 linha)
+            if j < len(lines):
+                print(f"Tentando ler Valor Original na linha: '{lines[j]}'", file=sys.stdout)
+                temp_data["valor_original"] = parse_br_currency(lines[j])
+                campos_encontrados += 1 # Assume que sempre existe, mesmo que 0.0
+                j += 1
+
+            # 4. Saldo Devedor (1 linha)
+            if j < len(lines):
+                print(f"Tentando ler Saldo Devedor na linha: '{lines[j]}'", file=sys.stdout)
+                temp_data["saldo_devedor"] = parse_br_currency(lines[j])
+                campos_encontrados += 1
+                j += 1
+
+            # 5. Multa (1 linha)
+            if j < len(lines):
+                print(f"Tentando ler Multa na linha: '{lines[j]}'", file=sys.stdout)
+                temp_data["multa"] = parse_br_currency(lines[j])
+                campos_encontrados += 1
+                j += 1
+
+            # 6. Juros (1 linha)
+            if j < len(lines):
+                print(f"Tentando ler Juros na linha: '{lines[j]}'", file=sys.stdout)
+                temp_data["juros"] = parse_br_currency(lines[j])
+                campos_encontrados += 1
+                j += 1
+
+            # 7. Saldo Devedor Consolidado (1 linha)
+            if j < len(lines):
+                print(f"Tentando ler Saldo Consolidado na linha: '{lines[j]}'", file=sys.stdout)
+                temp_data["saldo_devedor_consolidado"] = parse_br_currency(lines[j])
+                campos_encontrados += 1
+                j += 1
+
+            # 8. Situação (1 linha)
+            if j < len(lines):
+                print(f"Tentando ler Situação na linha: '{lines[j]}'", file=sys.stdout)
+                temp_data["situacao"] = lines[j].strip()
+                campos_encontrados += 1
+                j += 1
+
+            # Validação: Precisamos pelo menos de receita, período e vencimento válidos
+            if debito_data["receita"] and temp_data.get("periodo_apuracao") and temp_data.get("vencimento"):
+                debito_data.update(temp_data) # Adiciona os campos lidos
                 result.append(debito_data)
-                print(f"✅ Item extraído com sucesso (v5 flexível): {debito_data}", file=sys.stdout)
-                i = j  # Continua da linha onde parou a coleta
+                print(f"Item extraído com sucesso (lógica v4): {debito_data}", file=sys.stdout)
+                i = j # Atualiza o índice principal para continuar após os campos lidos
             else:
-                print(f"❌ Falha na validação dos campos obrigatórios para '{debito_data['receita']}'. Dados: {debito_data}", file=sys.stdout)
-                i += 1
+                print(f"Falha na validação dos campos obrigatórios (receita, período, vencimento) para a receita '{debito_data['receita']}'. Dados lidos: {temp_data}", file=sys.stdout)
+                i += 1 # Avança apenas uma linha (a da receita) e tenta novamente
 
         else:
             # Se a linha não é CNPJ, cabeçalho ou início de receita, apenas pula
-            print(f"Linha ignorada (não reconhecida como início de débito): '{line}'", file=sys.stdout)
+            print(f"Linha ignorada (não reconhecida como início de débito ou cabeçalho): '{line}'", file=sys.stdout)
             i += 1
 
     if not result:
@@ -982,252 +968,5 @@ async def extract_pdf(file: UploadFile = File(...)):
         # Para segurança, podemos definir um padrão aqui, mas o ideal é que o try/except cubra.
         if 'response_to_send' not in locals():
              response_to_send = JSONResponse(content={"error": "Erro inesperado antes de gerar resposta."}, status_code=500)
-
-    return response_to_send
-
-# Função para extrair dados do DARF - Versão Multi-página
-def extract_darf_data(text):
-    result = []
-    lines = text.split('\n')
-    
-    print("\n--- Iniciando extração de dados do DARF (Multi-página) ---", file=sys.stdout)
-    
-    # Procura por TODAS as seções "Composição do Documento de Arrecadação"
-    start_pattern = r"Composição\s+do\s+Documento\s+de\s+Arrecadação"
-    header_pattern = r"Código\s+Denominação\s+Principal\s+Multa\s+Juros\s+Total"
-    
-    # Encontra todas as seções de composição
-    composition_sections = []
-    for i, line in enumerate(lines):
-        if re.search(start_pattern, line.strip(), re.IGNORECASE):
-            composition_sections.append(i)
-            print(f"Seção de composição encontrada na linha {i+1}: '{line.strip()}'", file=sys.stdout)
-    
-    print(f"Total de seções de composição encontradas: {len(composition_sections)}", file=sys.stdout)
-    
-    # Processa cada seção de composição
-    for section_idx, section_start in enumerate(composition_sections):
-        print(f"\n--- Processando seção {section_idx + 1} (linha {section_start + 1}) ---", file=sys.stdout)
-        
-        # Define o fim da seção atual (início da próxima seção ou fim do texto)
-        if section_idx < len(composition_sections) - 1:
-            section_end = composition_sections[section_idx + 1]
-        else:
-            section_end = len(lines)
-        
-        # Processa apenas as linhas desta seção
-        in_composition_section = False
-        i = section_start
-        
-        while i < section_end:
-            line = lines[i].strip()
-            
-            # Ativa a seção quando encontra o padrão
-            if not in_composition_section and re.search(start_pattern, line, re.IGNORECASE):
-                in_composition_section = True
-                print(f"Seção {section_idx + 1} ativada na linha {i+1}", file=sys.stdout)
-                i += 1
-                continue
-                
-            if not in_composition_section:
-                i += 1
-                continue
-                
-            # Pula linha de cabeçalho da tabela
-            if re.search(header_pattern, line, re.IGNORECASE):
-                print(f"Cabeçalho da tabela encontrado na linha {i+1}: '{line}'", file=sys.stdout)
-                i += 1
-                continue
-                
-            # Para se chegar ao fim desta seção (mas não para a extração global)
-            if not line or line.startswith("Total do Documento") or line.startswith("VENCIMENTO") or line.startswith("AUTENTICAÇÃO"):
-                print(f"Fim da seção {section_idx + 1} detectado na linha {i+1}: '{line}'", file=sys.stdout)
-                break
-                
-            # Tenta detectar início de item DARF por dois padrões diferentes
-            
-            # Padrão 1: linha só com 4 dígitos (formato original)
-            codigo_only_match = re.match(r"^(\d{4})$", line)
-            
-            # Padrão 2: código + denominação + valores na mesma linha
-            codigo_inline_match = re.match(r"^(\d{4})\s+(.+?)\s+([\d.,]+)\s+([\d.,]+)\s+([\d.,]+)\s+([\d.,]+)$", line)
-            
-            if codigo_only_match:
-                # FORMATO 1: Código sozinho
-                codigo = codigo_only_match.group(1)
-                print(f"\n🎯 Código DARF (Formato 1) encontrado: {codigo} na linha {i+1} (Seção {section_idx + 1})", file=sys.stdout)
-                
-                # Verifica se temos linhas suficientes para um item completo dentro desta seção
-                if i + 7 >= section_end:
-                    print(f"❌ Não há linhas suficientes após código {codigo} na seção {section_idx + 1}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                # Extrai dados nas próximas linhas conforme o padrão observado
-                denominacao = lines[i+1].strip()  # denominação
-                principal_str = lines[i+2].strip()  # principal
-                multa_str = lines[i+3].strip()      # multa
-                juros_str = lines[i+4].strip()      # juros
-                total_str = lines[i+5].strip()      # total
-                descricao_completa = lines[i+6].strip()  # descrição completa
-                periodo_vencimento = lines[i+7].strip()  # PA + vencimento
-                
-                print(f"Denominação: '{denominacao}'", file=sys.stdout)
-                print(f"Valores: {principal_str}, {multa_str}, {juros_str}, {total_str}", file=sys.stdout)
-                print(f"Período/Vencimento: '{periodo_vencimento}'", file=sys.stdout)
-                
-                # Converte valores monetários
-                try:
-                    principal = parse_br_currency(principal_str)
-                    multa = parse_br_currency(multa_str)
-                    juros = parse_br_currency(juros_str)
-                    total = parse_br_currency(total_str)
-                except Exception as e:
-                    print(f"❌ Erro ao converter valores monetários: {e}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                # Extrai período de apuração (formato pode ser DD/MM/YYYY ou MM/YYYY)
-                periodo_match = re.search(r"PA\s+(\d{2}/\d{2}/\d{4}|\d{2}/\d{4})", periodo_vencimento)
-                periodo = periodo_match.group(1) if periodo_match else ""
-                
-                # Extrai data de vencimento
-                vencimento_match = re.search(r"Vencimento\s+(\d{2}/\d{2}/\d{4})", periodo_vencimento)
-                vencimento = vencimento_match.group(1) if vencimento_match else ""
-                
-                print(f"Período extraído: '{periodo}'", file=sys.stdout)
-                print(f"Vencimento extraído: '{vencimento}'", file=sys.stdout)
-                
-                # Validação básica
-                if not denominacao or not periodo or not vencimento:
-                    print(f"❌ Dados incompletos para código {codigo} na seção {section_idx + 1}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                darf_item = {
-                    "codigo": codigo,
-                    "denominacao": denominacao,
-                    "periodo_apuracao": periodo,
-                    "vencimento": vencimento,
-                    "principal": principal,
-                    "multa": multa,
-                    "juros": juros,
-                    "total": total
-                }
-                
-                result.append(darf_item)
-                print(f"✅ Item DARF (Formato 1) extraído da seção {section_idx + 1}: {darf_item}", file=sys.stdout)
-                
-                # Pula para depois das 8 linhas processadas (código + 7 linhas de dados)
-                i += 8
-                continue
-                
-            elif codigo_inline_match:
-                # FORMATO 2: Código + denominação + valores na mesma linha
-                codigo = codigo_inline_match.group(1)
-                denominacao = codigo_inline_match.group(2).strip()
-                principal_str = codigo_inline_match.group(3)
-                multa_str = codigo_inline_match.group(4)
-                juros_str = codigo_inline_match.group(5)
-                total_str = codigo_inline_match.group(6)
-                
-                print(f"\n🎯 Código DARF (Formato 2) encontrado: {codigo} na linha {i+1} (Seção {section_idx + 1})", file=sys.stdout)
-                print(f"Denominação: '{denominacao}'", file=sys.stdout)
-                print(f"Valores: {principal_str}, {multa_str}, {juros_str}, {total_str}", file=sys.stdout)
-                
-                # Verifica se temos linhas suficientes para descrição e período
-                if i + 2 >= section_end:
-                    print(f"❌ Não há linhas suficientes após código {codigo} na seção {section_idx + 1}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                # Próximas linhas contêm descrição e período/vencimento
-                descricao_completa = lines[i+1].strip()  # descrição completa
-                periodo_vencimento = lines[i+2].strip()  # PA + vencimento
-                
-                print(f"Período/Vencimento: '{periodo_vencimento}'", file=sys.stdout)
-                
-                # Converte valores monetários
-                try:
-                    principal = parse_br_currency(principal_str)
-                    multa = parse_br_currency(multa_str)
-                    juros = parse_br_currency(juros_str)
-                    total = parse_br_currency(total_str)
-                except Exception as e:
-                    print(f"❌ Erro ao converter valores monetários: {e}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                # Extrai período de apuração (formato pode ser DD/MM/YYYY ou MM/YYYY)
-                periodo_match = re.search(r"PA\s+(\d{2}/\d{2}/\d{4}|\d{2}/\d{4})", periodo_vencimento)
-                periodo = periodo_match.group(1) if periodo_match else ""
-                
-                # Extrai data de vencimento
-                vencimento_match = re.search(r"Vencimento\s+(\d{2}/\d{2}/\d{4})", periodo_vencimento)
-                vencimento = vencimento_match.group(1) if vencimento_match else ""
-                
-                print(f"Período extraído: '{periodo}'", file=sys.stdout)
-                print(f"Vencimento extraído: '{vencimento}'", file=sys.stdout)
-                
-                # Validação básica
-                if not denominacao or not periodo or not vencimento:
-                    print(f"❌ Dados incompletos para código {codigo} na seção {section_idx + 1}", file=sys.stdout)
-                    i += 1
-                    continue
-                
-                darf_item = {
-                    "codigo": codigo,
-                    "denominacao": denominacao,
-                    "periodo_apuracao": periodo,
-                    "vencimento": vencimento,
-                    "principal": principal,
-                    "multa": multa,
-                    "juros": juros,
-                    "total": total
-                }
-                
-                result.append(darf_item)
-                print(f"✅ Item DARF (Formato 2) extraído da seção {section_idx + 1}: {darf_item}", file=sys.stdout)
-                
-                # Pula 3 linhas (linha atual + descrição + período)
-                i += 3
-                continue
-            
-            i += 1
-    
-    print(f"Extração DARF finalizada. {len(result)} itens encontrados em {len(composition_sections)} seções.", file=sys.stdout)
-    return result
-
-@app.post("/api/extraction/extract-darf")
-async def extract_darf_pdf(file: UploadFile = File(...)):
-    import sys
-    import traceback
-    response_to_send = None
-    try:
-        print(">>> Endpoint /api/extraction/extract-darf INICIADO <<<", file=sys.stdout)
-        print("Recebido PDF DARF para extração", file=sys.stdout)
-        contents = await file.read()
-
-        # Usa a função de extração de texto existente
-        extracted_text = extract_pdf_text(contents)
-        print("\n---\nTexto extraído do DARF (primeiros 1000 chars):", extracted_text[:1000].replace('\n', ' '), file=sys.stdout)
-
-        # Pré-processa o texto
-        cleaned_text = preprocess_text(extracted_text)
-
-        # Extrai dados do DARF
-        darf_data = extract_darf_data(cleaned_text)
-        
-        print(f"Dados DARF extraídos: {len(darf_data)} itens", file=sys.stdout)
-
-        response_to_send = JSONResponse(content={"data": darf_data})
-
-    except Exception as e:
-        print(f"Erro no endpoint /extract-darf: {e}\n{traceback.format_exc()}", file=sys.stdout)
-        response_to_send = JSONResponse(content={"error": f"Erro ao processar DARF: {e}"}, status_code=500)
-    finally:
-        print("Finalizando processamento do endpoint /extract-darf.", file=sys.stdout)
-        if 'response_to_send' not in locals():
-             response_to_send = JSONResponse(content={"error": "Erro inesperado no processamento DARF."}, status_code=500)
 
     return response_to_send
