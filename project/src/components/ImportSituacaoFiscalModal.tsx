@@ -239,20 +239,28 @@ export function ImportSituacaoFiscalModal({
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">CNPJ</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Inscrição</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Receita</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Data Inscrição</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Inscrito em</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Ajuizado em</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Processo</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Tipo Devedor</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Devedor Principal</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Situação</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {extractedData.pendenciasInscricao.map((item, index) => (
                           <tr key={index}>
+                            <td className="px-3 py-2 text-sm">{item.cnpj}</td>
                             <td className="px-3 py-2 text-sm">{item.inscricao}</td>
                             <td className="px-3 py-2 text-sm">{item.receita}</td>
-                            <td className="px-3 py-2 text-sm">{item.data_inscricao}</td>
+                            <td className="px-3 py-2 text-sm">{item.inscrito_em}</td>
+                            <td className="px-3 py-2 text-sm">{item.ajuizado_em || '-'}</td>
                             <td className="px-3 py-2 text-sm">{item.processo}</td>
+                            <td className="px-3 py-2 text-sm">{item.tipo_devedor}</td>
+                            <td className="px-3 py-2 text-sm">{item.devedor_principal || '-'}</td>
                             <td className="px-3 py-2 text-sm">{item.situacao}</td>
                           </tr>
                         ))}

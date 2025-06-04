@@ -177,7 +177,29 @@ export function OrderItemsTable({
                         ) : (
                           // Células padrão para débitos e outros
                           <>
-                            <TableCell>{item.code}</TableCell> {/* code é a receita */}
+                            <TableCell>
+                              <div className="max-w-xs">
+                                <div className="font-medium text-sm">{item.code}</div>
+                                {/* Mostra a denominação/descrição se disponível */}
+                                {(item as any).denominacao && (
+                                  <div className="text-xs text-gray-600 truncate" title={(item as any).denominacao}>
+                                    {(item as any).denominacao}
+                                  </div>
+                                )}
+                                {/* Fallback para DARF: se não tem denominacao, mostra indicação */}
+                                {type === 'DARF' && !(item as any).denominacao && (
+                                  <div className="text-xs text-amber-600 italic">
+                                    ⚠️ Descrição indisponível - Execute migração SQL
+                                  </div>
+                                )}
+                                {/* Se não tem denominacao, tenta usar tax_type para identificar o tipo */}
+                                {!(item as any).denominacao && item.tax_type && item.tax_type !== 'DARF' && (
+                                  <div className="text-xs text-gray-600">
+                                    {item.tax_type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
                             <TableCell>{item.start_period}</TableCell>
                             {/* <TableCell>{item.end_period}</TableCell> */}
                             <TableCell>{item.due_date}</TableCell>

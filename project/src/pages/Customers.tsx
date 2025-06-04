@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getCustomers, createCustomer, deleteCustomer } from '../lib/api'; // Remove updateCustomer
-import { Plus, FileText, Trash2, Eye } from 'lucide-react'; // Add Eye icon
+import { Plus, FileText, Trash2, Eye, Pencil } from 'lucide-react'; // Add Eye and Pencil icons
 import toast from 'react-hot-toast';
 import { fireConfetti } from '@/lib/confetti';
 import {
@@ -182,6 +182,19 @@ export default function Customers() {
                       className="text-primary hover:text-primary-hover hover:bg-primary/10"
                     >
                       <Eye className="h-4 w-4" />
+                    </Button>
+                    {/* Add Edit Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click if enabled
+                        navigate(`/customers/edit/${customer.id}`);
+                      }}
+                      title="Editar Cliente"
+                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                    >
+                      <Pencil className="h-4 w-4" />
                     </Button>
                     {/* Keep Delete Button */}
                     <Button

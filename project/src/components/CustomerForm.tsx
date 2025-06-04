@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useState } from 'react'; // Import useState
-import { Upload, Eye, EyeOff } from 'lucide-react'; // Import Eye and EyeOff icons
+import { Upload, Eye, EyeOff, FileText, XCircle } from 'lucide-react'; // Import Eye, EyeOff, FileText, XCircle
 import { uploadCertificate } from '../lib/api';
 import toast from 'react-hot-toast';
 
@@ -25,6 +25,10 @@ interface CustomerFormProps {
   onCertificateUpload?: () => void; // Callback after successful upload (mainly for edit)
   onFileChange?: (file: File | null) => void; // Callback for file selection/drop
   isSubmitting?: boolean; // Add isSubmitting prop
+  existingCertificateUrl?: string | null; // Add prop for existing certificate URL
+  existingCertificateName?: string | null; // Add prop for existing certificate name
+  certificateExpiryDate?: string | null; // Add prop for certificate expiry date
+  onRemoveCertificate?: () => void; // Optional: Handler to remove/clear certificate selection
 }
 
 export function CustomerForm({ 
@@ -35,21 +39,41 @@ export function CustomerForm({
   customerId, // Needed for upload on edit
   onCertificateUpload, // Callback after successful upload (mainly for edit)
   onFileChange, // Callback for file selection/drop
-  isSubmitting = false // Destructure with default value
+  isSubmitting = false, // Destructure with default value
+  existingCertificateUrl = null, // Destructure with default
+  existingCertificateName = null, // Destructure with default
+  certificateExpiryDate = null, // Destructure with default
+  onRemoveCertificate // Destructure
 }: CustomerFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
   const handleFileUpload = async (file: File) => {
-    if (!customerId) return;
+    if (!customerId && !isEdit) { // For create mode, customerId might not be available yet
+        // The parent component (CreateCustomer) handles upload after customer creation.
+        // This function in CustomerForm is more for the edit scenario or direct upload if customerId is present.
+        if (onFileChange) onFileChange(file); // Notify parent about the file
+        setSelectedFileName(file.name);
+        return;
+    }
+    if (!customerId && isEdit) {
+        toast.error('ID do cliente não encontrado para upload.');
+        return;
+    }
 
-    try {
-      await uploadCertificate(file, customerId);
-      toast.success('Certificado enviado com sucesso');
-      onCertificateUpload?.();
-    } catch (error) {
-      toast.error('Erro ao enviar certificado');
+    if (customerId) { // Ensure customerId is present for upload
+        try {
+        await uploadCertificate(file, customerId);
+        toast.success('Certificado enviado com sucesso');
+        setSelectedFileName(file.name); // Update selected file name
+        onCertificateUpload?.();
+        } catch (error) {
+        toast.error('Erro ao enviar certificado');
+        setSelectedFileName(null); // Clear on error
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        }
     }
   };
 
@@ -65,21 +89,27 @@ export function CustomerForm({
     return true;
   };
 
-  // Renamed internal handler to avoid conflict with prop
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (file && !validateFile(file)) {
-      onFileChange?.(null); // Clear selection if invalid
-      if (fileInputRef.current) fileInputRef.current.value = ''; // Reset input
+      onFileChange?.(null);
+      setSelectedFileName(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
-    onFileChange?.(file); // Pass valid file (or null) to parent
-    // Upload only happens on edit form via handleFileUpload or on create form after customer creation
-    if (isEdit && file) {
-       handleFileUpload(file);
-    } else if (!file) {
-       // Clear potential previous selection if user cancels
-       onFileChange?.(null);
+    onFileChange?.(file);
+    setSelectedFileName(file ? file.name : null);
+    // In edit mode, if a customerId is present, we might directly upload.
+    // However, the primary upload logic is handled by the parent EditCustomer/CreateCustomer page on submit.
+    // This ensures validation (like password) happens first.
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFileName(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    onFileChange?.(null); // Notify parent that file is removed
+    if (isEdit && onRemoveCertificate) {
+        onRemoveCertificate(); // Call parent handler if in edit mode
     }
   };
 
@@ -87,19 +117,14 @@ export function CustomerForm({
     e.preventDefault();
     e.stopPropagation();
     const file = e.dataTransfer.files?.[0] ?? null;
-     if (file && !validateFile(file)) {
-       onFileChange?.(null); // Clear selection if invalid
-       return;
-     }
-    onFileChange?.(file); // Pass valid file (or null) to parent
-    // Upload only happens on edit form via handleFileUpload or on create form after customer creation
-    if (isEdit && file) {
-       handleFileUpload(file);
-    } else if (!file) {
-       // Clear potential previous selection if user cancels
-       onFileChange?.(null);
+    if (file && !validateFile(file)) {
+      onFileChange?.(null);
+      setSelectedFileName(null);
+      return;
     }
-  }, [isEdit, onFileChange]); // Add dependencies
+    onFileChange?.(file);
+    setSelectedFileName(file ? file.name : null);
+  }, [onFileChange]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -316,30 +341,53 @@ export function CustomerForm({
             ref={dropZoneRef}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-shadow-dark border-dashed rounded-md hover:border-primary transition-colors duration-200"
+            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-shadow-dark border-dashed rounded-md hover:border-primary transition-colors duration-200 relative"
           >
-            <div className="space-y-1 text-center">
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-              <div className="flex text-sm text-gray-600">
-                <label
-                  htmlFor="certificate"
-                  className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-hover focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
+            {selectedFileName || existingCertificateName ? (
+              <div className="text-center">
+                <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="text-sm text-gray-700 mt-2 truncate max-w-xs">
+                  {selectedFileName || existingCertificateName}
+                </p>
+                {certificateExpiryDate && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Validade: {new Date(certificateExpiryDate).toLocaleDateString('pt-BR')}
+                  </p>
+                )}
+                <button 
+                  type="button"
+                  onClick={handleRemoveFile}
+                  className="mt-2 text-sm text-red-600 hover:text-red-800 inline-flex items-center"
+                  aria-label="Remover arquivo"
                 >
-                  <span>Enviar arquivo</span>
-                  <input
-                    id="certificate"
-                    name="certificate"
-                    type="file"
-                    className="sr-only"
-                    accept=".pfx"
-                    ref={fileInputRef}
-                    onChange={handleFileInputChange} // Use updated handler
-                  />
-                </label>
-                <p className="pl-1">ou arraste e solte</p>
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Remover
+                </button>
               </div>
-              <p className="text-xs text-gray-500">Arquivos PFX até 10MB</p>
-            </div>
+            ) : (
+              <div className="space-y-1 text-center">
+                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="flex text-sm text-gray-600">
+                  <label
+                    htmlFor="certificate"
+                    className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-hover focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
+                  >
+                    <span>Enviar arquivo</span>
+                    <input
+                      id="certificate"
+                      name="certificate"
+                      type="file"
+                      className="sr-only"
+                      accept=".pfx"
+                      ref={fileInputRef}
+                      onChange={handleFileInputChange}
+                    />
+                  </label>
+                  <p className="pl-1">ou arraste e solte</p>
+                </div>
+                <p className="text-xs text-gray-500">Arquivos PFX até 10MB</p>
+              </div>
+            )}
           </div>
         </div>
       {/* Removed isEdit condition */}

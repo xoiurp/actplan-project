@@ -68,10 +68,18 @@ export function TaxSummary({ itens_pedido }: TaxSummaryProps) {
                 {itens_pedido.length}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {formatCurrency(itens_pedido.reduce((sum, item) => sum + item.original_value, 0))}
+                {formatCurrency(
+                  itens_pedido
+                    .filter(item => item.tax_type === 'DARF')
+                    .reduce((sum, item) => sum + item.original_value, 0)
+                )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {formatCurrency(itens_pedido.reduce((sum, item) => sum + item.current_balance, 0))}
+                {formatCurrency(
+                  itens_pedido
+                    .filter(item => item.tax_type === 'DARF')
+                    .reduce((sum, item) => sum + item.current_balance, 0)
+                )}
               </td>
             </tr>
           </tbody>

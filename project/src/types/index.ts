@@ -78,6 +78,7 @@ export interface OrderItem {
   // Campos comuns/Débito SIEF
   cnpj?: string; // Adicionado CNPJ como opcional geral
   code?: string; // Código da Receita ou Inscrição ou Conta ou Parcelamento
+  denominacao?: string; // Denominação/descrição do imposto (especialmente importante para DARF)
   start_period?: string; // Período Apuração ou Data Inscrição
   end_period?: string; // Geralmente igual a start_period para débitos
   due_date?: string; // Vencimento (não aplicável a SIDA)

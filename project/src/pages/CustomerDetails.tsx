@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getCustomerById } from '../lib/api'; // Import the actual API function
+import { getCustomer } from '../lib/api'; // Import the actual API function
 import { Loader2, ArrowLeft, Building2, User, Phone, MapPin, FileText } from 'lucide-react'; // Add icons
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,7 @@ export default function CustomerDetails() {
         console.error("Customer ID is undefined.");
         return Promise.resolve(null); 
       }
-      return getCustomerById(id);
+      return getCustomer(id);
     },
     enabled: !!id, // Only run the query if the id exists
   });

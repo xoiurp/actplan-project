@@ -146,44 +146,37 @@ export default function CreateOrder() {
 
   // Construct a more complete OrderItem, handle potential missing fields from modal
   const handleItemAdd = (newItemData: Partial<OrderItem>) => { 
-    // Map tax types to their numeric IDs
-    const taxTypeIds: Record<string, string> = {
-      'PIS': '9',
-      'PASEP': '9',
-      'COFINS': '10',
-      'IRPJ': '11',
-      'CSLL': '12',
-      'CP-TERCEIROS': '13',
-      'CP-PATRONAL': '14',
-      'IRRF': '15'
-    };
-
     // Create a more complete item, providing defaults for required fields
     // Merge defaults with newItemData, ensuring newItemData overrides defaults
     const completeNewItem: OrderItem = {
-      id: `temp-${Date.now()}-${Math.random()}`, // Temporary client-side ID
+      id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Unique client-side ID
       order_id: '', // Will be set after order creation
-      code: '',
-      tax_type: '',
-      start_period: '',
-      end_period: '',
-      due_date: '',
-      original_value: 0,
-      current_balance: 0,
-      fine: 0,
-      interest: 0,
-      status: 'pending', // Default status
+      code: newItemData.code || '',
+      tax_type: newItemData.tax_type || 'MANUAL',
+      start_period: newItemData.start_period || '2024-01-01', // Garantir data válida
+      end_period: newItemData.end_period || '2024-01-01',     // Garantir data válida
+      due_date: newItemData.due_date || '2024-01-01',         // Garantir data válida
+      original_value: newItemData.original_value || 0,
+      current_balance: newItemData.current_balance || 0,
+      fine: newItemData.fine || 0,
+      interest: newItemData.interest || 0,
+      status: newItemData.status || 'pending', // Default status
       created_at: new Date().toISOString(), // Set creation time
       updated_at: new Date().toISOString(), // Set update time
       ...newItemData, // Spread newItemData to override defaults and add optional fields like cno
     };
+    
     // Ensure current_balance defaults to original_value if not provided or nullish in newItemData
     if (completeNewItem.current_balance == null) {
        completeNewItem.current_balance = completeNewItem.original_value ?? 0;
     }
-    
-    // Remove the tax type based ID logic as we use a temp ID now
-    // completeNewItem.id = taxTypeIds[completeNewItem.tax_type] || completeNewItem.tax_type; 
+
+    console.log('🔍 Item manual criado:', {
+      code: completeNewItem.code,
+      start_period: completeNewItem.start_period,
+      end_period: completeNewItem.end_period,
+      due_date: completeNewItem.due_date
+    });
     
     setItensPedido(prev => [...prev, completeNewItem]);
   };
@@ -197,6 +190,13 @@ export default function CreateOrder() {
   };
 
   const handleDarfImport = (items: OrderItem[], file: File) => {
+    console.log('🎯 DARF Import iniciado!', { 
+      itemsRecebidos: items.length, 
+      itensExistentes: itens_pedido.length 
+    });
+    console.log('📋 Itens DARF recebidos:', items);
+    console.log('📋 Itens existentes na tabela:', itens_pedido);
+
     // Store file info in form state
     setFormData(prev => ({
       ...prev,
@@ -206,19 +206,35 @@ export default function CreateOrder() {
           name: file.name,
           type: file.type,
           size: file.size,
-          url: URL.createObjectURL(file)
+          url: URL.createObjectURL(file),
+          file: file // Armazena o arquivo real para upload
         }
       }
     }));
 
+    // Se não há itens existentes, adiciona os itens do DARF diretamente
+    if (itens_pedido.length === 0) {
+      console.log('🆕 Nenhum item existente, adicionando itens DARF diretamente');
+      console.log('🔍 Verificando IDs dos itens DARF:', items.map(item => ({ id: item.id, code: item.code })));
+      setItensPedido(items);
+      toast.success(`${items.length} itens DARF adicionados com sucesso`);
+      setIsImportModalOpen(false);
+      return;
+    }
+
     // Atualiza os itens existentes com os dados do DARF
     const updatedItems = itens_pedido.map(item => {
-      const matchingDarfItem = items.find(darfItem => 
-        darfItem.code === item.code && 
-        (darfItem.cno ? darfItem.cno === item.cno : true)
-      );
+      console.log(`🔍 Procurando match para item existente: ${item.code}`);
+      
+      const matchingDarfItem = items.find(darfItem => {
+        const codeMatch = darfItem.code === item.code;
+        const cnoMatch = darfItem.cno ? darfItem.cno === item.cno : true;
+        console.log(`   - DARF ${darfItem.code}: codeMatch=${codeMatch}, cnoMatch=${cnoMatch}`);
+        return codeMatch && cnoMatch;
+      });
 
       if (matchingDarfItem) {
+        console.log(`✅ Match encontrado para ${item.code}:`, matchingDarfItem);
         return {
           ...item,
           fine: matchingDarfItem.fine,
@@ -226,18 +242,40 @@ export default function CreateOrder() {
           current_balance: matchingDarfItem.current_balance,
           ...(matchingDarfItem.cno && { original_value: matchingDarfItem.original_value }) // Atualiza valor original apenas para itens com CNO
         };
+      } else {
+        console.log(`❌ Nenhum match encontrado para ${item.code}`);
       }
 
       return item;
     });
 
+    // Adiciona itens DARF que não tiveram match (novos itens)
+    const unmatchedDarfItems = items.filter(darfItem => {
+      return !itens_pedido.some(existingItem => 
+        darfItem.code === existingItem.code && 
+        (darfItem.cno ? darfItem.cno === existingItem.cno : true)
+      );
+    });
+
+    if (unmatchedDarfItems.length > 0) {
+      console.log(`🆕 Adicionando ${unmatchedDarfItems.length} novos itens DARF:`, unmatchedDarfItems);
+      updatedItems.push(...unmatchedDarfItems);
+    }
+
+    console.log('📋 Itens finais após correlação:', updatedItems);
     setItensPedido(updatedItems);
-    toast.success(`Dados do DARF importados com sucesso`);
+    toast.success(`Dados do DARF importados: ${unmatchedDarfItems.length} novos, ${updatedItems.length - unmatchedDarfItems.length} atualizados`);
     setIsImportModalOpen(false);
   };
 
   // Novo: handler recebe também o JSON completo da situação fiscal
   const handleSituacaoFiscalImport = (importedItems: OrderItem[], file: File, rawSituacaoFiscalData?: any) => {
+    console.log('🎯 Situação Fiscal Import iniciado!', { 
+      itemsRecebidos: importedItems.length,
+      itensExistentes: itens_pedido.length 
+    });
+    console.log('📋 Itens Situação Fiscal recebidos:', importedItems);
+
     // Salva o arquivo e o JSON completo da situação fiscal no estado
     setFormData(prev => ({
       ...prev,
@@ -248,29 +286,19 @@ export default function CreateOrder() {
           type: file.type,
           size: file.size,
           url: URL.createObjectURL(file),
+          file: file, // Armazena o arquivo real para upload
           ...(rawSituacaoFiscalData ? rawSituacaoFiscalData : {})
         }
       }
     }));
 
-    // Map tax types to their numeric IDs
-    const taxTypeIds: Record<string, string> = {
-      'PIS': '9',
-      'PASEP': '9',
-      'COFINS': '10',
-      'IRPJ': '11',
-      'CSLL': '12',
-      'CP-TERCEIROS': '13',
-      'CP-PATRONAL': '14',
-      'IRRF': '15'
-    };
-
-    // Os itens já devem vir com as chaves corretas (snake_case) do pdfProcessor
-    const newItems = importedItems.map(item => ({
+    // Gera IDs únicos para evitar chaves duplicadas
+    const newItems = importedItems.map((item, index) => ({
       ...item,
-      id: taxTypeIds[item.tax_type] || item.tax_type
+      id: `situacao-fiscal-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`
     }));
 
+    console.log('📋 Itens com IDs únicos:', newItems);
     setItensPedido(prevItems => [...prevItems, ...newItems]);
     toast.success(`${importedItems.length} itens importados com sucesso`);
   };
@@ -693,7 +721,7 @@ export default function CreateOrder() {
                             <td className="px-2 py-1">{item.cnpj}</td>
                             <td className="px-2 py-1">{item.inscricao}</td>
                             <td className="px-2 py-1">{item.receita}</td>
-                            <td className="px-2 py-1">{item.data_inscricao}</td>
+                            <td className="px-2 py-1">{item.inscrito_em}</td>
                             <td className="px-2 py-1">{item.processo}</td>
                             <td className="px-2 py-1">{item.tipo_devedor}</td>
                             <td className="px-2 py-1">{item.situacao}</td>

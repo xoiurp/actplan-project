@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { OrderItemsTable } from '../components/OrderItemsTable';
 import { AddOrderItemModal } from '../components/AddOrderItemModal';
 import { ImportSituacaoFiscalModal } from '../components/ImportSituacaoFiscalModal';
-import { getCustomers, getOrders, updateOrder } from '../lib/api';
+import { getCustomers, getOrder, updateOrder } from '../lib/api';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BillingCalculationsTable } from '../components/BillingCalculationsTable';
 import { ImportDarfModal } from '../components/ImportDarfModal';
@@ -54,15 +54,32 @@ export default function EditOrder() {
     documentos: undefined
   });
 
-  const { data: orders } = useQuery({
-    queryKey: ['orders'],
-    queryFn: getOrders,
+  const { data: order } = useQuery({
+    queryKey: ['order', id],
+    queryFn: () => getOrder(id!),
+    enabled: !!id, // Só executa se tiver id
   });
-
-  const order = orders?.find(o => o.id === id);
 
   useEffect(() => {
     if (order) {
+      console.log('🔍 [EditOrder] Order recebido:', order);
+      console.log('🔍 [EditOrder] Itens do pedido:', order.itens_pedido);
+      
+      // Log específico para itens DARF
+      const darfItems = order.itens_pedido.filter((item: OrderItem) => item.tax_type === 'DARF');
+      if (darfItems.length > 0) {
+        console.log('🔍 [EditOrder] Itens DARF encontrados:', darfItems);
+        darfItems.forEach((item: OrderItem, index: number) => {
+          console.log(`🔍 [EditOrder] DARF Item ${index}:`, {
+            id: item.id,
+            code: item.code,
+            denominacao: item.denominacao,
+            tax_type: item.tax_type,
+            allKeys: Object.keys(item)
+          });
+        });
+      }
+      
       setFormData({
     customer: order.customer_id || '',
     orderDate: order.data_pedido ? formatDateString(order.data_pedido) : '',
@@ -75,9 +92,10 @@ export default function EditOrder() {
     documentos: order.documentos
       });
 
-      // Transform order items to match the expected format
+      // Transform order items to match the expected format - preservando TODOS os campos
       const transformedItems = order.itens_pedido.map((item: OrderItem) => ({
         id: item.id,
+        order_id: item.order_id,
         code: item.code,
         tax_type: item.tax_type,
         start_period: item.start_period,
@@ -88,7 +106,26 @@ export default function EditOrder() {
         status: item.status,
         fine: item.fine,
         interest: item.interest,
-        cno: item.cno
+        cno: item.cno,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        // Campos importantes que estavam sendo perdidos
+        denominacao: item.denominacao,
+        cnpj: item.cnpj,
+        inscricao: item.inscricao,
+        receita: item.receita,
+        inscrito_em: item.inscrito_em,
+        ajuizado_em: item.ajuizado_em,
+        processo: item.processo,
+        tipo_devedor: item.tipo_devedor,
+        devedor_principal: item.devedor_principal,
+        parcelamento: item.parcelamento,
+        valor_suspenso: item.valor_suspenso,
+        modalidade: item.modalidade,
+        sispar_conta: item.sispar_conta,
+        sispar_descricao: item.sispar_descricao,
+        sispar_modalidade: item.sispar_modalidade,
+        saldo_devedor_consolidado: item.saldo_devedor_consolidado
       }));
       setItensPedido(transformedItems);
     }
@@ -153,6 +190,9 @@ export default function EditOrder() {
       itens_pedido: itens_pedido
     };
 
+    console.log('Dados do pedido para envio:', orderData);
+    console.log('Itens do pedido:', itens_pedido);
+    
     updateOrderMutation.mutate({ id: id!, data: orderData });
   };
 
@@ -218,83 +258,18 @@ export default function EditOrder() {
     setIsSituacaoFiscalModalOpen(true);
   };
 
-  const handleDarfImport = async (file: File) => {
+  const handleDarfImport = (importedItems: OrderItem[], file: File) => {
     try {
-      const darfItems = await processDarfPDF(file);
+      console.log(`Importando ${importedItems.length} itens DARF:`, importedItems);
       
-      if (!darfItems || darfItems.length === 0) {
-        toast.error('Falha ao extrair dados do DARF');
+      if (!importedItems || importedItems.length === 0) {
+        toast.error('Nenhum item DARF para importar');
         return;
       }
 
-      let updatedCount = 0;
-      const updatedItems = [...itens_pedido];
-
-      for (const darfData of darfItems) {
-        const matchingCodeItems = itens_pedido.filter((item: OrderItem) => {
-          const itemBaseCode = item.code.split('-')[0];
-          const darfBaseCode = darfData.code.split('-')[0];
-          return itemBaseCode === darfBaseCode;
-        });
-
-        if (matchingCodeItems.length === 0) {
-          console.log(`Nenhum item encontrado para código ${darfData.code}`);
-          continue;
-        }
-
-        let matchingItem: OrderItem | undefined;
-        if (darfData.code === '1646' && darfData.cno) {
-          matchingItem = matchingCodeItems.find((item: OrderItem) => 
-            item.cno === darfData.cno && 
-            item.start_period.includes(darfData.period)
-          );
-          
-          if (!matchingItem) {
-            console.log(`Nenhum item CP-PATRONAL encontrado com CNO ${darfData.cno} e período ${darfData.period}`);
-            continue;
-          }
-
-          const itemIndex = updatedItems.findIndex((item: OrderItem) => item.id === matchingItem!.id);
-          if (itemIndex !== -1) {
-            updatedItems[itemIndex] = {
-              ...matchingItem,
-              original_value: darfData.principal,
-              fine: darfData.fine,
-              interest: darfData.interest,
-              current_balance: darfData.totalValue
-            };
-            updatedCount++;
-          }
-        } else {
-          matchingItem = matchingCodeItems.find((item: OrderItem) => 
-            Math.abs(item.current_balance - darfData.principal) < 0.01
-          );
-
-          if (!matchingItem) {
-            console.log(`Nenhum item encontrado com valor ${darfData.principal} para código ${darfData.code}`);
-            continue;
-          }
-
-          const itemIndex = updatedItems.findIndex((item: OrderItem) => item.id === matchingItem!.id);
-          if (itemIndex !== -1) {
-            updatedItems[itemIndex] = {
-              ...matchingItem,
-              fine: darfData.fine,
-              interest: darfData.interest,
-              current_balance: darfData.totalValue
-            };
-            updatedCount++;
-          }
-        }
-      }
-
-      if (updatedCount === 0) {
-        toast.error('Nenhum débito correspondente encontrado para os itens do DARF');
-        return;
-      }
-
-      setItensPedido(updatedItems);
-      toast.success(`${updatedCount} item(s) atualizado(s) com sucesso`);
+      // Adiciona os novos itens DARF à lista existente
+      setItensPedido(prevItems => [...prevItems, ...importedItems]);
+      toast.success(`${importedItems.length} itens DARF importados com sucesso`);
       setIsImportModalOpen(false);
     } catch (error) {
       console.error('Erro ao processar DARF:', error);
@@ -332,8 +307,22 @@ export default function EditOrder() {
     return items.reduce((sum, item) => sum + selector(item), 0);
   };
 
-  const originalTotal = calculateTotal(itens_pedido, item => item.original_value);
-  const currentTotal = calculateTotal(itens_pedido, item => item.current_balance);
+  // Separa itens DARF dos demais para cálculo correto
+  const darfItems = itens_pedido.filter(item => item.tax_type === 'DARF');
+  const nonDarfItems = itens_pedido.filter(item => item.tax_type !== 'DARF');
+
+  // O total do pedido deve ser APENAS o valor do DARF (documento realmente pagável)
+  // Os outros itens são apenas informativos sobre a composição
+  const originalTotal = calculateTotal(darfItems, item => item.original_value || 0);
+  const currentTotal = calculateTotal(darfItems, item => item.current_balance || 0);
+
+  console.log('💰 Cálculo de totais:', {
+    totalItens: itens_pedido.length,
+    itensDarf: darfItems.length,
+    itensNaoDarf: nonDarfItems.length,
+    valorOriginalDarf: originalTotal,
+    valorAtualDarf: currentTotal
+  });
 
   const taxSummary = itens_pedido.reduce((acc: Record<string, { count: number; originalTotal: number; currentTotal: number }>, item) => {
     const key = item.tax_type;
@@ -341,8 +330,8 @@ export default function EditOrder() {
       acc[key] = { count: 0, originalTotal: 0, currentTotal: 0 };
     }
     acc[key].count += 1;
-    acc[key].originalTotal += item.original_value;
-    acc[key].currentTotal += item.current_balance;
+    acc[key].originalTotal += item.original_value || 0;
+    acc[key].currentTotal += item.current_balance || 0;
     return acc;
   }, {});
 

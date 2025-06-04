@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { getOrders } from '../lib/api';
-import { Plus, FileText, MessageSquare, CreditCard } from 'lucide-react';
+import { getOrders, deleteOrder, deleteMultipleOrders } from '../lib/api';
+import { Plus, FileText, MessageSquare, CreditCard, Trash2, Check } from 'lucide-react';
+import { DeleteConfirmationModal } from '../components/DeleteConfirmationModal';
+import toast from 'react-hot-toast';
+import { formatCurrency } from '../lib/utils';
 import {
   Table,
   TableBody,
@@ -26,21 +29,49 @@ const orderStatusMap: Record<OrderStatus, { label: string; bg: string; color: st
 
 export default function Orders() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    type: 'single' | 'multiple';
+    orderId?: string;
+  }>({ isOpen: false, type: 'single' });
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: getOrders,
   });
 
+  // Mutations for delete operations
+  const deleteSingleMutation = useMutation({
+    mutationFn: deleteOrder,
+    onSuccess: () => {
+      toast.success('Pedido excluído com sucesso');
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      setDeleteModal({ isOpen: false, type: 'single' });
+    },
+    onError: (error: Error) => {
+      toast.error('Erro ao excluir pedido: ' + error.message);
+    }
+  });
+
+  const deleteMultipleMutation = useMutation({
+    mutationFn: deleteMultipleOrders,
+    onSuccess: () => {
+      toast.success(`${selectedOrders.length} pedidos excluídos com sucesso`);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      setSelectedOrders([]);
+      setDeleteModal({ isOpen: false, type: 'multiple' });
+    },
+    onError: (error: Error) => {
+      toast.error('Erro ao excluir pedidos: ' + error.message);
+    }
+  });
+
   const formatDate = (timestamp: number) => {
     if (!timestamp) return '-';
     return new Date(timestamp).toLocaleDateString('pt-BR');
-  };
-
-  const formatCurrency = (value: number | null | undefined) => {
-    if (!value) return '-';
-    return `R$ ${value.toFixed(2)}`;
   };
 
   const handleOrderClick = (orderId: string) => {
@@ -51,31 +82,74 @@ export default function Orders() {
     navigate('/orders/new');
   };
 
+  // Selection handlers
+  const handleSelectOrder = (orderId: string) => {
+    setSelectedOrders(prev => 
+      prev.includes(orderId) 
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedOrders.length === orders.length) {
+      setSelectedOrders([]);
+    } else {
+      setSelectedOrders(orders.map(order => order.id));
+    }
+  };
+
+  // Delete handlers
+  const handleDeleteSingle = (orderId: string) => {
+    setDeleteModal({ isOpen: true, type: 'single', orderId });
+  };
+
+  const handleDeleteMultiple = () => {
+    setDeleteModal({ isOpen: true, type: 'multiple' });
+  };
+
+  const confirmDelete = () => {
+    if (deleteModal.type === 'single' && deleteModal.orderId) {
+      deleteSingleMutation.mutate(deleteModal.orderId);
+    } else if (deleteModal.type === 'multiple') {
+      deleteMultipleMutation.mutate(selectedOrders);
+    }
+  };
+
+  const isDeleting = deleteSingleMutation.isPending || deleteMultipleMutation.isPending;
+
   if (isLoading) {
     return <div className="animate-pulse">Carregando...</div>;
   }
 
   const orderActions = (
     <div className="flex items-center gap-2">
-      {/* Using Button component with size="sm" and variant="outline" */}
+      {selectedOrders.length > 0 && (
+        <Button
+          size="sm"
+          variant="destructive"
+          onClick={handleDeleteMultiple}
+          disabled={isDeleting}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Excluir {selectedOrders.length} {selectedOrders.length === 1 ? 'Pedido' : 'Pedidos'}
+        </Button>
+      )}
       <Button
         size="sm" 
         variant="outline"
         onClick={() => navigate('/payment-plans/bulk')}
-        // className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
       >
         <CreditCard className="mr-2 h-5 w-5" />
         Criar Cobrança em Lote
       </Button> 
-      {/* Using Button component with size="sm" */}
       <Button 
         size="sm"
         onClick={handleCreateOrder}
-        // className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
       >
         <Plus className="-ml-1 mr-2 h-5 w-5" />
         Novo Pedido
-      </Button> {/* Ensured closing tag */}
+      </Button>
     </div>
   );
 
@@ -90,6 +164,14 @@ export default function Orders() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  <input
+                    type="checkbox"
+                    checked={selectedOrders.length === orders.length && orders.length > 0}
+                    onChange={handleSelectAll}
+                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                </TableHead>
                 <TableHead>Pedido</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Cliente</TableHead>
@@ -102,17 +184,31 @@ export default function Orders() {
               {orders.map((order: Order) => (
                 <TableRow 
                   key={order.id} 
-                  className="hover:bg-shadow cursor-pointer"
-                  onClick={() => handleOrderClick(order.id)}
+                  className={`hover:bg-shadow cursor-pointer ${selectedOrders.includes(order.id) ? 'bg-blue-50' : ''}`}
                 >
-                  <TableCell className="whitespace-nowrap">
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selectedOrders.includes(order.id)}
+                      onChange={() => handleSelectOrder(order.id)}
+                      className="rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                  </TableCell>
+                  <TableCell 
+                    className="whitespace-nowrap"
+                    onClick={() => handleOrderClick(order.id)}
+                  >
                     {order.order_number ? (
                       `#${order.order_year || new Date().getFullYear()}/${order.order_number.toString().padStart(4, '0')}`
                     ) : '-'}
                   </TableCell>
-                  <TableCell>{order.data_pedido || formatDate(order.created_at)}</TableCell>
-                  <TableCell>{order.customer?.razao_social || '-'}</TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => handleOrderClick(order.id)}>
+                    {order.data_pedido || formatDate(order.created_at)}
+                  </TableCell>
+                  <TableCell onClick={() => handleOrderClick(order.id)}>
+                    {order.customer?.razao_social || '-'}
+                  </TableCell>
+                  <TableCell onClick={() => handleOrderClick(order.id)}>
                     <span
                       className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                       style={{
@@ -123,10 +219,13 @@ export default function Orders() {
                       {orderStatusMap[order.status as OrderStatus]?.label || order.status || 'Pendente'}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    {formatCurrency(order.itens_pedido.reduce((sum, item) => 
-                      sum + (item.current_balance || 0), 0
-                    ))}
+                  <TableCell onClick={() => handleOrderClick(order.id)}>
+                    {(() => {
+                      const total = order.itens_pedido
+                        .filter(item => item.tax_type === 'DARF')
+                        .reduce((sum, item) => sum + (item.current_balance || 0), 0);
+                      return total > 0 ? formatCurrency(total) : '-';
+                    })()}
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
@@ -147,13 +246,24 @@ export default function Orders() {
                       >
                         <MessageSquare className="h-4 w-4 text-gray-500" />
                       </button>
+                      <button
+                        className="p-1 hover:bg-red-50 rounded-full text-red-600 hover:text-red-800"
+                        title="Excluir Pedido"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteSingle(order.id);
+                        }}
+                        disabled={isDeleting}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
               {orders.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4 text-gray-500">
+                  <TableCell colSpan={7} className="text-center py-4 text-gray-500">
                     Nenhum pedido encontrado
                   </TableCell>
                 </TableRow>
@@ -162,6 +272,19 @@ export default function Orders() {
           </Table>
         </div>
       </div>
+
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, type: 'single' })}
+        onConfirm={confirmDelete}
+        title={deleteModal.type === 'single' ? 'Excluir Pedido' : 'Excluir Pedidos'}
+        message={
+          deleteModal.type === 'single'
+            ? 'Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.'
+            : `Tem certeza que deseja excluir ${selectedOrders.length} pedidos? Esta ação não pode ser desfeita.`
+        }
+        isLoading={isDeleting}
+      />
     </>
   );
 }
