@@ -1,0 +1,23 @@
+# Configurações de build para Netlify
+
+[build]
+  # Comando para construir o projeto
+  command = "npm run build"
+  
+  # Diretório base onde o comando de build será executado
+  # e onde o package.json está localizado
+  base = "project/" 
+  
+  # Diretório que contém os arquivos estáticos após o build (relativo ao 'base')
+  publish = "dist/"
+
+# Configuração do scanner de segurança para permitir variáveis específicas
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_EXTRACTION_API_URL"
+
+# Redirecionamento para lidar com roteamento de Single Page Application (SPA)
+# Necessário para o React Router funcionar corretamente
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -11,9 +11,9 @@
   # Diretório que contém os arquivos estáticos após o build (relativo ao 'base')
   publish = "dist/"
 
-# Opcional: Redirecionamento para lidar com roteamento de Single Page Application (SPA)
-# Descomente se seu projeto React usa react-router-dom ou similar
-# [[redirects]]
-#  from = "/*"
-#  to = "/index.html"
-#  status = 200
+# Redirecionamento para lidar com roteamento de Single Page Application (SPA)
+# Necessário para o React Router funcionar corretamente
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
