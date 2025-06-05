@@ -20,13 +20,35 @@ export async function processSituacaoFiscalPDF(file: File): Promise<SituacaoFisc
   formData.append('file', file);
 
   // Use localhost for development, production URL for deployment
-  const baseUrl = import.meta.env.VITE_EXTRACTION_API_URL || 'http://localhost:8000/api/extraction';
+  const extractionApiUrl = import.meta.env.VITE_EXTRACTION_API_URL;
+  const baseUrl = extractionApiUrl || 'http://localhost:8000/api/extraction';
+  
+  console.log('VITE_EXTRACTION_API_URL:', extractionApiUrl);
+  console.log('baseUrl:', baseUrl);
+  
+  // Validar se a URL é válida antes de construir endpoints
+  let validBaseUrl: string;
+  try {
+    new URL(baseUrl);
+    validBaseUrl = baseUrl;
+  } catch (error) {
+    console.error('URL base inválida:', baseUrl, error);
+    validBaseUrl = 'http://localhost:8000/api/extraction';
+  }
   
   // Lista de endpoints para tentar (fallback)
-  const endpoints = [
-    baseUrl + '/extract',
-    baseUrl.replace('/extraction', '/document') + '/process'
-  ];
+  const endpoints: string[] = [];
+  
+  try {
+    endpoints.push(validBaseUrl + '/extract');
+    endpoints.push(validBaseUrl.replace('/extraction', '/document') + '/process');
+  } catch (error) {
+    console.error('Erro ao construir endpoints:', error);
+    endpoints.push('http://localhost:8000/api/extraction/extract');
+    endpoints.push('http://localhost:8000/api/document/process');
+  }
+  
+  console.log('Endpoints a serem testados:', endpoints);
   
   const headers = {
     'User-Agent': 'ActPlan-PDF-Processor/1.0',
@@ -42,6 +64,9 @@ export async function processSituacaoFiscalPDF(file: File): Promise<SituacaoFisc
   for (const apiUrl of endpoints) {
     try {
       console.log(`Tentando endpoint: ${apiUrl}`);
+      
+      // Validar URL antes de fazer a requisição
+      new URL(apiUrl);
       
       const response = await fetch(apiUrl, {
         method: 'POST',

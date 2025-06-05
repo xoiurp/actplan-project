@@ -29,13 +29,35 @@ export async function processDarfPDF(file: File): Promise<DarfData[]> {
   formData.append('file', file);
 
   // Construct DARF API URL properly
-  const baseExtractionUrl = import.meta.env.VITE_EXTRACTION_API_URL || 'http://localhost:8000/api/extraction';
+  const extractionApiUrl = import.meta.env.VITE_EXTRACTION_API_URL;
+  const baseExtractionUrl = extractionApiUrl || 'http://localhost:8000/api/extraction';
+  
+  console.log('DARF VITE_EXTRACTION_API_URL:', extractionApiUrl);
+  console.log('DARF baseUrl:', baseExtractionUrl);
+  
+  // Validar se a URL é válida antes de construir endpoints
+  let validBaseUrl: string;
+  try {
+    new URL(baseExtractionUrl);
+    validBaseUrl = baseExtractionUrl;
+  } catch (error) {
+    console.error('DARF URL base inválida:', baseExtractionUrl, error);
+    validBaseUrl = 'http://localhost:8000/api/extraction';
+  }
   
   // Lista de endpoints para tentar (fallback)
-  const endpoints = [
-    baseExtractionUrl + '/extract-darf',
-    baseExtractionUrl.replace('/extraction', '/document') + '/process-darf'
-  ];
+  const endpoints: string[] = [];
+  
+  try {
+    endpoints.push(validBaseUrl + '/extract-darf');
+    endpoints.push(validBaseUrl.replace('/extraction', '/document') + '/process-darf');
+  } catch (error) {
+    console.error('DARF Erro ao construir endpoints:', error);
+    endpoints.push('http://localhost:8000/api/extraction/extract-darf');
+    endpoints.push('http://localhost:8000/api/document/process-darf');
+  }
+  
+  console.log('DARF Endpoints a serem testados:', endpoints);
   
   const headers = {
     'User-Agent': 'ActPlan-PDF-Processor/1.0',
@@ -51,6 +73,9 @@ export async function processDarfPDF(file: File): Promise<DarfData[]> {
   for (const apiUrl of endpoints) {
     try {
       console.log('DARF API URL:', apiUrl); // Debug log
+      
+      // Validar URL antes de fazer a requisição
+      new URL(apiUrl);
       
       const response = await fetch(apiUrl, {
         method: 'POST',
