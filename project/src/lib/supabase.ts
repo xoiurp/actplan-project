@@ -1,11 +1,21 @@
 import { createClient, type SupabaseClientOptions } from '@supabase/supabase-js';
 
-// Ler variáveis de ambiente do objeto global (para ambiente Docker com Nginx)
-// Fallback para import.meta.env (para ambiente de desenvolvimento local com Vite)
-const supabaseUrl = window._env_?.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = window._env_?.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Para Netlify, usamos import.meta.env diretamente
+// Para Docker, as variáveis são injetadas no build time
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+console.log('Environment check:', {
+  hasSupabaseUrl: !!supabaseUrl,
+  hasSupabaseKey: !!supabaseAnonKey,
+  supabaseUrl: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'undefined'
+});
 
 if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables:', {
+    VITE_SUPABASE_URL: supabaseUrl,
+    VITE_SUPABASE_ANON_KEY: supabaseAnonKey ? 'present' : 'missing'
+  });
   throw new Error('Missing Supabase environment variables');
 }
 
@@ -18,5 +28,5 @@ const options: SupabaseClientOptions<'public'> = {
   }
 };
 
-// Initialize client directly, reading from window._env_ first
+// Initialize client directly
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, options);
