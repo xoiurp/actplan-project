@@ -5,53 +5,23 @@ import { createClient, type SupabaseClientOptions, type SupabaseClient } from '@
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-console.log('=== SUPABASE INIT DEBUG ===');
-console.log('Environment check:', {
-  hasSupabaseUrl: !!supabaseUrl,
-  hasSupabaseKey: !!supabaseAnonKey,
-  supabaseUrl: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'undefined'
+// Não logar valores sensíveis diretamente para evitar mascaramento
+console.log('Supabase initialization check:', {
+  hasUrl: !!supabaseUrl,
+  hasKey: !!supabaseAnonKey,
+  urlType: typeof supabaseUrl,
+  keyType: typeof supabaseAnonKey
 });
 
-// Debug detalhado da URL
-console.log('Raw VITE_SUPABASE_URL:', supabaseUrl);
-console.log('URL type:', typeof supabaseUrl);
-console.log('URL length:', supabaseUrl?.length);
-console.log('URL starts with http:', supabaseUrl?.startsWith('http'));
-console.log('URL trimmed:', supabaseUrl?.trim());
-console.log('URL value (encoded):', supabaseUrl ? encodeURIComponent(supabaseUrl) : 'undefined');
-
-// Verificar caracteres invisíveis
-if (supabaseUrl) {
-  console.log('URL char codes:');
-  for (let i = 0; i < Math.min(10, supabaseUrl.length); i++) {
-    console.log(`  [${i}]: '${supabaseUrl[i]}' (${supabaseUrl.charCodeAt(i)})`);
-  }
-}
-
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables:', {
-    VITE_SUPABASE_URL: supabaseUrl,
-    VITE_SUPABASE_ANON_KEY: supabaseAnonKey ? 'present' : 'missing'
-  });
-  throw new Error('Missing Supabase environment variables');
+  console.error('Missing Supabase environment variables');
+  throw new Error('Missing Supabase environment variables. Please check your environment configuration.');
 }
 
-// Limpar e validar a URL
-const cleanUrl = (supabaseUrl || '').toString().trim();
-const cleanKey = (supabaseAnonKey || '').toString().trim();
-
-console.log('Clean URL:', cleanUrl);
-console.log('Clean URL length:', cleanUrl.length);
-
-// Validar URL antes de passar para createClient
-try {
-  const urlTest = new URL(cleanUrl);
-  console.log('URL validation passed:', urlTest.href);
-} catch (error) {
-  console.error('Invalid Supabase URL:', cleanUrl);
-  console.error('Error details:', error);
-  console.error('URL that failed (JSON):', JSON.stringify(cleanUrl));
-  throw new Error(`Invalid Supabase URL: ${cleanUrl}`);
+// Validar se as variáveis não foram mascaradas
+if (supabaseUrl.includes('*') || supabaseAnonKey.includes('*')) {
+  console.error('Environment variables appear to be masked. This is a known issue with some build systems.');
+  throw new Error('Environment variables are masked. Please check your build configuration.');
 }
 
 const options: SupabaseClientOptions<'public'> = {
@@ -64,16 +34,14 @@ const options: SupabaseClientOptions<'public'> = {
 };
 
 // Initialize client
-let supabaseClient: SupabaseClient | null = null;
+let supabaseClient: SupabaseClient;
 
 try {
-  console.log('Creating Supabase client...');
-  supabaseClient = createClient(cleanUrl, cleanKey, options);
-  console.log('Supabase client created successfully');
+  supabaseClient = createClient(supabaseUrl, supabaseAnonKey, options);
+  console.log('Supabase client initialized successfully');
 } catch (error) {
   console.error('Failed to create Supabase client:', error);
-  throw error;
+  throw new Error('Failed to initialize Supabase client');
 }
 
 export const supabase = supabaseClient;
-console.log('=== SUPABASE INIT DEBUG END ===');
