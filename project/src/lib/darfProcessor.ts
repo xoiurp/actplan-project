@@ -28,36 +28,18 @@ export async function processDarfPDF(file: File): Promise<DarfData[]> {
   const formData = new FormData();
   formData.append('file', file);
 
-  // Construct DARF API URL properly
-  const extractionApiUrl = import.meta.env.VITE_EXTRACTION_API_URL;
-  const baseExtractionUrl = extractionApiUrl || 'http://localhost:8000/api/extraction';
+  // Use the proxy route for production
+  const baseUrl = '/api-pdf-extraction';
   
-  console.log('DARF VITE_EXTRACTION_API_URL:', extractionApiUrl);
-  console.log('DARF baseUrl:', baseExtractionUrl);
-  
-  // Validar se a URL é válida antes de construir endpoints
-  let validBaseUrl: string;
-  try {
-    new URL(baseExtractionUrl);
-    validBaseUrl = baseExtractionUrl;
-  } catch (error) {
-    console.error('DARF URL base inválida:', baseExtractionUrl, error);
-    validBaseUrl = 'http://localhost:8000/api/extraction';
-  }
+  console.log('Using DARF extraction URL:', baseUrl);
   
   // Lista de endpoints para tentar (fallback)
-  const endpoints: string[] = [];
+  const endpoints: string[] = [
+    baseUrl + '/extraction/extract-darf',
+    baseUrl + '/document/process-darf'
+  ];
   
-  try {
-    endpoints.push(validBaseUrl + '/extract-darf');
-    endpoints.push(validBaseUrl.replace('/extraction', '/document') + '/process-darf');
-  } catch (error) {
-    console.error('DARF Erro ao construir endpoints:', error);
-    endpoints.push('http://localhost:8000/api/extraction/extract-darf');
-    endpoints.push('http://localhost:8000/api/document/process-darf');
-  }
-  
-  console.log('DARF Endpoints a serem testados:', endpoints);
+  console.log('DARF endpoints to try:', endpoints);
   
   const headers = {
     'User-Agent': 'ActPlan-PDF-Processor/1.0',
@@ -73,9 +55,6 @@ export async function processDarfPDF(file: File): Promise<DarfData[]> {
   for (const apiUrl of endpoints) {
     try {
       console.log('DARF API URL:', apiUrl); // Debug log
-      
-      // Validar URL antes de fazer a requisição
-      new URL(apiUrl);
       
       const response = await fetch(apiUrl, {
         method: 'POST',
