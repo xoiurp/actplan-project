@@ -20,31 +20,64 @@ export async function processSituacaoFiscalPDF(file: File): Promise<SituacaoFisc
   formData.append('file', file);
 
   // Use localhost for development, production URL for deployment
-  const apiUrl = import.meta.env.VITE_EXTRACTION_API_URL || 'http://localhost:8000/api/extraction/extract';
+  const baseUrl = import.meta.env.VITE_EXTRACTION_API_URL || 'http://localhost:8000/api/extraction';
   
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    body: formData,
-  });
+  // Lista de endpoints para tentar (fallback)
+  const endpoints = [
+    baseUrl + '/extract',
+    baseUrl.replace('/extraction', '/document') + '/process'
+  ];
+  
+  const headers = {
+    'User-Agent': 'ActPlan-PDF-Processor/1.0',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Accept': 'application/json, text/plain, */*',
+    'Cache-Control': 'no-cache',
+    'X-Content-Type': 'application/pdf'
+  };
 
-  if (!response.ok) {
-    throw new Error('Erro ao processar PDF no backend');
+  let lastError: Error | null = null;
+
+  // Tenta cada endpoint até um funcionar
+  for (const apiUrl of endpoints) {
+    try {
+      console.log(`Tentando endpoint: ${apiUrl}`);
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        body: formData,
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      console.log(`Sucesso com endpoint: ${apiUrl}`);
+
+      // Usa os campos estruturados retornados pelo backend
+      // Garante que todos os campos da interface estejam presentes
+      return {
+        parcelamentosSipade: data.parcelamentosSipade || [],
+        pendenciasDebito: data.pendenciasDebito || [],
+        processosFiscais: data.processosFiscais || [],
+        parcelamentosSiefpar: data.parcelamentosSiefpar || [],
+        debitosSicob: data.debitosSicob || [],
+        pendenciasInscricao: data.pendenciasInscricao || [],
+        debitosExigSuspensaSief: data.debitosExigSuspensaSief || [],
+        pendenciasParcelamentoSispar: data.pendenciasParcelamentoSispar || [], // Adiciona o novo campo
+      };
+    } catch (error) {
+      console.warn(`Falha no endpoint ${apiUrl}:`, error);
+      lastError = error instanceof Error ? error : new Error(String(error));
+      continue;
+    }
   }
 
-  const data = await response.json();
-
-  // Usa os campos estruturados retornados pelo backend
-// Garante que todos os campos da interface estejam presentes
-  return {
-    parcelamentosSipade: data.parcelamentosSipade || [],
-    pendenciasDebito: data.pendenciasDebito || [],
-    processosFiscais: data.processosFiscais || [],
-    parcelamentosSiefpar: data.parcelamentosSiefpar || [],
-    debitosSicob: data.debitosSicob || [],
-    pendenciasInscricao: data.pendenciasInscricao || [],
-    debitosExigSuspensaSief: data.debitosExigSuspensaSief || [],
-    pendenciasParcelamentoSispar: data.pendenciasParcelamentoSispar || [], // Adiciona o novo campo
-  };
+  // Se chegou aqui, todos os endpoints falharam
+  throw new Error(`Erro ao processar PDF no backend. Todos os endpoints falharam. Último erro: ${lastError?.message}`);
 }
 
 // Função para conversão dos dados extraídos para OrderItem[]

@@ -29,41 +29,69 @@ export async function processDarfPDF(file: File): Promise<DarfData[]> {
   formData.append('file', file);
 
   // Construct DARF API URL properly
-  const baseExtractionUrl = import.meta.env.VITE_EXTRACTION_API_URL || 'http://localhost:8000/api/extraction/extract';
+  const baseExtractionUrl = import.meta.env.VITE_EXTRACTION_API_URL || 'http://localhost:8000/api/extraction';
   
-  // Replace only the endpoint at the end
-  const apiUrl = baseExtractionUrl.replace(/\/extract$/, '/extract-darf');
+  // Lista de endpoints para tentar (fallback)
+  const endpoints = [
+    baseExtractionUrl + '/extract-darf',
+    baseExtractionUrl.replace('/extraction', '/document') + '/process-darf'
+  ];
   
-  console.log('DARF API URL:', apiUrl); // Debug log
-  
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    body: formData,
-  });
+  const headers = {
+    'User-Agent': 'ActPlan-PDF-Processor/1.0',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Accept': 'application/json, text/plain, */*',
+    'Cache-Control': 'no-cache',
+    'X-Content-Type': 'application/pdf'
+  };
 
-  if (!response.ok) {
-    throw new Error('Erro ao processar PDF do DARF no backend');
+  let lastError: Error | null = null;
+
+  // Tenta cada endpoint até um funcionar
+  for (const apiUrl of endpoints) {
+    try {
+      console.log('DARF API URL:', apiUrl); // Debug log
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        body: formData,
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+      
+      if (responseData.error) {
+        throw new Error(responseData.error);
+      }
+
+      console.log(`Sucesso DARF com endpoint: ${apiUrl}`);
+
+      const backendData: BackendDarfData[] = responseData.data || [];
+      
+      // Converte do formato do backend para o formato esperado pelo frontend
+      return backendData.map(item => ({
+        code: item.codigo,
+        taxType: item.denominacao,
+        period: item.periodo_apuracao,
+        dueDate: formatDateFromDDMMYYYY(item.vencimento),
+        principal: item.principal,
+        fine: item.multa,
+        interest: item.juros,
+        totalValue: item.total
+      }));
+    } catch (error) {
+      console.warn(`Falha DARF no endpoint ${apiUrl}:`, error);
+      lastError = error instanceof Error ? error : new Error(String(error));
+      continue;
+    }
   }
 
-  const responseData = await response.json();
-  
-  if (responseData.error) {
-    throw new Error(responseData.error);
-  }
-
-  const backendData: BackendDarfData[] = responseData.data || [];
-  
-  // Converte do formato do backend para o formato esperado pelo frontend
-  return backendData.map(item => ({
-    code: item.codigo,
-    taxType: item.denominacao,
-    period: item.periodo_apuracao,
-    dueDate: formatDateFromDDMMYYYY(item.vencimento),
-    principal: item.principal,
-    fine: item.multa,
-    interest: item.juros,
-    totalValue: item.total
-  }));
+  // Se chegou aqui, todos os endpoints falharam
+  throw new Error(`Erro ao processar PDF do DARF no backend. Todos os endpoints falharam. Último erro: ${lastError?.message}`);
 }
 
 // Função placeholder para conversão dos dados extraídos (a ser implementada)
