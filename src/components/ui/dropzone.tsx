@@ -3,19 +3,19 @@ import { Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DropzoneProps {
-  onFileSelect: (file: File) => void;
+  onDrop: (acceptedFiles: File[]) => void;
   accept?: string;
   maxSize?: number;
   className?: string;
-  selectedFile?: File | null;
+  multiple?: boolean;
 }
 
 export function Dropzone({ 
-  onFileSelect, 
+  onDrop, 
   accept = 'application/pdf', 
   maxSize = 5 * 1024 * 1024,
   className,
-  selectedFile
+  multiple = false
 }: DropzoneProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -23,11 +23,11 @@ export function Dropzone({
     e.preventDefault();
     e.stopPropagation();
 
-    const file = e.dataTransfer.files[0];
-    if (file && validateFile(file)) {
-      onFileSelect(file);
+    const files = Array.from(e.dataTransfer.files).filter(validateFile);
+    if (files.length) {
+      onDrop(files);
     }
-  }, [onFileSelect]);
+  }, [onDrop]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -35,19 +35,22 @@ export function Dropzone({
   }, []);
 
   const validateFile = (file: File): boolean => {
-    if (!file.type.includes('pdf')) {
+    const acceptArray = accept.split(',').map(s => s.trim());
+    if (!acceptArray.includes(file.type)) {
+      console.warn(`File type not accepted: ${file.type}`);
       return false;
     }
     if (file.size > maxSize) {
+      console.warn(`File size too large: ${file.size}`);
       return false;
     }
     return true;
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && validateFile(file)) {
-      onFileSelect(file);
+    const files = Array.from(e.target.files || []).filter(validateFile);
+    if (files.length) {
+      onDrop(files);
     }
   };
 
@@ -72,16 +75,12 @@ export function Dropzone({
               className="sr-only"
               accept={accept}
               onChange={handleFileInput}
+              multiple={multiple}
             />
           </label>
           <p className="pl-1">or drag and drop</p>
         </div>
         <p className="text-xs leading-5 text-gray-600">PDF up to {maxSize / 1024 / 1024}MB</p>
-        {selectedFile && (
-          <div className="mt-4 text-sm text-gray-600">
-            Selected: {selectedFile.name}
-          </div>
-        )}
       </div>
     </div>
   );

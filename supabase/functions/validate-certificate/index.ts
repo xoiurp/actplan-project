@@ -23,6 +23,81 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
   return bytes.buffer;
 }
 
+// Função para extrair informações específicas do certificado
+function extractCertificateInfo(cert: any) {
+  const info: any = {};
+  
+  // Log completo do certificado para debug
+  console.log('Full certificate:', JSON.stringify(cert, null, 2));
+  console.log('Certificate subject:', cert.subject);
+  console.log('Certificate subject attributes:', cert.subject.attributes);
+
+  // Extrair informações do subject
+  cert.subject.attributes.forEach((attr: any) => {
+    console.log('Processing attribute:', {
+      type: attr.type,
+      value: attr.value,
+      name: attr.name,
+      shortName: attr.shortName
+    });
+
+    // Mapeamento direto dos atributos comuns
+    switch (attr.shortName) {
+      case 'CN':
+        // Separar razão social e CNPJ se estiverem juntos
+        const parts = attr.value.split(':');
+        if (parts.length > 1) {
+          info.razao_social = parts[0].trim();
+          info.cnpj = parts[1].replace(/[^\d]/g, '');
+        } else {
+          info.razao_social = attr.value;
+        }
+        break;
+      case 'O':
+        if (!info.razao_social) {
+          info.razao_social = attr.value;
+        }
+        break;
+      case 'OU':
+        info.nome_fantasia = attr.value;
+        break;
+      case 'L':
+        info.cidade = attr.value;
+        break;
+      case 'ST':
+        info.estado = attr.value;
+        break;
+      case 'street':
+        // Tentar separar endereço e número
+        const addressParts = attr.value.split(/(\d+)/);
+        if (addressParts.length > 1) {
+          info.endereco = addressParts[0].trim();
+          info.numero = addressParts[1];
+        } else {
+          info.endereco = attr.value;
+        }
+        break;
+      case 'postalCode':
+        info.cep = attr.value.replace(/[^\d]/g, '');
+        break;
+    }
+
+    // Verificar se é um atributo específico do ICP-Brasil
+    if (attr.type === '2.16.76.1.3.3') {
+      info.cnpj = attr.value.replace(/[^\d]/g, '');
+    }
+  });
+
+  // Formatar CNPJ se existir
+  if (info.cnpj) {
+    info.cnpj = info.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+  }
+
+  // Log final para debug
+  console.log('Extracted certificate info:', info);
+
+  return info;
+}
 
 serve(async (req: Request) => {
   // Handle CORS preflight request
@@ -62,12 +137,19 @@ serve(async (req: Request) => {
     const now = new Date();
     const isValid = expirationDate > now;
 
+    // Extrair informações do certificado
+    const certificateInfo = extractCertificateInfo(cert);
+
+    // Log para debug
+    console.log('Sending response with certificate info:', certificateInfo);
+
     return new Response(
       JSON.stringify({
         isValid: isValid,
         expirationDate: expirationDate.toISOString(),
         subject: cert.subject.attributes.map(attr => `${attr.shortName}=${attr.value}`).join(', '),
         issuer: cert.issuer.attributes.map(attr => `${attr.shortName}=${attr.value}`).join(', '),
+        certificateInfo: certificateInfo
       }),
       {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },

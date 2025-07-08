@@ -11,7 +11,7 @@ import type { OrderItem } from '@/types';
 interface ImportSituacaoFiscalModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (items: OrderItem[], file: File) => void;
+  onImport: (items: OrderItem[], file: File, rawData: SituacaoFiscalData) => void;
 }
 
 export function ImportSituacaoFiscalModal({ 
@@ -24,9 +24,11 @@ export function ImportSituacaoFiscalModal({
   const [error, setError] = useState<string | null>(null);
   const [extractedData, setExtractedData] = useState<SituacaoFiscalData | null>(null);
 
-  const handleFileSelect = (file: File) => {
-    setSelectedFile(file);
-    setError(null);
+  const handleFileSelect = (files: File[]) => {
+    if (files.length > 0) {
+      setSelectedFile(files[0]);
+      setError(null);
+    }
   };
 
   const handleProcess = async () => {
@@ -37,10 +39,38 @@ export function ImportSituacaoFiscalModal({
     setExtractedData(null);
 
     try {
+      console.log('🔄 Iniciando processamento do arquivo:', selectedFile.name);
       const data = await processSituacaoFiscalPDF(selectedFile);
+      console.log('📊 Dados extraídos do backend:', data);
+      
+      // Log detalhado das seções extraídas
+      console.log('📋 Resumo das seções extraídas:', {
+        pendenciasDebito: data.pendenciasDebito?.length || 0,
+        debitosExigSuspensaSief: data.debitosExigSuspensaSief?.length || 0,
+        parcelamentosSiefpar: data.parcelamentosSiefpar?.length || 0,
+        pendenciasInscricao: data.pendenciasInscricao?.length || 0,
+        pendenciasParcelamentoSispar: data.pendenciasParcelamentoSispar?.length || 0
+      });
+      
+      // Log específico para itens do Simples Nacional
+      const simplesItems = data.pendenciasDebito?.filter(item => 
+        (item.receita || "").toUpperCase().includes('SIMPLES')
+      ) || [];
+      console.log(`🎯 Itens do Simples Nacional encontrados: ${simplesItems.length}`, simplesItems);
+      
+      // Log específico para itens de inscrição
+      if (data.pendenciasInscricao?.length > 0) {
+        console.log('📝 Itens de inscrição encontrados:', data.pendenciasInscricao);
+      }
+      
+      // Log específico para itens de parcelamento SISPAR
+      if (data.pendenciasParcelamentoSispar?.length > 0) {
+        console.log('📄 Itens de parcelamento SISPAR encontrados:', data.pendenciasParcelamentoSispar);
+      }
+      
       setExtractedData(data);
     } catch (error: any) {
-      console.error('Erro no processamento:', error);
+      console.error('❌ Erro no processamento:', error);
       setError(`Falha ao processar o arquivo: ${error.message}`);
       toast.error(`Falha ao processar arquivo: ${error.message}`);
     } finally {
@@ -50,10 +80,30 @@ export function ImportSituacaoFiscalModal({
 
   const handleConfirm = () => {
     if (!selectedFile || !extractedData) return;
-    const orderItems = convertToOrderItems(extractedData);
-    onImport(orderItems, selectedFile);
-    onClose();
-    handleReset();
+    
+    try {
+      const orderItems = convertToOrderItems(extractedData);
+      console.log(`🔄 Total de itens convertidos: ${orderItems.length}`, orderItems);
+      
+      // Remove validação restritiva - aceita todos os itens convertidos
+      const validItems = orderItems; // Aceita todos os itens
+      
+      console.log(`🎯 Todos os itens aceitos: ${validItems.length} itens`);
+      
+      if (validItems.length === 0) {
+        toast.error('Nenhum item encontrado no arquivo');
+        return;
+      }
+      
+      console.log(`✅ Situação Fiscal: ${validItems.length} itens importados com sucesso`, validItems);
+      
+      onImport(validItems, selectedFile, extractedData);
+      onClose();
+      handleReset();
+    } catch (error: any) {
+      console.error('❌ Erro ao processar itens da situação fiscal:', error);
+      toast.error(`Erro ao processar dados: ${error.message}`);
+    }
   };
 
   const handleReset = () => {
@@ -71,8 +121,7 @@ export function ImportSituacaoFiscalModal({
       <div className="space-y-4">
         {!extractedData && (
           <Dropzone
-            onFileSelect={handleFileSelect}
-            selectedFile={selectedFile}
+            onDrop={handleFileSelect}
             accept="application/pdf"
             maxSize={5 * 1024 * 1024}
           />
@@ -239,20 +288,28 @@ export function ImportSituacaoFiscalModal({
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">CNPJ</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Inscrição</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Receita</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Data Inscrição</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Inscrito em</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Ajuizado em</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Processo</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Tipo Devedor</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Devedor Principal</th>
                           <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Situação</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {extractedData.pendenciasInscricao.map((item, index) => (
                           <tr key={index}>
+                            <td className="px-3 py-2 text-sm">{item.cnpj}</td>
                             <td className="px-3 py-2 text-sm">{item.inscricao}</td>
                             <td className="px-3 py-2 text-sm">{item.receita}</td>
-                            <td className="px-3 py-2 text-sm">{item.data_inscricao}</td>
+                            <td className="px-3 py-2 text-sm">{item.inscrito_em}</td>
+                            <td className="px-3 py-2 text-sm">{item.ajuizado_em || '-'}</td>
                             <td className="px-3 py-2 text-sm">{item.processo}</td>
+                            <td className="px-3 py-2 text-sm">{item.tipo_devedor}</td>
+                            <td className="px-3 py-2 text-sm">{item.devedor_principal || '-'}</td>
                             <td className="px-3 py-2 text-sm">{item.situacao}</td>
                           </tr>
                         ))}

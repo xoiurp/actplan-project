@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { OrderItemsTable } from '../components/OrderItemsTable';
 import { AddOrderItemModal } from '../components/AddOrderItemModal';
 import { ImportSituacaoFiscalModal } from '../components/ImportSituacaoFiscalModal';
-import { getCustomers, createOrder } from '../lib/api';
+import { getCustomers, createOrder, deleteOrderItem } from '../lib/api';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { BillingCalculationsTable } from '../components/BillingCalculationsTable';
 import { ImportDarfModal } from '../components/ImportDarfModal';
@@ -19,6 +19,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '../components/ui/textarea'; // Corrigido o caminho do import
+import { Dropzone } from '../components/ui/dropzone';
+import { Trash2 } from 'lucide-react';
 
 interface FormData {
   customer: string;
@@ -49,8 +51,43 @@ export default function CreateOrder() {
     supplier: '',
     dueDate: undefined, // Changed initial value
     notes: '',
-    documentos: undefined
+    documentos: {
+      vendas: [],
+      juridico: []
+    }
   });
+
+  const handleFileUpload = (acceptedFiles: File[], type: 'vendas' | 'juridico') => {
+    const newDocuments = acceptedFiles.map(file => ({
+      file,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: URL.createObjectURL(file)
+    }));
+
+    setFormData(prev => ({
+      ...prev,
+      documentos: {
+        ...prev.documentos,
+        [type]: [...(prev.documentos?.[type] || []), ...newDocuments]
+      }
+    }));
+  };
+
+  const handleFileRemove = (index: number, type: 'vendas' | 'juridico') => {
+    setFormData(prev => {
+      const updatedDocs = [...(prev.documentos?.[type] || [])];
+      updatedDocs.splice(index, 1);
+      return {
+        ...prev,
+        documentos: {
+          ...prev.documentos,
+          [type]: updatedDocs
+        }
+      };
+    });
+  };
 
   const createOrderMutation = useMutation({
     mutationFn: createOrder,
@@ -146,44 +183,50 @@ export default function CreateOrder() {
 
   // Construct a more complete OrderItem, handle potential missing fields from modal
   const handleItemAdd = (newItemData: Partial<OrderItem>) => { 
-    // Map tax types to their numeric IDs
-    const taxTypeIds: Record<string, string> = {
-      'PIS': '9',
-      'PASEP': '9',
-      'COFINS': '10',
-      'IRPJ': '11',
-      'CSLL': '12',
-      'CP-TERCEIROS': '13',
-      'CP-PATRONAL': '14',
-      'IRRF': '15'
-    };
-
     // Create a more complete item, providing defaults for required fields
     // Merge defaults with newItemData, ensuring newItemData overrides defaults
+    
+    // Melhora o tratamento de código para itens sem código
+    let code = newItemData.code || '';
+    if (!code || code.trim() === '') {
+      if (newItemData.start_period) {
+        // Gera código baseado no período se não houver código
+        const periodo = newItemData.start_period.replace(/[\/\s]/g, "-");
+        code = `ITEM-MANUAL-${periodo}`;
+      } else {
+        code = `ITEM-MANUAL-${Date.now()}`;
+      }
+    }
+    
     const completeNewItem: OrderItem = {
-      id: `temp-${Date.now()}-${Math.random()}`, // Temporary client-side ID
+      id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Unique client-side ID
       order_id: '', // Will be set after order creation
-      code: '',
-      tax_type: '',
-      start_period: '',
-      end_period: '',
-      due_date: '',
-      original_value: 0,
-      current_balance: 0,
-      fine: 0,
-      interest: 0,
-      status: 'pending', // Default status
+      code: code,
+      tax_type: newItemData.tax_type || 'MANUAL',
+      start_period: newItemData.start_period || '2024-01-01', // Garantir data válida
+      end_period: newItemData.end_period || '2024-01-01',     // Garantir data válida
+      due_date: newItemData.due_date || '2024-01-01',         // Garantir data válida
+      original_value: newItemData.original_value || 0,
+      current_balance: newItemData.current_balance || 0,
+      fine: newItemData.fine || 0,
+      interest: newItemData.interest || 0,
+      status: newItemData.status || 'pending', // Default status
       created_at: new Date().toISOString(), // Set creation time
       updated_at: new Date().toISOString(), // Set update time
       ...newItemData, // Spread newItemData to override defaults and add optional fields like cno
     };
+    
     // Ensure current_balance defaults to original_value if not provided or nullish in newItemData
     if (completeNewItem.current_balance == null) {
        completeNewItem.current_balance = completeNewItem.original_value ?? 0;
     }
-    
-    // Remove the tax type based ID logic as we use a temp ID now
-    // completeNewItem.id = taxTypeIds[completeNewItem.tax_type] || completeNewItem.tax_type; 
+
+    console.log('🔍 Item manual criado:', {
+      code: completeNewItem.code,
+      start_period: completeNewItem.start_period,
+      end_period: completeNewItem.end_period,
+      due_date: completeNewItem.due_date
+    });
     
     setItensPedido(prev => [...prev, completeNewItem]);
   };
@@ -197,6 +240,13 @@ export default function CreateOrder() {
   };
 
   const handleDarfImport = (items: OrderItem[], file: File) => {
+    console.log('🎯 DARF Import iniciado!', { 
+      itemsRecebidos: items.length, 
+      itensExistentes: itens_pedido.length 
+    });
+    console.log('📋 Itens DARF recebidos:', items);
+    console.log('📋 Itens existentes na tabela:', itens_pedido);
+
     // Store file info in form state
     setFormData(prev => ({
       ...prev,
@@ -206,19 +256,35 @@ export default function CreateOrder() {
           name: file.name,
           type: file.type,
           size: file.size,
-          url: URL.createObjectURL(file)
+          url: URL.createObjectURL(file),
+          file: file // Armazena o arquivo real para upload
         }
       }
     }));
 
+    // Se não há itens existentes, adiciona os itens do DARF diretamente
+    if (itens_pedido.length === 0) {
+      console.log('🆕 Nenhum item existente, adicionando itens DARF diretamente');
+      console.log('🔍 Verificando IDs dos itens DARF:', items.map(item => ({ id: item.id, code: item.code })));
+      setItensPedido(items);
+      toast.success(`${items.length} itens DARF adicionados com sucesso`);
+      setIsImportModalOpen(false);
+      return;
+    }
+
     // Atualiza os itens existentes com os dados do DARF
     const updatedItems = itens_pedido.map(item => {
-      const matchingDarfItem = items.find(darfItem => 
-        darfItem.code === item.code && 
-        (darfItem.cno ? darfItem.cno === item.cno : true)
-      );
+      console.log(`🔍 Procurando match para item existente: ${item.code}`);
+      
+      const matchingDarfItem = items.find(darfItem => {
+        const codeMatch = darfItem.code === item.code;
+        const cnoMatch = darfItem.cno ? darfItem.cno === item.cno : true;
+        console.log(`   - DARF ${darfItem.code}: codeMatch=${codeMatch}, cnoMatch=${cnoMatch}`);
+        return codeMatch && cnoMatch;
+      });
 
       if (matchingDarfItem) {
+        console.log(`✅ Match encontrado para ${item.code}:`, matchingDarfItem);
         return {
           ...item,
           fine: matchingDarfItem.fine,
@@ -226,18 +292,60 @@ export default function CreateOrder() {
           current_balance: matchingDarfItem.current_balance,
           ...(matchingDarfItem.cno && { original_value: matchingDarfItem.original_value }) // Atualiza valor original apenas para itens com CNO
         };
+      } else {
+        console.log(`❌ Nenhum match encontrado para ${item.code}`);
       }
 
       return item;
     });
 
+    // Adiciona itens DARF que não tiveram match (novos itens)
+    const unmatchedDarfItems = items.filter(darfItem => {
+      return !itens_pedido.some(existingItem => 
+        darfItem.code === existingItem.code && 
+        (darfItem.cno ? darfItem.cno === existingItem.cno : true)
+      );
+    });
+
+    if (unmatchedDarfItems.length > 0) {
+      console.log(`🆕 Adicionando ${unmatchedDarfItems.length} novos itens DARF:`, unmatchedDarfItems);
+      updatedItems.push(...unmatchedDarfItems);
+    }
+
+    console.log('📋 Itens finais após correlação:', updatedItems);
     setItensPedido(updatedItems);
-    toast.success(`Dados do DARF importados com sucesso`);
+    toast.success(`Dados do DARF importados: ${unmatchedDarfItems.length} novos, ${updatedItems.length - unmatchedDarfItems.length} atualizados`);
     setIsImportModalOpen(false);
   };
 
   // Novo: handler recebe também o JSON completo da situação fiscal
+  const handleDeleteItem = (itemId: string) => {
+    // Na criação de pedido, todos os itens são temporários
+    setItensPedido(prevItems => prevItems.filter(item => item.id !== itemId));
+    toast.success('Item removido da lista');
+  };
+
   const handleSituacaoFiscalImport = (importedItems: OrderItem[], file: File, rawSituacaoFiscalData?: any) => {
+    console.log('🎯 Situação Fiscal Import iniciado!', { 
+      itemsRecebidos: importedItems.length,
+      itensExistentes: itens_pedido.length 
+    });
+    console.log('📋 Itens Situação Fiscal recebidos:', importedItems);
+    
+    // Log detalhado de cada item recebido
+    importedItems.forEach((item, index) => {
+      console.log(`📝 Item ${index + 1}/${importedItems.length}:`, {
+        id: item.id,
+        code: item.code,
+        tax_type: item.tax_type,
+        start_period: item.start_period,
+        due_date: item.due_date,
+        original_value: item.original_value,
+        current_balance: item.current_balance,
+        status: item.status
+      });
+    });
+
     // Salva o arquivo e o JSON completo da situação fiscal no estado
     setFormData(prev => ({
       ...prev,
@@ -248,30 +356,40 @@ export default function CreateOrder() {
           type: file.type,
           size: file.size,
           url: URL.createObjectURL(file),
+          file: file, // Armazena o arquivo real para upload
           ...(rawSituacaoFiscalData ? rawSituacaoFiscalData : {})
         }
       }
     }));
 
-    // Map tax types to their numeric IDs
-    const taxTypeIds: Record<string, string> = {
-      'PIS': '9',
-      'PASEP': '9',
-      'COFINS': '10',
-      'IRPJ': '11',
-      'CSLL': '12',
-      'CP-TERCEIROS': '13',
-      'CP-PATRONAL': '14',
-      'IRRF': '15'
-    };
-
-    // Os itens já devem vir com as chaves corretas (snake_case) do pdfProcessor
-    const newItems = importedItems.map(item => ({
+    // Gera IDs únicos para evitar chaves duplicadas
+    const newItems = importedItems.map((item, index) => ({
       ...item,
-      id: taxTypeIds[item.tax_type] || item.tax_type
+      id: `situacao-fiscal-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`
     }));
 
-    setItensPedido(prevItems => [...prevItems, ...newItems]);
+    console.log('📋 Itens com IDs únicos gerados:', newItems);
+    console.log('📊 Contagem por tax_type dos itens a serem adicionados:', 
+      newItems.reduce((acc, item) => {
+        const type = item.tax_type || 'UNDEFINED';
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>)
+    );
+    
+    setItensPedido(prevItems => {
+      const updatedItems = [...prevItems, ...newItems];
+      console.log('📋 Estado final dos itens após adição:', updatedItems);
+      console.log('📊 Contagem final por tax_type:', 
+        updatedItems.reduce((acc, item) => {
+          const type = item.tax_type || 'UNDEFINED';
+          acc[type] = (acc[type] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      );
+      return updatedItems;
+    });
+    
     toast.success(`${importedItems.length} itens importados com sucesso`);
   };
 
@@ -451,77 +569,87 @@ export default function CreateOrder() {
               <BillingCalculationsTable calculations={calculations} />
             </TabsContent>
             
-            <TabsContent value="attachments" className="space-y-4">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 border border-shadow-dark rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-medium text-gray-900">Situação Fiscal</h3>
-                      <button
-                        type="button"
-                        onClick={() => setIsSituacaoFiscalModalOpen(true)}
-                        className="text-sm text-primary hover:text-primary-hover"
-                      >
-                        Importar
-                      </button>
-                    </div>
-                    {formData.documentos?.situacaoFiscal ? (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <FileText className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm text-gray-600">
-                            {formData.documentos.situacaoFiscal.name}
-                          </span>
-                        </div>
-                        <a
-                          href={formData.documentos.situacaoFiscal.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:text-primary-hover"
-                        >
-                          Download
-                        </a>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500">
-                        Nenhum arquivo importado
-                      </p>
-                    )}
+            <TabsContent value="attachments" className="space-y-6">
+              {/* Situação Fiscal e DARF */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Situação Fiscal */}
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-gray-900">Situação Fiscal</h3>
+                    <button type="button" onClick={() => setIsSituacaoFiscalModalOpen(true)} className="text-sm text-primary hover:text-primary-hover">Importar</button>
                   </div>
-
-                  <div className="p-4 border border-shadow-dark rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-medium text-gray-900">DARF</h3>
-                      <button
-                        type="button"
-                        onClick={() => setIsImportModalOpen(true)}
-                        className="text-sm text-primary hover:text-primary-hover"
-                      >
-                        Importar
-                      </button>
+                  {formData.documentos?.situacaoFiscal ? (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <FileText className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">{formData.documentos.situacaoFiscal.name}</span>
+                      </div>
+                      <a href={formData.documentos.situacaoFiscal.url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-primary-hover">Download</a>
                     </div>
-                    {formData.documentos?.darf ? (
-                      <div className="flex items-center justify-between">
+                  ) : <p className="text-sm text-gray-500">Nenhum arquivo importado</p>}
+                </div>
+                {/* DARF */}
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-gray-900">DARF</h3>
+                    <button type="button" onClick={() => setIsImportModalOpen(true)} className="text-sm text-primary hover:text-primary-hover">Importar</button>
+                  </div>
+                  {formData.documentos?.darf ? (
+                     <div className="flex items-center justify-between">
+                       <div className="flex items-center space-x-2">
+                         <FileText className="h-4 w-4 text-gray-400" />
+                         <span className="text-sm text-gray-600">{formData.documentos.darf.name}</span>
+                       </div>
+                       <a href={formData.documentos.darf.url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-primary-hover">Download</a>
+                     </div>
+                  ) : <p className="text-sm text-gray-500">Nenhum arquivo importado</p>}
+                </div>
+              </div>
+
+              {/* Vendas e Jurídico */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Vendas */}
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">Documentos de Vendas</h3>
+                  <Dropzone
+                    onDrop={(acceptedFiles: File[]) => handleFileUpload(acceptedFiles, 'vendas')}
+                    accept="application/pdf"
+                    multiple
+                  />
+                  <div className="mt-4 space-y-2">
+                    {formData.documentos?.vendas?.map((doc, index) => (
+                      <div key={index} className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <FileText className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm text-gray-600">
-                            {formData.documentos.darf.name}
-                          </span>
+                          <span className="text-sm text-gray-600">{doc.name}</span>
                         </div>
-                        <a
-                          href={formData.documentos.darf.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:text-primary-hover"
-                        >
-                          Download
-                        </a>
+                        <button type="button" onClick={() => handleFileRemove(index, 'vendas')} className="text-red-500 hover:text-red-700">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
-                    ) : (
-                      <p className="text-sm text-gray-500">
-                        Nenhum arquivo importado
-                      </p>
-                    )}
+                    ))}
+                  </div>
+                </div>
+                {/* Jurídico */}
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">Documentos Jurídicos</h3>
+                  <Dropzone
+                    onDrop={(acceptedFiles: File[]) => handleFileUpload(acceptedFiles, 'juridico')}
+                    accept="application/pdf"
+                    multiple
+                  />
+                  <div className="mt-4 space-y-2">
+                    {formData.documentos?.juridico?.map((doc, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm text-gray-600">{doc.name}</span>
+                        </div>
+                        <button type="button" onClick={() => handleFileRemove(index, 'juridico')} className="text-red-500 hover:text-red-700">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -626,23 +754,25 @@ export default function CreateOrder() {
                 <p className="text-center text-gray-500 py-4">Nenhum item adicionado ainda.</p>
               )}
               {Object.entries(grouped).map(([taxType, items]) => (
-                <div
-                  key={taxType}
-                  className="border border-gray-400 rounded-lg p-4 mb-6 bg-white"
-                >
-                  <h4 className="text-md font-semibold mb-2">{friendlyTitles[taxType] || taxType}</h4>
-                  <OrderItemsTable
-                    itens_pedido={items}
-                    onAddItem={() => {}}
-                    onImportDarf={() => {}}
-                    onImportSituacaoFiscal={() => {}}
-                    isEditing={false}
-                  />
-                </div>
+                <React.Fragment key={taxType}>
+                  <div
+                    className="border border-gray-400 rounded-lg p-4 mb-6 bg-white"
+                  >
+                    <h4 className="text-md font-semibold mb-2">{friendlyTitles[taxType] || taxType}</h4>
+                    <OrderItemsTable
+                      itens_pedido={items}
+                      onAddItem={() => {}}
+                      onImportDarf={() => {}}
+                      onImportSituacaoFiscal={() => {}}
+                      onDeleteItem={handleDeleteItem}
+                      isEditing={true}
+                    />
+                  </div>
+                </React.Fragment>
               ))}
 
               {/* Seção Parcelamentos Siefpar */}
-              {formData.documentos?.situacaoFiscal?.parcelamentosSiefpar?.length > 0 && (
+              {formData.documentos?.situacaoFiscal?.parcelamentosSiefpar && formData.documentos.situacaoFiscal.parcelamentosSiefpar.length > 0 && (
                 <div className="border border-gray-200 rounded-lg p-4 mb-6 bg-white">
                   <h4 className="text-md font-semibold mb-2">Parcelamentos SIEFPar</h4>
                   <div className="overflow-x-auto">
@@ -671,7 +801,7 @@ export default function CreateOrder() {
               )}
 
               {/* Seção Pendências de Inscrição */}
-              {formData.documentos?.situacaoFiscal?.pendenciasInscricao?.length > 0 && (
+              {formData.documentos?.situacaoFiscal?.pendenciasInscricao && formData.documentos.situacaoFiscal.pendenciasInscricao.length > 0 && (
                 <div className="border border-gray-400 rounded-lg p-4 mb-6 bg-white">
                   <h4 className="text-md font-semibold mb-2">Pendências de Inscrição</h4>
                   <div className="overflow-x-auto">
@@ -693,7 +823,7 @@ export default function CreateOrder() {
                             <td className="px-2 py-1">{item.cnpj}</td>
                             <td className="px-2 py-1">{item.inscricao}</td>
                             <td className="px-2 py-1">{item.receita}</td>
-                            <td className="px-2 py-1">{item.data_inscricao}</td>
+                            <td className="px-2 py-1">{item.inscrito_em}</td>
                             <td className="px-2 py-1">{item.processo}</td>
                             <td className="px-2 py-1">{item.tipo_devedor}</td>
                             <td className="px-2 py-1">{item.situacao}</td>

@@ -12,8 +12,9 @@ import { Customer } from '@/types';
 export default function CreateCustomer() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [certificateFile, setCertificateFile] = useState<File | null>(null); // State for the certificate file
-  const [certificateExpiryDate, setCertificateExpiryDate] = useState<string | null>(null); // State for expiry date YYYY-MM-DD
+  const [certificateFile, setCertificateFile] = useState<File | null>(null);
+  const [certificateExpiryDate, setCertificateExpiryDate] = useState<string | null>(null);
+  const [isCertificateValid, setIsCertificateValid] = useState(false);
   const [formData, setFormData] = useState({
     razao_social: '',
     cnpj: '',
@@ -26,34 +27,32 @@ export default function CreateCustomer() {
     nome_responsavel: '',
     sobrenome_responsavel: '',
     whatsapp_responsavel: '',
-    senha_certificado: '', // Add certificate password field to state
-    user_id: '', // Will be handled by API
+    senha_certificado: '',
+    user_id: '',
   });
 
   // Ref to track if upload is happening after creation
   const isUploadingCertificate = useRef(false);
 
   const createMutation = useMutation({
-    // Revert mutationFn type to match api.ts (expects updated_at)
     mutationFn: (data: Omit<Customer, 'id' | 'created_at' | 'certificado'>) => createCustomer(data),
-    onSuccess: async (createdCustomer) => { // Receive created customer data
+    onSuccess: async (createdCustomer) => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Cliente criado com sucesso');
 
-      // Upload certificate if one was selected
       if (certificateFile && createdCustomer?.id) {
-        isUploadingCertificate.current = true; // Indicate upload is starting
+        isUploadingCertificate.current = true;
         try {
           await uploadCertificate(certificateFile, createdCustomer.id);
           toast.success('Certificado enviado com sucesso');
         } catch (uploadError) {
           toast.error(`Erro ao enviar certificado: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
         } finally {
-          isUploadingCertificate.current = false; // Reset flag
+          isUploadingCertificate.current = false;
         }
       }
 
-      navigate('/customers'); // Navigate back to the list after creation (and potential upload)
+      navigate('/customers');
     },
     onError: (error) => {
       toast.error(`Erro ao criar cliente: ${error.message}`);
@@ -68,59 +67,79 @@ export default function CreateCustomer() {
     }));
   }, []);
 
-  // Handler for file changes from CustomerForm
   const handleFileChange = useCallback((file: File | null) => {
     setCertificateFile(file);
+    setIsCertificateValid(false); // Reset validation state when file changes
+  }, []);
+
+  const handleCertificateValidated = useCallback((info: any) => {
+    // Log para debug
+    console.log('Received certificate info in CreateCustomer:', info);
+
+    // Preencher formulário com informações do certificado
+    setFormData(prev => {
+      const newFormData = {
+        ...prev,
+        cnpj: info.cnpj || prev.cnpj,
+        razao_social: info.razao_social || prev.razao_social,
+        endereco: info.endereco || prev.endereco,
+        cep: info.cep || prev.cep,
+        cidade: info.cidade || prev.cidade,
+        estado: info.estado || prev.estado,
+      };
+
+      // Log para debug
+      console.log('Updated form data:', newFormData);
+
+      return newFormData;
+    });
+
+    setIsCertificateValid(true);
   }, []);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    let formattedExpiryDate: string | null = null; // Variable to hold expiry date within this scope
+    // Verificar se o certificado foi validado
+    if (certificateFile && !isCertificateValid) {
+      toast.error('Por favor, valide o certificado antes de criar o cliente.');
+      return;
+    }
 
-    // 1. Validate certificate if present
+    let formattedExpiryDate: string | null = null;
+
+    // Se o certificado foi validado, podemos prosseguir com a criação
     if (certificateFile && formData.senha_certificado) {
-      isUploadingCertificate.current = true; // Use the ref to indicate validation is in progress
+      isUploadingCertificate.current = true;
       try {
         const validationResult = await validateCertificateApi(certificateFile, formData.senha_certificado);
         if (!validationResult.isValid) {
           toast.error(validationResult.error || 'Certificado inválido ou expirado.');
-          isUploadingCertificate.current = false; // Reset flag on validation failure
-          return; // Stop submission
+          isUploadingCertificate.current = false;
+          return;
         }
-        // Store the formatted expiration date directly if valid
+
         if (validationResult.expirationDate) {
-            const expiry = new Date(validationResult.expirationDate);
-            formattedExpiryDate = expiry.toISOString().split('T')[0]; // Assign to local variable
-            // We can still set the state if needed elsewhere, but don't rely on it for the mutation below
-            setCertificateExpiryDate(formattedExpiryDate); 
+          const expiry = new Date(validationResult.expirationDate);
+          formattedExpiryDate = expiry.toISOString().split('T')[0];
+          setCertificateExpiryDate(formattedExpiryDate);
         } else {
-             setCertificateExpiryDate(null); // Clear state if no date returned
+          setCertificateExpiryDate(null);
         }
-        // Optional: Show success or expiration date if needed
-        // toast.success(`Certificado válido até: ${new Date(validationResult.expirationDate!).toLocaleDateString()}`);
       } catch (validationError) {
         toast.error(`Erro ao validar certificado: ${validationError instanceof Error ? validationError.message : String(validationError)}`);
-        isUploadingCertificate.current = false; // Reset flag on validation error
-        return; // Stop submission
-      } finally {
-         // Reset flag if validation passed but we don't proceed immediately (though we do here)
-         // isUploadingCertificate.current = false; 
+        isUploadingCertificate.current = false;
+        return;
       }
-    } else if (certificateFile && !formData.senha_certificado) {
-        toast.error('Por favor, insira a senha do certificado para validação.');
-        return; // Stop submission if file exists but password doesn't
     }
     
-    // 2. Proceed with customer creation if validation passed or wasn't needed
-    isUploadingCertificate.current = false; // Ensure flag is false before mutation starts
-    // Include the locally captured expiry date when mutating
+    isUploadingCertificate.current = false;
     createMutation.mutate({
       ...formData,
-      certificado_validade: formattedExpiryDate ?? undefined, // Pass the local variable (or undefined)
-      updated_at: null, // Add updated_at here as expected by createCustomer
+      certificado_validade: formattedExpiryDate ?? undefined,
+      updated_at: null,
     });
-  }, [formData, certificateFile, createMutation]); // Remove certificateExpiryDate from dependencies as we use a local var now
+  }, [formData, certificateFile, createMutation, isCertificateValid]);
 
   const headerActions = (
     <Button variant="outline" size="sm" onClick={() => navigate('/customers')}>
@@ -132,31 +151,16 @@ export default function CreateCustomer() {
   return (
     <>
       <Header title="Novo Cliente" actions={headerActions} />
-      <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 bg-white rounded-lg">
+      <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 bg-white rounded-lg mt-6">
         <CustomerForm
           onSubmit={handleSubmit}
           formData={formData}
+          setFormData={setFormData}
           onInputChange={handleInputChange}
-          onFileChange={handleFileChange} // Pass file change handler
-          isSubmitting={createMutation.isPending || isUploadingCertificate.current} // Disable form if creating or uploading
+          onFileChange={handleFileChange}
+          isSubmitting={createMutation.isPending || isUploadingCertificate.current}
+          onCertificateValidated={handleCertificateValidated}
         />
-        {/* Optionally add a submit button here if not inside CustomerForm */}
-        {/* <div className="flex justify-end mt-6">
-          <Button 
-            type="submit" 
-            form="customer-form" // Assuming CustomerForm has id="customer-form"
-            disabled={createMutation.isPending}
-          >
-            {createMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              'Salvar Cliente'
-            )}
-          </Button>
-        </div> */}
       </div>
     </>
   );

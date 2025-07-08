@@ -2,9 +2,11 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getCustomers, createCustomer, deleteCustomer } from '../lib/api'; // Remove updateCustomer
-import { Plus, FileText, Trash2, Eye } from 'lucide-react'; // Add Eye icon
+import { Plus, FileText, Trash2, Eye, Pencil } from 'lucide-react'; // Add Eye and Pencil icons
 import toast from 'react-hot-toast';
 import { fireConfetti } from '@/lib/confetti';
+import { useCustomerStatus, StatusInfo } from '@/hooks/useCustomerStatus';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -119,7 +121,7 @@ export default function Customers() {
   return (
     <>
       <Header title="Clientes" actions={customerActions} />
-      <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 bg-white rounded-lg overflow-hidden">
+      <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 bg-white rounded-lg overflow-hidden mt-6">
         {/* Button moved to Header actions */}
         {/* <div className="flex justify-end"> ... </div> */}
 
@@ -133,45 +135,50 @@ export default function Customers() {
                 <TableHead>WhatsApp</TableHead>
                 <TableHead>Cidade</TableHead>
                 <TableHead>Estado</TableHead>
-                <TableHead>Certificado</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers?.map((customer) => (
-                <TableRow
-                  key={customer.id}
-                  // Remove direct row click handler or change it to navigate
-                  className="hover:bg-shadow" 
-                  // onClick={() => navigate(`/customers/${customer.id}`)} // Option 1: Navigate on row click
-                >
-                  <TableCell className="font-medium">{customer.razao_social}</TableCell>
-                  <TableCell>{customer.cnpj}</TableCell>
-                  <TableCell>
-                    {customer.nome_responsavel} {customer.sobrenome_responsavel}
-                  </TableCell>
-                  <TableCell>{customer.whatsapp_responsavel}</TableCell>
-                  <TableCell>{customer.cidade}</TableCell>
-                  <TableCell>{customer.estado}</TableCell>
-                  <TableCell>
-                    {customer.certificado?.url ? (
-                      <a
-                        href={customer.certificado.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center text-primary hover:text-primary-hover"
-                      >
-                        <FileText className="h-4 w-4" />
-                        <span className="ml-1 text-sm">Ver</span>
-                      </a>
-                    ) : (
-                      <span className="text-gray-400 text-sm">Sem certificado</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="space-x-1"> 
-                    {/* Add View Details Button */}
-                    <Button
+              {customers?.map((customer) => {
+                const { allStatuses } = useCustomerStatus(customer);
+
+                const getBadgeVariant = (color: StatusInfo['color']) => {
+                  switch (color) {
+                    case 'green': return 'success';
+                    case 'yellow': return 'warning';
+                    case 'red': return 'destructive';
+                    case 'blue': return 'info';
+                    case 'gray': return 'secondary';
+                    default: return 'default';
+                  }
+                };
+
+                return (
+                  <TableRow
+                    key={customer.id}
+                    className="hover:bg-shadow"
+                  >
+                    <TableCell className="font-medium">{customer.razao_social}</TableCell>
+                    <TableCell>{customer.cnpj}</TableCell>
+                    <TableCell>
+                      {customer.nome_responsavel} {customer.sobrenome_responsavel}
+                    </TableCell>
+                    <TableCell>{customer.whatsapp_responsavel}</TableCell>
+                    <TableCell>{customer.cidade}</TableCell>
+                    <TableCell>{customer.estado}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {allStatuses.map(status => (
+                          <Badge key={status.label} variant={getBadgeVariant(status.color)} className="whitespace-nowrap">
+                            {status.label}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell className="space-x-1">
+                      {/* Add View Details Button */}
+                      <Button
                       variant="ghost"
                       size="icon"
                       onClick={(e) => {
@@ -182,6 +189,19 @@ export default function Customers() {
                       className="text-primary hover:text-primary-hover hover:bg-primary/10"
                     >
                       <Eye className="h-4 w-4" />
+                    </Button>
+                    {/* Add Edit Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click if enabled
+                        navigate(`/customers/edit/${customer.id}`);
+                      }}
+                      title="Editar Cliente"
+                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                    >
+                      <Pencil className="h-4 w-4" />
                     </Button>
                     {/* Keep Delete Button */}
                     <Button
@@ -194,8 +214,9 @@ export default function Customers() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>
-                </TableRow>
-              ))}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

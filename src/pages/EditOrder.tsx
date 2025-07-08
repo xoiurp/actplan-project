@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FileText, ArrowLeft, CalendarIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, ArrowLeft, CalendarIcon, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { OrderItemsTable } from '../components/OrderItemsTable';
 import { AddOrderItemModal } from '../components/AddOrderItemModal';
 import { ImportSituacaoFiscalModal } from '../components/ImportSituacaoFiscalModal';
-import { getCustomers, getOrders, updateOrder } from '../lib/api';
+import { getCustomers, getOrder, updateOrder, deleteOrderItem } from '../lib/api';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BillingCalculationsTable } from '../components/BillingCalculationsTable';
 import { ImportDarfModal } from '../components/ImportDarfModal';
@@ -20,6 +20,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Button } from '@/components/ui/button'; // Import Button
 import { formatCurrency } from '../lib/utils';
+import SectionInclusionControl from '../components/SectionInclusionControl';
+import { calculateFilteredTotal, calculateItemStatsByTaxType, extractInclusionFlags, shouldIncludeItem } from '../lib/totalCalculations';
 
 interface FormData {
   customer: string;
@@ -31,6 +33,14 @@ interface FormData {
   dueDate: string;
   notes: string;
   documentos: Order['documentos'];
+  // Section inclusion flags
+  include_pendencias_debito?: boolean;
+  include_debitos_exig_suspensa?: boolean;
+  include_parcelamentos_siefpar?: boolean;
+  include_pendencias_inscricao?: boolean;
+  include_pendencias_parcelamento?: boolean;
+  include_simples_nacional?: boolean;
+  include_darf?: boolean;
 }
 
 export default function EditOrder() {
@@ -54,15 +64,32 @@ export default function EditOrder() {
     documentos: undefined
   });
 
-  const { data: orders } = useQuery({
-    queryKey: ['orders'],
-    queryFn: getOrders,
+  const { data: order } = useQuery({
+    queryKey: ['order', id],
+    queryFn: () => getOrder(id!),
+    enabled: !!id, // Só executa se tiver id
   });
-
-  const order = orders?.find(o => o.id === id);
 
   useEffect(() => {
     if (order) {
+      console.log('🔍 [EditOrder] Order recebido:', order);
+      console.log('🔍 [EditOrder] Itens do pedido:', order.itens_pedido);
+      
+      // Log específico para itens DARF
+      const darfItems = order.itens_pedido.filter((item: OrderItem) => item.tax_type === 'DARF');
+      if (darfItems.length > 0) {
+        console.log('🔍 [EditOrder] Itens DARF encontrados:', darfItems);
+        darfItems.forEach((item: OrderItem, index: number) => {
+          console.log(`🔍 [EditOrder] DARF Item ${index}:`, {
+            id: item.id,
+            code: item.code,
+            denominacao: item.denominacao,
+            tax_type: item.tax_type,
+            allKeys: Object.keys(item)
+          });
+        });
+      }
+      
       setFormData({
     customer: order.customer_id || '',
     orderDate: order.data_pedido ? formatDateString(order.data_pedido) : '',
@@ -72,12 +99,15 @@ export default function EditOrder() {
     supplier: order.fornecedor || '',
     dueDate: order.vencimento ? formatDateString(order.vencimento) : '',
     notes: order.notas || '',
-    documentos: order.documentos
+    documentos: order.documentos,
+    // Extract inclusion flags from order
+    ...extractInclusionFlags(order)
       });
 
-      // Transform order items to match the expected format
+      // Transform order items to match the expected format - preservando TODOS os campos
       const transformedItems = order.itens_pedido.map((item: OrderItem) => ({
         id: item.id,
+        order_id: item.order_id,
         code: item.code,
         tax_type: item.tax_type,
         start_period: item.start_period,
@@ -88,7 +118,26 @@ export default function EditOrder() {
         status: item.status,
         fine: item.fine,
         interest: item.interest,
-        cno: item.cno
+        cno: item.cno,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        // Campos importantes que estavam sendo perdidos
+        denominacao: item.denominacao,
+        cnpj: item.cnpj,
+        inscricao: item.inscricao,
+        receita: item.receita,
+        inscrito_em: item.inscrito_em,
+        ajuizado_em: item.ajuizado_em,
+        processo: item.processo,
+        tipo_devedor: item.tipo_devedor,
+        devedor_principal: item.devedor_principal,
+        parcelamento: item.parcelamento,
+        valor_suspenso: item.valor_suspenso,
+        modalidade: item.modalidade,
+        sispar_conta: item.sispar_conta,
+        sispar_descricao: item.sispar_descricao,
+        sispar_modalidade: item.sispar_modalidade,
+        saldo_devedor_consolidado: item.saldo_devedor_consolidado
       }));
       setItensPedido(transformedItems);
     }
@@ -150,9 +199,20 @@ export default function EditOrder() {
       fornecedor: formData.supplier,
       vencimento: formData.dueDate,
       notas: formData.notes,
-      itens_pedido: itens_pedido
+      itens_pedido: itens_pedido,
+      // Include section inclusion flags
+      include_pendencias_debito: formData.include_pendencias_debito,
+      include_debitos_exig_suspensa: formData.include_debitos_exig_suspensa,
+      include_parcelamentos_siefpar: formData.include_parcelamentos_siefpar,
+      include_pendencias_inscricao: formData.include_pendencias_inscricao,
+      include_pendencias_parcelamento: formData.include_pendencias_parcelamento,
+      include_simples_nacional: formData.include_simples_nacional,
+      include_darf: formData.include_darf
     };
 
+    console.log('Dados do pedido para envio:', orderData);
+    console.log('Itens do pedido:', itens_pedido);
+    
     updateOrderMutation.mutate({ id: id!, data: orderData });
   };
 
@@ -202,11 +262,17 @@ export default function EditOrder() {
       current_balance: newItem.current_balance || 0,
       fine: newItem.fine || 0,
       interest: newItem.interest || 0,
+      saldo_devedor_consolidado: newItem.saldo_devedor_consolidado || 0,
       status: newItem.status || 'pending',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       cno: newItem.cno
     };
+    
+    console.log('🔍 Item adicionado com saldo_devedor_consolidado:', {
+      original: newItem.saldo_devedor_consolidado,
+      final: itemWithId.saldo_devedor_consolidado
+    });
     setItensPedido(prev => [...prev, itemWithId]);
   };
 
@@ -218,83 +284,18 @@ export default function EditOrder() {
     setIsSituacaoFiscalModalOpen(true);
   };
 
-  const handleDarfImport = async (file: File) => {
+  const handleDarfImport = (importedItems: OrderItem[], file: File) => {
     try {
-      const darfItems = await processDarfPDF(file);
+      console.log(`Importando ${importedItems.length} itens DARF:`, importedItems);
       
-      if (!darfItems || darfItems.length === 0) {
-        toast.error('Falha ao extrair dados do DARF');
+      if (!importedItems || importedItems.length === 0) {
+        toast.error('Nenhum item DARF para importar');
         return;
       }
 
-      let updatedCount = 0;
-      const updatedItems = [...itens_pedido];
-
-      for (const darfData of darfItems) {
-        const matchingCodeItems = itens_pedido.filter((item: OrderItem) => {
-          const itemBaseCode = item.code.split('-')[0];
-          const darfBaseCode = darfData.code.split('-')[0];
-          return itemBaseCode === darfBaseCode;
-        });
-
-        if (matchingCodeItems.length === 0) {
-          console.log(`Nenhum item encontrado para código ${darfData.code}`);
-          continue;
-        }
-
-        let matchingItem: OrderItem | undefined;
-        if (darfData.code === '1646' && darfData.cno) {
-          matchingItem = matchingCodeItems.find((item: OrderItem) => 
-            item.cno === darfData.cno && 
-            item.start_period.includes(darfData.period)
-          );
-          
-          if (!matchingItem) {
-            console.log(`Nenhum item CP-PATRONAL encontrado com CNO ${darfData.cno} e período ${darfData.period}`);
-            continue;
-          }
-
-          const itemIndex = updatedItems.findIndex((item: OrderItem) => item.id === matchingItem!.id);
-          if (itemIndex !== -1) {
-            updatedItems[itemIndex] = {
-              ...matchingItem,
-              original_value: darfData.principal,
-              fine: darfData.fine,
-              interest: darfData.interest,
-              current_balance: darfData.totalValue
-            };
-            updatedCount++;
-          }
-        } else {
-          matchingItem = matchingCodeItems.find((item: OrderItem) => 
-            Math.abs(item.current_balance - darfData.principal) < 0.01
-          );
-
-          if (!matchingItem) {
-            console.log(`Nenhum item encontrado com valor ${darfData.principal} para código ${darfData.code}`);
-            continue;
-          }
-
-          const itemIndex = updatedItems.findIndex((item: OrderItem) => item.id === matchingItem!.id);
-          if (itemIndex !== -1) {
-            updatedItems[itemIndex] = {
-              ...matchingItem,
-              fine: darfData.fine,
-              interest: darfData.interest,
-              current_balance: darfData.totalValue
-            };
-            updatedCount++;
-          }
-        }
-      }
-
-      if (updatedCount === 0) {
-        toast.error('Nenhum débito correspondente encontrado para os itens do DARF');
-        return;
-      }
-
-      setItensPedido(updatedItems);
-      toast.success(`${updatedCount} item(s) atualizado(s) com sucesso`);
+      // Adiciona os novos itens DARF à lista existente
+      setItensPedido(prevItems => [...prevItems, ...importedItems]);
+      toast.success(`${importedItems.length} itens DARF importados com sucesso`);
       setIsImportModalOpen(false);
     } catch (error) {
       console.error('Erro ao processar DARF:', error);
@@ -323,26 +324,81 @@ export default function EditOrder() {
     toast.success(`${importedItems.length} itens importados com sucesso`);
   };
 
-  const handleDeleteItem = (itemId: string) => {
-    setItensPedido(prevItems => prevItems.filter(item => item.id !== itemId));
-    toast.success('Item removido com sucesso');
+  const handleDeleteItem = async (itemId: string) => {
+    try {
+      // Se o item tem um ID numérico ou UUID, é um item existente no banco
+      const item = itens_pedido.find(item => item.id === itemId);
+      const isExistingItem = item && item.order_id && !itemId.includes('situacao-fiscal-') && !itemId.includes('darf-');
+      
+      if (isExistingItem) {
+        // Item existe no banco - chama a API para deletar
+        await deleteOrderItem(itemId);
+        toast.success('Item removido do banco de dados');
+      } else {
+        // Item temporário (ainda não salvo) - remove apenas do estado local
+        toast.success('Item removido da lista');
+      }
+      
+      // Remove do estado local em ambos os casos
+      setItensPedido(prevItems => prevItems.filter(item => item.id !== itemId));
+    } catch (error) {
+      console.error('Erro ao deletar item:', error);
+      toast.error('Erro ao remover item: ' + (error as Error).message);
+    }
   };
 
   const calculateTotal = (items: OrderItem[], selector: (item: OrderItem) => number): number => {
     return items.reduce((sum, item) => sum + selector(item), 0);
   };
 
-  const originalTotal = calculateTotal(itens_pedido, item => item.original_value);
-  const currentTotal = calculateTotal(itens_pedido, item => item.current_balance);
+  // Extrai flags de inclusão do formData
+  const inclusionFlags = {
+    include_pendencias_debito: formData.include_pendencias_debito,
+    include_debitos_exig_suspensa: formData.include_debitos_exig_suspensa,
+    include_parcelamentos_siefpar: formData.include_parcelamentos_siefpar,
+    include_pendencias_inscricao: formData.include_pendencias_inscricao,
+    include_pendencias_parcelamento: formData.include_pendencias_parcelamento,
+    include_simples_nacional: formData.include_simples_nacional,
+    include_darf: formData.include_darf
+  };
 
-  const taxSummary = itens_pedido.reduce((acc: Record<string, { count: number; originalTotal: number; currentTotal: number }>, item) => {
+  // Calcula totais baseados nas flags de inclusão
+  const originalTotal = calculateFilteredTotal(
+    itens_pedido, 
+    inclusionFlags, 
+    item => item.original_value || 0
+  );
+  const currentTotal = calculateFilteredTotal(
+    itens_pedido, 
+    inclusionFlags, 
+    item => item.saldo_devedor_consolidado || item.current_balance || 0
+  );
+
+  console.log('💰 Cálculo de totais:', {
+    totalItens: itens_pedido.length,
+    valorOriginalFiltrado: originalTotal,
+    valorAtualFiltrado: currentTotal,
+    flagsInclusao: inclusionFlags
+  });
+
+  // Calcula resumo por tipo de imposto respeitando as flags de inclusão
+  const taxSummary = itens_pedido.reduce((acc: Record<string, { count: number; originalTotal: number; currentTotal: number; included: boolean }>, item) => {
     const key = item.tax_type;
+    const isIncluded = shouldIncludeItem(item, inclusionFlags);
+    
     if (!acc[key]) {
-      acc[key] = { count: 0, originalTotal: 0, currentTotal: 0 };
+      acc[key] = { count: 0, originalTotal: 0, currentTotal: 0, included: isIncluded };
     }
+    
     acc[key].count += 1;
-    acc[key].originalTotal += item.original_value;
-    acc[key].currentTotal += item.current_balance;
+    acc[key].originalTotal += item.original_value || 0;
+    acc[key].currentTotal += item.saldo_devedor_consolidado || item.current_balance || 0;
+    
+    // Se pelo menos um item do tipo está incluído, marca o tipo como incluído
+    if (isIncluded) {
+      acc[key].included = true;
+    }
+    
     return acc;
   }, {});
 
@@ -494,6 +550,7 @@ export default function EditOrder() {
               <TabsTrigger value="financial">Financeiro</TabsTrigger>
               <TabsTrigger value="attachments">Anexos</TabsTrigger>
               <TabsTrigger value="notes">Observações</TabsTrigger>
+              <TabsTrigger value="config">Configurações</TabsTrigger>
             </TabsList>
             
             <TabsContent value="summary" className="space-y-4">
@@ -699,11 +756,52 @@ export default function EditOrder() {
                 />
               </div>
             </TabsContent>
+            
+            <TabsContent value="config" className="space-y-4">
+              <SectionInclusionControl
+                flags={inclusionFlags}
+                onChange={(newFlags) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    ...newFlags
+                  }));
+                }}
+                itemCounts={calculateItemStatsByTaxType(itens_pedido).counts}
+                itemTotals={calculateItemStatsByTaxType(itens_pedido).totals}
+              />
+            </TabsContent>
           </Tabs>
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-medium mb-4">Itens do Pedido</h3>
+        <div className="flex space-x-4 mb-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsSituacaoFiscalModalOpen(true)}
+            className="inline-flex items-center px-3 py-2"
+          >
+            Importar Situação Fiscal
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsImportModalOpen(true)}
+            className="inline-flex items-center px-3 py-2"
+          >
+            Importar DARF
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setIsAddItemModalOpen(true)}
+            className="inline-flex items-center px-3 py-2"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Item
+          </Button>
+        </div>
         <div className="bg-white rounded-lg border border-shadow-dark overflow-hidden mb-6">
           <OrderItemsTable
             itens_pedido={itens_pedido}
@@ -718,7 +816,19 @@ export default function EditOrder() {
         {/* Tax Summary */}
         {itens_pedido.length > 0 && (
           <div className="mt-6 bg-white rounded-lg border border-shadow-dark p-4">
-            <h3 className="text-sm font-medium mb-3">Resumo por Tipo de Imposto</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium">Resumo por Tipo de Imposto</h3>
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-green-100 border border-green-300 rounded"></div>
+                  <span>Incluído no total</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-red-100 border border-red-300 rounded"></div>
+                  <span>Excluído do total</span>
+                </div>
+              </div>
+            </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -727,21 +837,33 @@ export default function EditOrder() {
                       Tipo
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Quantidade
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Vl. Original
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Sdo. Devedor
+                      Sdo. Dev. Cons
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {Object.entries(taxSummary).map(([taxType, data]) => (
-                    <tr key={taxType}>
+                    <tr key={taxType} className={data.included ? 'bg-green-50' : 'bg-red-50'}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {taxType}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          data.included 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {data.included ? 'Incluído' : 'Excluído'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {data.count}
@@ -754,18 +876,23 @@ export default function EditOrder() {
                       </td>
                     </tr>
                   ))}
-                  <tr className="bg-gray-50 font-medium">
+                  <tr className="bg-blue-50 font-medium border-t-2 border-blue-200">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      Total
+                      <strong>Total (Apenas Incluídos)</strong>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Calculado
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {itens_pedido.length}
+                      {Object.values(taxSummary).filter(data => data.included).reduce((sum, data) => sum + data.count, 0)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatCurrency(originalTotal)}
+                      <strong>{formatCurrency(originalTotal)}</strong>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatCurrency(currentTotal)}
+                      <strong>{formatCurrency(currentTotal)}</strong>
                     </td>
                   </tr>
                 </tbody>

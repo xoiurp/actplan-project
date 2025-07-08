@@ -1,11 +1,12 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getCustomerById } from '../lib/api'; // Import the actual API function
+import { getCustomer } from '../lib/api'; // Import the actual API function
 import { Loader2, ArrowLeft, Building2, User, Phone, MapPin, FileText } from 'lucide-react'; // Add icons
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Customer } from '@/types';
+import { CustomerStatusStepper } from '@/components/CustomerStatusStepper';
 
 // Helper function to format date YYYY-MM-DD to DD/MM/YYYY
 const formatDate = (dateString: string | undefined | null): string => {
@@ -35,7 +36,7 @@ export default function CustomerDetails() {
         console.error("Customer ID is undefined.");
         return Promise.resolve(null); 
       }
-      return getCustomerById(id);
+      return getCustomer(id);
     },
     enabled: !!id, // Only run the query if the id exists
   });
@@ -96,6 +97,12 @@ export default function CustomerDetails() {
       {/* Add bg-white and rounded-lg for consistency */}
       {/* Add bg-white and rounded-lg for consistency */}
       <div className="flex flex-1 flex-col gap-6 p-4 md:gap-8 md:p-6 bg-white rounded-lg">
+        {/* Customer Status Stepper */}
+        <div className="p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4 border-b pb-3">Status da Negociação</h2>
+          <CustomerStatusStepper customerStatus={customer.status} />
+        </div>
+
         {/* Customer Info Card */}
         {/* Re-add shadow and rounding to inner cards */}
         <div className="p-6 rounded-lg shadow-md">

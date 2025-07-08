@@ -1,30 +1,26 @@
-import React, { useRef, useCallback, useState } from 'react'; // Import useState
-import { Upload, Eye, EyeOff } from 'lucide-react'; // Import Eye and EyeOff icons
-import { uploadCertificate } from '../lib/api';
+import React, { useRef, useCallback, useState, useEffect } from 'react'; // Import useState and useEffect
+import { Upload, Eye, EyeOff, FileText, XCircle, CheckCircle2 } from 'lucide-react'; // Import Eye, EyeOff, FileText, XCircle, CheckCircle2
+import { uploadCertificate, validateCertificateApi } from '../lib/api';
 import toast from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+
+import { Customer } from '@/types';
 
 interface CustomerFormProps {
   onSubmit: (e: React.FormEvent) => void;
-  formData: {
-    razao_social: string;
-    cnpj: string;
-    endereco: string;
-    cidade: string;
-    estado: string;
-    cep: string;
-    numero: string;
-    complemento: string;
-    nome_responsavel: string;
-    sobrenome_responsavel: string;
-    whatsapp_responsavel: string;
-    senha_certificado: string; // Add certificate password field
-  };
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  formData: Partial<Customer>;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   isEdit?: boolean;
   customerId?: string; // Needed for upload on edit
   onCertificateUpload?: () => void; // Callback after successful upload (mainly for edit)
   onFileChange?: (file: File | null) => void; // Callback for file selection/drop
   isSubmitting?: boolean; // Add isSubmitting prop
+  existingCertificateUrl?: string | null; // Add prop for existing certificate URL
+  existingCertificateName?: string | null; // Add prop for existing certificate name
+  certificateExpiryDate?: string | null; // Add prop for certificate expiry date
+  onRemoveCertificate?: () => void; // Optional: Handler to remove/clear certificate selection
+  onCertificateValidated?: (info: any) => void; // Nova prop para callback de validação
+  setFormData: React.Dispatch<React.SetStateAction<Partial<Customer>>>;
 }
 
 export function CustomerForm({ 
@@ -35,21 +31,98 @@ export function CustomerForm({
   customerId, // Needed for upload on edit
   onCertificateUpload, // Callback after successful upload (mainly for edit)
   onFileChange, // Callback for file selection/drop
-  isSubmitting = false // Destructure with default value
+  isSubmitting = false, // Destructure with default value
+  existingCertificateUrl = null, // Destructure with default
+  existingCertificateName = null, // Destructure with default
+  certificateExpiryDate = null, // Destructure with default
+  onRemoveCertificate, // Destructure
+  onCertificateValidated,
+  setFormData
 }: CustomerFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const [isCertificateValid, setIsCertificateValid] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); // Novo estado para armazenar o arquivo
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      senha_certificado: e.target.value
+    }));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    let formattedValue = value;
+
+    // Aplicar máscaras específicas para cada campo
+    switch (name) {
+      case 'cnpj':
+        // Remover caracteres não numéricos
+        const numbers = value.replace(/\D/g, '');
+        // Aplicar máscara de CNPJ
+        formattedValue = numbers.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        break;
+      case 'whatsapp_responsavel':
+        // Remover caracteres não numéricos
+        const whatsappNumbers = value.replace(/\D/g, '');
+        // Aplicar máscara de telefone
+        formattedValue = whatsappNumbers.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+        break;
+      case 'cep':
+        // Remover caracteres não numéricos
+        const cepNumbers = value.replace(/\D/g, '');
+        // Aplicar máscara de CEP
+        formattedValue = cepNumbers.replace(/^(\d{5})(\d{3})$/, '$1-$2');
+        break;
+      default:
+        formattedValue = value;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: formattedValue
+    }));
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleFileUpload = async (file: File) => {
-    if (!customerId) return;
+    if (!customerId && !isEdit) {
+      if (onFileChange) onFileChange(file);
+      setSelectedFileName(file.name);
+      setSelectedFile(file); // Armazenar o arquivo
+      return;
+    }
+    if (!customerId && isEdit) {
+      toast.error('ID do cliente não encontrado para upload.');
+      return;
+    }
 
-    try {
-      await uploadCertificate(file, customerId);
-      toast.success('Certificado enviado com sucesso');
-      onCertificateUpload?.();
-    } catch (error) {
-      toast.error('Erro ao enviar certificado');
+    if (customerId) {
+      try {
+        await uploadCertificate(file, customerId);
+        toast.success('Certificado enviado com sucesso');
+        setSelectedFileName(file.name);
+        setSelectedFile(file); // Armazenar o arquivo
+        onCertificateUpload?.();
+      } catch (error) {
+        toast.error('Erro ao enviar certificado');
+        setSelectedFileName(null);
+        setSelectedFile(null); // Limpar o arquivo em caso de erro
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -65,21 +138,27 @@ export function CustomerForm({
     return true;
   };
 
-  // Renamed internal handler to avoid conflict with prop
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (file && !validateFile(file)) {
-      onFileChange?.(null); // Clear selection if invalid
-      if (fileInputRef.current) fileInputRef.current.value = ''; // Reset input
+      onFileChange?.(null);
+      setSelectedFileName(null);
+      setSelectedFile(null); // Limpar o arquivo
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
-    onFileChange?.(file); // Pass valid file (or null) to parent
-    // Upload only happens on edit form via handleFileUpload or on create form after customer creation
-    if (isEdit && file) {
-       handleFileUpload(file);
-    } else if (!file) {
-       // Clear potential previous selection if user cancels
-       onFileChange?.(null);
+    onFileChange?.(file);
+    setSelectedFileName(file ? file.name : null);
+    setSelectedFile(file); // Armazenar o arquivo
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFileName(null);
+    setSelectedFile(null); // Limpar o arquivo
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    onFileChange?.(null);
+    if (isEdit && onRemoveCertificate) {
+      onRemoveCertificate();
     }
   };
 
@@ -87,24 +166,89 @@ export function CustomerForm({
     e.preventDefault();
     e.stopPropagation();
     const file = e.dataTransfer.files?.[0] ?? null;
-     if (file && !validateFile(file)) {
-       onFileChange?.(null); // Clear selection if invalid
-       return;
-     }
-    onFileChange?.(file); // Pass valid file (or null) to parent
-    // Upload only happens on edit form via handleFileUpload or on create form after customer creation
-    if (isEdit && file) {
-       handleFileUpload(file);
-    } else if (!file) {
-       // Clear potential previous selection if user cancels
-       onFileChange?.(null);
+    if (file && !validateFile(file)) {
+      onFileChange?.(null);
+      setSelectedFileName(null);
+      setSelectedFile(null); // Limpar o arquivo
+      return;
     }
-  }, [isEdit, onFileChange]); // Add dependencies
+    onFileChange?.(file);
+    setSelectedFileName(file ? file.name : null);
+    setSelectedFile(file); // Armazenar o arquivo
+  }, [onFileChange]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
+
+  const handleValidateCertificate = async () => {
+    if (!selectedFile) {
+      toast.error('Por favor, selecione um certificado primeiro.');
+      return;
+    }
+
+    if (!formData.senha_certificado) {
+      toast.error('Por favor, insira a senha do certificado.');
+      return;
+    }
+
+    setIsValidating(true);
+    try {
+      const validationResult = await validateCertificateApi(selectedFile, formData.senha_certificado);
+      
+      if (validationResult.isValid) {
+        setIsCertificateValid(true);
+        toast.success('Certificado válido!');
+        
+        // Log para debug
+        console.log('Certificate validation result:', validationResult);
+        
+        if (validationResult.certificateInfo) {
+          console.log('Calling onCertificateValidated with:', validationResult.certificateInfo);
+          onCertificateValidated?.(validationResult.certificateInfo);
+        } else {
+          console.log('No certificate info available in validation result');
+        }
+      } else {
+        setIsCertificateValid(false);
+        toast.error(validationResult.error || 'Certificado inválido ou expirado.');
+      }
+    } catch (error) {
+      setIsCertificateValid(false);
+      toast.error(`Erro ao validar certificado: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  // Função para buscar dados do ViaCEP
+  const fetchViaCep = async (cep: string) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.erro) return;
+      setFormData(prev => ({
+        ...prev,
+        endereco: data.logradouro || prev.endereco,
+        complemento: data.complemento || prev.complemento,
+        cidade: data.localidade || prev.cidade,
+        estado: data.uf || prev.estado,
+        cep: data.cep || prev.cep,
+      }));
+    } catch (err) {
+      // Silencioso, não faz nada se erro
+    }
+  };
+
+  // Efeito para monitorar mudanças no campo CEP
+  useEffect(() => {
+    const onlyNumbers = (formData.cep || '').replace(/\D/g, '');
+    if (onlyNumbers.length === 8) {
+      fetchViaCep(onlyNumbers);
+    }
+  }, [formData.cep]);
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -118,7 +262,7 @@ export function CustomerForm({
           name="razao_social"
           required
           className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-          value={formData.razao_social}
+          value={formData.razao_social || ''}
           onChange={onInputChange}
         />
       </div>
@@ -133,7 +277,7 @@ export function CustomerForm({
           name="cnpj"
           required
           className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-          value={formData.cnpj}
+          value={formData.cnpj || ''}
           onChange={onInputChange}
         />
       </div>
@@ -149,8 +293,8 @@ export function CustomerForm({
             name="nome_responsavel"
             required
             className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-            value={formData.nome_responsavel}
-            onChange={onInputChange}
+            value={formData.nome_responsavel || ''}
+            onChange={handleInputChange}
           />
         </div>
 
@@ -162,10 +306,9 @@ export function CustomerForm({
             type="text"
             id="sobrenome_responsavel"
             name="sobrenome_responsavel"
-            required
             className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-            value={formData.sobrenome_responsavel}
-            onChange={onInputChange}
+            value={formData.sobrenome_responsavel || ''}
+            onChange={handleInputChange}
           />
         </div>
       </div>
@@ -178,11 +321,29 @@ export function CustomerForm({
           type="tel"
           id="whatsapp_responsavel"
           name="whatsapp_responsavel"
-          required
           className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-          value={formData.whatsapp_responsavel}
+          value={formData.whatsapp_responsavel || ''}
           onChange={onInputChange}
         />
+      </div>
+
+      <div>
+        <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+          Status do Cliente
+        </label>
+        <select
+          id="status"
+          name="status"
+          className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+          value={formData.status || 'Prospect'}
+          onChange={onInputChange}
+        >
+          <option value="Prospect">Prospect</option>
+          <option value="Proposta Enviada">Proposta Enviada</option>
+          <option value="Aguardando Assinatura">Aguardando Assinatura</option>
+          <option value="Ativo">Ativo</option>
+          <option value="Inativo/Pausado">Inativo/Pausado</option>
+        </select>
       </div>
 
       <div>
@@ -195,7 +356,7 @@ export function CustomerForm({
           name="endereco"
           required
           className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-          value={formData.endereco}
+          value={formData.endereco || ''}
           onChange={onInputChange}
         />
       </div>
@@ -211,8 +372,8 @@ export function CustomerForm({
             name="numero"
             required
             className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-            value={formData.numero}
-            onChange={onInputChange}
+            value={formData.numero || ''}
+            onChange={handleInputChange}
           />
         </div>
 
@@ -225,8 +386,8 @@ export function CustomerForm({
             id="complemento"
             name="complemento"
             className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-            value={formData.complemento}
-            onChange={onInputChange}
+            value={formData.complemento || ''}
+            onChange={handleInputChange}
           />
         </div>
       </div>
@@ -242,8 +403,8 @@ export function CustomerForm({
             name="cidade"
             required
             className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-            value={formData.cidade}
-            onChange={onInputChange}
+            value={formData.cidade || ''}
+            onChange={handleInputChange}
           />
         </div>
 
@@ -257,8 +418,8 @@ export function CustomerForm({
             name="estado"
             required
             className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-            value={formData.estado}
-            onChange={onInputChange}
+            value={formData.estado || ''}
+            onChange={handleInputChange}
           />
         </div>
 
@@ -272,8 +433,8 @@ export function CustomerForm({
             name="cep"
             required
             className="mt-1 block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-            value={formData.cep}
-            onChange={onInputChange}
+            value={formData.cep || ''}
+            onChange={handleInputChange}
           />
         </div>
       </div>
@@ -285,23 +446,22 @@ export function CustomerForm({
         </label>
         <div className="relative mt-1">
           <input
-            type={showPassword ? 'text' : 'password'} // Toggle input type
+            type={showPassword ? "text" : "password"}
             id="senha_certificado"
             name="senha_certificado"
-            className="block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm pr-10" // Add padding for icon
-            value={formData.senha_certificado}
-            onChange={onInputChange}
+            className="block w-full rounded-md border border-shadow-dark px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm pr-10"
+            value={formData.senha_certificado || ''}
+            onChange={handlePasswordChange}
           />
           <button
-            type="button" // Prevent form submission
+            type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700 focus:outline-none"
-            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 right-0 flex items-center pr-3"
           >
             {showPassword ? (
-              <EyeOff className="h-5 w-5" />
+              <EyeOff className="h-5 w-5 text-gray-400" />
             ) : (
-              <Eye className="h-5 w-5" />
+              <Eye className="h-5 w-5 text-gray-400" />
             )}
           </button>
         </div>
@@ -316,30 +476,77 @@ export function CustomerForm({
             ref={dropZoneRef}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-shadow-dark border-dashed rounded-md hover:border-primary transition-colors duration-200"
+            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-shadow-dark border-dashed rounded-md hover:border-primary transition-colors duration-200 relative"
           >
-            <div className="space-y-1 text-center">
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-              <div className="flex text-sm text-gray-600">
-                <label
-                  htmlFor="certificate"
-                  className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-hover focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
-                >
-                  <span>Enviar arquivo</span>
-                  <input
-                    id="certificate"
-                    name="certificate"
-                    type="file"
-                    className="sr-only"
-                    accept=".pfx"
-                    ref={fileInputRef}
-                    onChange={handleFileInputChange} // Use updated handler
-                  />
-                </label>
-                <p className="pl-1">ou arraste e solte</p>
+            {selectedFileName || existingCertificateName ? (
+              <div className="text-center">
+                <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="text-sm text-gray-700 mt-2 truncate max-w-xs">
+                  {selectedFileName || existingCertificateName}
+                </p>
+                {certificateExpiryDate && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Validade: {new Date(certificateExpiryDate).toLocaleDateString('pt-BR')}
+                  </p>
+                )}
+                {isCertificateValid && (
+                  <div className="flex items-center justify-center mt-2 text-green-600">
+                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                    <span className="text-sm">Certificado Válido</span>
+                  </div>
+                )}
+                <div className="mt-2 space-x-2">
+                  <button 
+                    type="button"
+                    onClick={handleRemoveFile}
+                    className="text-sm text-red-600 hover:text-red-800 inline-flex items-center"
+                    aria-label="Remover arquivo"
+                  >
+                    <XCircle className="h-4 w-4 mr-1" />
+                    Remover
+                  </button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleValidateCertificate}
+                    disabled={isValidating || !selectedFileName || !formData.senha_certificado}
+                  >
+                    {isValidating ? (
+                      <>
+                        <span className="animate-spin mr-2">⟳</span>
+                        Validando...
+                      </>
+                    ) : (
+                      'Validar Certificado'
+                    )}
+                  </Button>
+                </div>
               </div>
-              <p className="text-xs text-gray-500">Arquivos PFX até 10MB</p>
-            </div>
+            ) : (
+              <div className="space-y-1 text-center">
+                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="flex text-sm text-gray-600">
+                  <label
+                    htmlFor="certificate"
+                    className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-hover focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
+                  >
+                    <span>Enviar arquivo</span>
+                    <input
+                      id="certificate"
+                      name="certificate"
+                      type="file"
+                      className="sr-only"
+                      accept=".pfx"
+                      ref={fileInputRef}
+                      onChange={handleFileInputChange}
+                    />
+                  </label>
+                  <p className="pl-1">ou arraste e solte</p>
+                </div>
+                <p className="text-xs text-gray-500">Arquivos PFX até 10MB</p>
+              </div>
+            )}
           </div>
         </div>
       {/* Removed isEdit condition */}

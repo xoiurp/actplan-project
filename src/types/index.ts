@@ -24,10 +24,19 @@ export interface Customer {
     name: string;
     type: string;
     size: number;
-  };
+  } | null;
   senha_certificado?: string; // Add optional certificate password field
-  certificado_validade?: string; // Add optional certificate expiry date (YYYY-MM-DD)
+  certificado_validade?: string | null; // Add optional certificate expiry date (YYYY-MM-DD)
+  status?: 'Prospect' | 'Proposta Enviada' | 'Aguardando Assinatura' | 'Ativo' | 'Inativo/Pausado';
   user_id: string;
+}
+
+export interface DocumentInfo {
+  url: string;
+  name: string;
+  type: string;
+  size: number;
+  file?: File; // Optional: to hold the file object before upload
 }
 
 export interface Order {
@@ -45,12 +54,16 @@ export interface Order {
   fornecedor: string;
   vencimento: string;
   notas: string;
+  // Section inclusion flags for total calculation
+  include_pendencias_debito?: boolean;
+  include_debitos_exig_suspensa?: boolean;
+  include_parcelamentos_siefpar?: boolean;
+  include_pendencias_inscricao?: boolean;
+  include_pendencias_parcelamento?: boolean;
+  include_simples_nacional?: boolean;
+  include_darf?: boolean;
   documentos?: {
-    situacaoFiscal?: {
-      url: string;
-      name: string;
-      type: string;
-      size: number;
+    situacaoFiscal?: DocumentInfo & {
       // Dados completos da situação fiscal extraídos pela IA
       debitosExigSuspensaSief?: any[];
       parcelamentosSipade?: any[];
@@ -60,12 +73,9 @@ export interface Order {
       debitosSicob?: any[];
       pendenciasInscricao?: any[];
     };
-    darf?: {
-      url: string;
-      name: string;
-      type: string;
-      size: number;
-    };
+    darf?: DocumentInfo;
+    vendas?: DocumentInfo[];
+    juridico?: DocumentInfo[];
   };
   customer: Customer;
   itens_pedido: OrderItem[];
@@ -74,18 +84,38 @@ export interface Order {
 export interface OrderItem {
   id: string;
   order_id: string;
-  code: string;
-  tax_type: string;
-  start_period: string;
-  end_period: string;
-  due_date: string;
-  original_value: number;
-  current_balance: number;
-  fine: number;
-  interest: number;
-  status: string;
-  cno?: string;
-  saldo_devedor_consolidado?: number; // Novo campo para Sdo. Dev. Cons
+  tax_type: 'DEBITO' | 'DEBITO_EXIG_SUSPENSA_SIEF' | 'PARCELAMENTO_SIEFPAR' | 'PENDENCIA_INSCRICAO_SIDA' | 'PENDENCIA_PARCELAMENTO_SISPAR' | 'SIMPLES_NACIONAL' | string; // Tipo mais específico
+  // Campos comuns/Débito SIEF
+  cnpj?: string; // Adicionado CNPJ como opcional geral
+  code?: string; // Código da Receita ou Inscrição ou Conta ou Parcelamento
+  denominacao?: string; // Denominação/descrição do imposto (especialmente importante para DARF)
+  start_period?: string; // Período Apuração ou Data Inscrição
+  end_period?: string; // Geralmente igual a start_period para débitos
+  due_date?: string; // Vencimento (não aplicável a SIDA)
+  original_value?: number; // Valor Original (não aplicável a SIDA)
+  current_balance?: number; // Saldo Devedor (não aplicável a SIDA)
+  fine?: number; // Multa (não aplicável a SIDA)
+  interest?: number; // Juros (não aplicável a SIDA)
+  status?: string; // Situação
+  cno?: string; // CNO (aplicável a Débito Exig Suspensa)
+  saldo_devedor_consolidado?: number; // Saldo Consolidado (Débito SIEF)
+  // Campos específicos SIDA
+  inscricao?: string;
+  receita?: string; // Receita também existe em SIDA
+  inscrito_em?: string; // Data de Inscrição
+  ajuizado_em?: string; // Data de Ajuizamento
+  processo?: string; // Número do Processo
+  tipo_devedor?: string; // Tipo de Devedor
+  devedor_principal?: string; // Devedor Principal (se corresponsável)
+  // Campos específicos SIEFPAR
+  parcelamento?: string; // Número do Parcelamento
+  valor_suspenso?: number; // Valor Suspenso
+  modalidade?: string; // Modalidade do Parcelamento SIEFPAR
+  // Campos específicos SISPAR
+  sispar_conta?: string;
+  sispar_descricao?: string;
+  sispar_modalidade?: string; // Modalidade do Parcelamento SISPAR
+  // Timestamps
   created_at: string;
   updated_at: string;
 }

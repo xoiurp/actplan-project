@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Header } from '@/components/Header';
+import { extractInclusionFlags, calculateFilteredTotal } from '../lib/totalCalculations';
 
 type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
 
@@ -45,12 +46,15 @@ export default function CreateBulkPaymentPlan() {
     });
   };
 
-  // Calculate total amount for selected orders
+  // Calculate total amount for selected orders using inclusion flags
   const totalAmount = selectedOrders.reduce((sum, orderId) => {
     const order = pendingOrders.find(o => o.id === orderId);
     if (!order) return sum;
-    return sum + order.itens_pedido.reduce((orderSum: number, item: OrderItem) => 
-      orderSum + item.current_balance, 0
+    const inclusionFlags = extractInclusionFlags(order);
+    return sum + calculateFilteredTotal(
+      order.itens_pedido, 
+      inclusionFlags, 
+      item => item.saldo_devedor_consolidado || item.current_balance || 0
     );
   }, 0);
 
@@ -148,11 +152,15 @@ export default function CreateBulkPaymentPlan() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        {formatCurrency(
-                          order.itens_pedido.reduce((sum: number, item: OrderItem) => 
-                            sum + item.current_balance, 0
-                          )
-                        )}
+                        {(() => {
+                          const inclusionFlags = extractInclusionFlags(order);
+                          const total = calculateFilteredTotal(
+                            order.itens_pedido, 
+                            inclusionFlags, 
+                            item => item.saldo_devedor_consolidado || item.current_balance || 0
+                          );
+                          return formatCurrency(total);
+                        })()}
                       </TableCell>
                     </TableRow>
                   ))

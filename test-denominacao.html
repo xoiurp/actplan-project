@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Campo Denominacao</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Teste do Campo Denominacao</h1>
+    <button onclick="testDenominacao()">Testar Campo Denominacao</button>
+    <div id="result"></div>
+
+    <script>
+        // Substitua pelas suas configurações
+        const SUPABASE_URL = 'SUA_URL_SUPABASE';
+        const SUPABASE_ANON_KEY = 'SUA_CHAVE_SUPABASE';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        async function testDenominacao() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testando...</p>';
+            
+            try {
+                // Teste 1: Verificar se o campo existe na tabela
+                console.log('🔍 Teste 1: Verificando estrutura da tabela');
+                const { data: columns, error: columnsError } = await supabase
+                    .rpc('exec', { 
+                        sql: `
+                            SELECT column_name, data_type, is_nullable 
+                            FROM information_schema.columns 
+                            WHERE table_name = 'order_items' 
+                            AND column_name = 'denominacao'
+                        `
+                    });
+                
+                if (columnsError) {
+                    console.error('Erro ao verificar colunas:', columnsError);
+                } else {
+                    console.log('Colunas encontradas:', columns);
+                }
+                
+                // Teste 2: Buscar order_items com denominacao
+                console.log('🔍 Teste 2: Buscando order_items com denominacao');
+                const { data: items, error: itemsError } = await supabase
+                    .from('order_items')
+                    .select('id, code, tax_type, denominacao')
+                    .eq('tax_type', 'DARF')
+                    .limit(5);
+                
+                if (itemsError) {
+                    console.error('Erro ao buscar items:', itemsError);
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Erro: ${itemsError.message}</p>`;
+                    return;
+                }
+                
+                console.log('Items encontrados:', items);
+                
+                // Teste 3: Verificar conteúdo
+                let html = '<h2>Resultados:</h2>';
+                
+                if (items && items.length > 0) {
+                    html += '<h3>✅ Itens DARF encontrados:</h3>';
+                    items.forEach((item, index) => {
+                        html += `
+                            <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+                                <strong>Item ${index + 1}:</strong><br>
+                                ID: ${item.id}<br>
+                                Código: ${item.code}<br>
+                                Tax Type: ${item.tax_type}<br>
+                                Denominação: ${item.denominacao || '<span style="color: red;">NULL/VAZIO</span>'}<br>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<p style="color: orange;">⚠️ Nenhum item DARF encontrado</p>';
+                }
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Erro no teste:', error);
+                resultDiv.innerHTML = `<p style="color: red;">❌ Erro: ${error.message}</p>`;
+            }
+        }
+        
+        // Instrução para o usuário
+        document.addEventListener('DOMContentLoaded', function() {
+            if (SUPABASE_URL === 'SUA_URL_SUPABASE') {
+                document.getElementById('result').innerHTML = `
+                    <p style="color: orange;">⚠️ Configure suas credenciais do Supabase no código antes de testar!</p>
+                    <p>1. Edite o arquivo e substitua SUPABASE_URL e SUPABASE_ANON_KEY</p>
+                    <p>2. Abra este arquivo no navegador</p>
+                    <p>3. Clique no botão "Testar"</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 

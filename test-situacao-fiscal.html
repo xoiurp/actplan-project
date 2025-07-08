@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Situação Fiscal</title>
+</head>
+<body>
+    <h1>Teste de Processamento da Situação Fiscal</h1>
+    <div id="output"></div>
+
+    <script>
+        const mockData = {
+            "debitosExigSuspensaSief": [
+                {"receita": "0561-07 - IRRF", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1082-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1099-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"}
+            ],
+            "pendenciasDebito": [
+                {"receita": "0561-07 - IRRF", "cnpj": "19.107.062/0001-25"},
+                {"receita": "0561-07 - IRRF", "cnpj": "19.107.062/0001-25"},
+                {"receita": "0561-07 - IRRF", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1082-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1082-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1082-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1099-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1099-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1099-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"},
+                {"receita": "1099-01 - CP-SEGUR.", "cnpj": "19.107.062/0001-25"}
+            ],
+            "parcelamentosSiefpar": [
+                {"parcelamento": "02110001200048962772454", "cnpj": "19.107.062/0001-25"}
+            ],
+            "pendenciasInscricao": [
+                {"inscricao": "80.4.21.266774-67", "receita": "1507-SIMPLES", "cnpj": "19.107.062/0001-25"},
+                {"inscricao": "80.4.21.530081-98", "receita": "1507-SIMPLES", "cnpj": "19.107.062/0001-25"},
+                {"inscricao": "80.4.22.260577-89", "receita": "1507-SIMPLES", "cnpj": "19.107.062/0001-25"}
+            ],
+            "pendenciasParcelamentoSispar": [
+                {"conta": "005377051", "modalidade": "SIMPLES NACIONAL", "cnpj": "19.107.062/0001-25"},
+                {"conta": "007238844", "modalidade": "SIMPLES NACIONAL", "cnpj": "19.107.062/0001-25"}
+            ]
+        };
+
+        const total = mockData.debitosExigSuspensaSief.length + 
+                     mockData.pendenciasDebito.length + 
+                     mockData.parcelamentosSiefpar.length + 
+                     mockData.pendenciasInscricao.length + 
+                     mockData.pendenciasParcelamentoSispar.length;
+
+        document.getElementById('output').innerHTML = `
+            <h2>Resultado</h2>
+            <p>Total esperado: ${total} itens</p>
+            <ul>
+                <li>Débitos Exig. Suspensa: ${mockData.debitosExigSuspensaSief.length}</li>
+                <li>Pendências Débito: ${mockData.pendenciasDebito.length}</li>
+                <li>Parcelamentos SIEFPAR: ${mockData.parcelamentosSiefpar.length}</li>
+                <li>Pendências Inscrição: ${mockData.pendenciasInscricao.length}</li>
+                <li>Pendências Parcelamento SISPAR: ${mockData.pendenciasParcelamentoSispar.length}</li>
+            </ul>
+            <p><strong>Total: 3 + 10 + 1 + 3 + 2 = 19 itens</strong></p>
+        `;
+    </script>
+</body>
+</html> 

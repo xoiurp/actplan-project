@@ -118,7 +118,7 @@ export default function Layout() {
           </SidebarFooter>
         </Sidebar>
         {/* SidebarInset uses bg-content-background internally now */}
-        <SidebarInset> 
+        <SidebarInset className="bg-[#F8F8FC] min-h-screen px-0 md:px-6"> 
           <Outlet />
         </SidebarInset>
       </SidebarProvider>

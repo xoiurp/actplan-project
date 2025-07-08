@@ -1,4 +1,4 @@
-import { User, Customer, Order, DashboardStats, PaymentPlan, Installment } from '../types';
+import { User, Customer, Order, DashboardStats, PaymentPlan, Installment, DocumentInfo } from '../types';
 import { supabase } from './supabase';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -184,7 +184,7 @@ export async function getCustomers(): Promise<Customer[]> {
   return data;
 }
 
-export async function getCustomerById(id: string): Promise<Customer | null> {
+export async function getCustomer(id: string): Promise<Customer | null> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     throw new Error('User not authenticated');
@@ -310,7 +310,7 @@ export async function uploadCertificate(file: File, customerId: string): Promise
   return { url: secureUrl };
 }
 
-export async function uploadOrderPDF(file: File, orderId: string, type: 'situacaoFiscal' | 'darf'): Promise<{ url: string }> {
+export async function uploadOrderPDF(file: File, orderId: string, type: 'situacaoFiscal' | 'darf' | 'vendas' | 'juridico'): Promise<{ url: string, name: string, type: string, size: number }> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     throw new Error('User not authenticated');
@@ -333,33 +333,7 @@ export async function uploadOrderPDF(file: File, orderId: string, type: 'situaca
 
   const secureUrl = publicUrl.replace('http://', 'https://');
 
-  const { data: order, error: orderError } = await supabase
-    .from('orders')
-    .select('documentos')
-    .eq('id', orderId)
-    .single();
-
-  if (orderError) throw orderError;
-
-  const documentos = {
-    ...order?.documentos,
-    [type]: {
-      url: secureUrl,
-      name: safeFileName,
-      type: file.type,
-      size: file.size
-    }
-  };
-
-  const { error: updateError } = await supabase
-    .from('orders')
-    .update({ documentos })
-    .eq('id', orderId)
-    .eq('user_id', user.id);
-
-  if (updateError) throw updateError;
-
-  return { url: secureUrl };
+  return { url: secureUrl, name: safeFileName, type: file.type, size: file.size };
 }
 
 export async function getOrders() {
@@ -368,7 +342,39 @@ export async function getOrders() {
     .select(`
       *,
       customer:customers(*),
-      itens_pedido:order_items(*)
+      itens_pedido:order_items(
+        id,
+        order_id,
+        code,
+        tax_type,
+        start_period,
+        end_period,
+        due_date,
+        original_value,
+        current_balance,
+        fine,
+        interest,
+        status,
+        cno,
+        denominacao,
+        cnpj,
+        inscricao,
+        receita,
+        inscrito_em,
+        ajuizado_em,
+        processo,
+        tipo_devedor,
+        devedor_principal,
+        parcelamento,
+        valor_suspenso,
+        modalidade,
+        sispar_conta,
+        sispar_descricao,
+        sispar_modalidade,
+        saldo_devedor_consolidado,
+        created_at,
+        updated_at
+      )
     `)
     .order('created_at', { ascending: false });
 
@@ -376,7 +382,56 @@ export async function getOrders() {
   return data;
 }
 
+export async function getOrder(orderId: string) {
+  const { data, error } = await supabase
+    .from('orders')
+    .select(`
+      *,
+      customer:customers(*),
+      itens_pedido:order_items(
+        id,
+        order_id,
+        code,
+        tax_type,
+        start_period,
+        end_period,
+        due_date,
+        original_value,
+        current_balance,
+        fine,
+        interest,
+        status,
+        cno,
+        denominacao,
+        cnpj,
+        inscricao,
+        receita,
+        inscrito_em,
+        ajuizado_em,
+        processo,
+        tipo_devedor,
+        devedor_principal,
+        parcelamento,
+        valor_suspenso,
+        modalidade,
+        sispar_conta,
+        sispar_descricao,
+        sispar_modalidade,
+        saldo_devedor_consolidado,
+        created_at,
+        updated_at
+      )
+    `)
+    .eq('id', orderId)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function createOrder(order: any) {
+  console.log('createOrder chamada com:', { order });
+  
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     throw new Error('User not authenticated');
@@ -400,69 +455,246 @@ export async function createOrder(order: any) {
 
   if (error) throw error;
 
-  let documentos = {};
+  const documentos: any = {};
+
   if (order.documentos) {
+    console.log('Processando documentos:', order.documentos);
+
+    // Função auxiliar para upload e atualização do objeto de documentos
+    const handleUpload = async (docInfo: any, type: 'situacaoFiscal' | 'darf' | 'vendas' | 'juridico') => {
+      if (docInfo.file) {
+        const uploadedFile = await uploadOrderPDF(docInfo.file, data.id, type);
+        return { ...uploadedFile };
+      }
+      return docInfo; // Retorna o docInfo existente se não houver novo arquivo
+    };
+
+    // Processa documentos que são objetos únicos
     if (order.documentos.situacaoFiscal) {
-      const { url } = await uploadOrderPDF(order.documentos.situacaoFiscal.file, data.id, 'situacaoFiscal');
-      documentos = {
-        ...documentos,
-        situacaoFiscal: {
-          url,
-          name: order.documentos.situacaoFiscal.file.name,
-          type: order.documentos.situacaoFiscal.file.type,
-          size: order.documentos.situacaoFiscal.file.size
-        }
-      };
+      documentos.situacaoFiscal = await handleUpload(order.documentos.situacaoFiscal, 'situacaoFiscal');
     }
     if (order.documentos.darf) {
-      const { url } = await uploadOrderPDF(order.documentos.darf.file, data.id, 'darf');
-      documentos = {
-        ...documentos,
-        darf: {
-          url,
-          name: order.documentos.darf.file.name,
-          type: order.documentos.darf.file.type,
-          size: order.documentos.darf.file.size
-        }
-      };
+      documentos.darf = await handleUpload(order.documentos.darf, 'darf');
     }
 
-    const { error: updateError } = await supabase
-      .from('orders')
-      .update({ documentos })
-      .eq('id', data.id)
-      .eq('user_id', user.id);
+    // Processa documentos que são arrays
+    if (order.documentos.vendas?.length) {
+      documentos.vendas = await Promise.all(
+        order.documentos.vendas.map((doc: any) => handleUpload(doc, 'vendas'))
+      );
+    }
+    if (order.documentos.juridico?.length) {
+      documentos.juridico = await Promise.all(
+        order.documentos.juridico.map((doc: any) => handleUpload(doc, 'juridico'))
+      );
+    }
 
-    if (updateError) throw updateError;
+    const finalDocumentos: any = {};
+
+    for (const key in documentos) {
+        const typedKey = key as keyof typeof documentos;
+        const value = documentos[typedKey];
+
+        if (Array.isArray(value)) {
+            finalDocumentos[typedKey] = value.map((item: DocumentInfo) => {
+                const { file, ...rest } = item;
+                return rest;
+            });
+        } else if (typeof value === 'object' && value !== null) {
+            const { file, ...rest } = value;
+            finalDocumentos[typedKey] = rest;
+        } else {
+            finalDocumentos[typedKey] = value;
+        }
+    }
+
+    if (Object.keys(finalDocumentos).length > 0) {
+      console.log('Atualizando pedido com documentos:', finalDocumentos);
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ documentos: finalDocumentos })
+        .eq('id', data.id);
+
+      if (updateError) throw updateError;
+      console.log('Pedido atualizado com documentos com sucesso');
+    }
   }
 
   if (order.itens_pedido?.length > 0) {
-    const orderItems = order.itens_pedido.map((item: any) => ({
-      order_id: data.id,
-      code: item.code,
-      tax_type: item.taxType,
-      start_period: formatDateForDB(item.startPeriod),
-      end_period: formatDateForDB(item.endPeriod),
-      due_date: formatDateForDB(item.dueDate),
-      original_value: item.originalValue,
-      current_balance: item.currentBalance,
-      fine: item.fine || 0,
-      interest: item.interest || 0,
-      status: item.status,
-      cno: item.cno
-    }));
+    console.log('Processando itens do pedido:', order.itens_pedido);
+    
+    const orderItems = order.itens_pedido.map((item: any, index: number): any => {
+      console.log(`\n🔍 [DB Item ${index}] Processando para inserção:`, {
+        code: item.code,
+        start_period: item.start_period,
+        end_period: item.end_period,
+        due_date: item.due_date
+      });
+
+      const formattedItem = {
+        order_id: data.id,
+        code: item.code || `ITEM_${index}`,
+        tax_type: item.tax_type || 'UNKNOWN',
+        start_period: formatDateForDB(item.start_period) || '2024-01-01',
+        end_period: formatDateForDB(item.end_period) || '2024-01-01',
+        due_date: formatDateForDB(item.due_date) || '2024-01-01',
+        original_value: item.original_value || 0,
+        current_balance: item.current_balance || 0,
+        fine: item.fine || 0,
+        interest: item.interest || 0,
+        status: item.status || 'pending',
+        cno: item.cno || '',
+        // Campos adicionais importantes que estavam sendo perdidos
+        denominacao: item.denominacao || null,
+        cnpj: item.cnpj || null,
+        inscricao: item.inscricao || null,
+        receita: item.receita || null,
+        inscrito_em: item.inscrito_em || null,
+        ajuizado_em: item.ajuizado_em || null,
+        processo: item.processo || null,
+        tipo_devedor: item.tipo_devedor || null,
+        devedor_principal: item.devedor_principal || null,
+        parcelamento: item.parcelamento || null,
+        valor_suspenso: item.valor_suspenso || null,
+        modalidade: item.modalidade || null,
+        sispar_conta: item.sispar_conta || null,
+        sispar_descricao: item.sispar_descricao || null,
+        sispar_modalidade: item.sispar_modalidade || null,
+        saldo_devedor_consolidado: item.saldo_devedor_consolidado || null
+      };
+      
+      // Validação final antes da inserção
+      if (!formattedItem.start_period || formattedItem.start_period === '') {
+        console.error(`❌ [DB Item ${index}] start_period ainda é null/vazio após formatação:`, {
+          original_start_period: item.start_period,
+          formatted_start_period: formattedItem.start_period,
+          item_completo: item
+        });
+        formattedItem.start_period = '2024-01-01'; // Força fallback
+      }
+
+      if (!formattedItem.due_date || formattedItem.due_date === '') {
+        console.error(`❌ [DB Item ${index}] due_date ainda é null/vazio após formatação:`, {
+          original_due_date: item.due_date,
+          formatted_due_date: formattedItem.due_date,
+          item_completo: item
+        });
+        formattedItem.due_date = '2024-01-01'; // Força fallback
+      }
+
+      console.log(`✅ [DB Item ${index}] Item formatado para DB:`, {
+        code: formattedItem.code,
+        start_period: formattedItem.start_period,
+        end_period: formattedItem.end_period,
+        due_date: formattedItem.due_date
+      });
+      
+      return formattedItem;
+    });
+
+    console.log('Itens formatados para inserção:', orderItems);
+    
+    // Log de validação dos campos obrigatórios (sem bloquear)
+    const itemsWithNullFields = orderItems.filter(item => !item.start_period || !item.due_date);
+    if (itemsWithNullFields.length > 0) {
+      console.warn('⚠️ Itens com campos obrigatórios que podem estar vazios:', itemsWithNullFields);
+      // Não bloqueia mais - as correções no darfProcessor devem resolver isso
+    }
 
     const { error: itemsError } = await supabase
       .from('order_items')
       .insert(orderItems);
 
     if (itemsError) throw itemsError;
+    console.log('Itens do pedido inseridos com sucesso');
   }
 
+  console.log('Pedido criado com sucesso:', data);
   return data;
 }
 
+export async function deleteOrder(orderId: string): Promise<void> {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    throw new Error('User not authenticated');
+  }
+
+  // First delete all order items
+  const { error: itemsError } = await supabase
+    .from('order_items')
+    .delete()
+    .eq('order_id', orderId);
+
+  if (itemsError) throw itemsError;
+
+  // Then delete the order
+  const { error } = await supabase
+    .from('orders')
+    .delete()
+    .eq('id', orderId)
+    .eq('user_id', user.id);
+
+  if (error) throw error;
+}
+
+export async function deleteMultipleOrders(orderIds: string[]): Promise<void> {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    throw new Error('User not authenticated');
+  }
+
+  // Delete all order items for these orders
+  const { error: itemsError } = await supabase
+    .from('order_items')
+    .delete()
+    .in('order_id', orderIds);
+
+  if (itemsError) throw itemsError;
+
+  // Delete all orders
+  const { error } = await supabase
+    .from('orders')
+    .delete()
+    .in('id', orderIds)
+    .eq('user_id', user.id);
+
+  if (error) throw error;
+}
+
+export async function deleteOrderItem(itemId: string): Promise<void> {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    throw new Error('User not authenticated');
+  }
+
+  // Verify that the item belongs to an order owned by the current user
+  const { data: item, error: fetchError } = await supabase
+    .from('order_items')
+    .select(`
+      id,
+      order_id,
+      orders!inner(user_id)
+    `)
+    .eq('id', itemId)
+    .single();
+
+  if (fetchError) throw fetchError;
+  if (!item || (item as any).orders.user_id !== user.id) {
+    throw new Error('Order item not found or access denied');
+  }
+
+  // Delete the order item
+  const { error } = await supabase
+    .from('order_items')
+    .delete()
+    .eq('id', itemId);
+
+  if (error) throw error;
+}
+
 export async function updateOrder(orderId: string, order: any) {
+  console.log('updateOrder chamada com:', { orderId, order });
+  
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     throw new Error('User not authenticated');
@@ -478,29 +710,34 @@ export async function updateOrder(orderId: string, order: any) {
 
   let documentos = existingOrder.documentos || {};
   if (order.documentos) {
-    if (order.documentos.situacaoFiscal?.file) {
-      const { url } = await uploadOrderPDF(order.documentos.situacaoFiscal.file, orderId, 'situacaoFiscal');
-      documentos = {
-        ...documentos,
-        situacaoFiscal: {
-          url,
-          name: order.documentos.situacaoFiscal.file.name,
-          type: order.documentos.situacaoFiscal.file.type,
-          size: order.documentos.situacaoFiscal.file.size
-        }
-      };
+    const handleUpload = async (docInfo: any, type: 'situacaoFiscal' | 'darf' | 'vendas' | 'juridico') => {
+      if (docInfo.file) {
+        const uploadedFile = await uploadOrderPDF(docInfo.file, orderId, type);
+        return { ...uploadedFile };
+      }
+      // Se não há arquivo novo, mantém os dados existentes, removendo o campo 'file' se houver
+      const { file, ...rest } = docInfo;
+      return rest;
+    };
+
+    // Processa documentos que são objetos únicos
+    if (order.documentos.situacaoFiscal) {
+      documentos.situacaoFiscal = await handleUpload(order.documentos.situacaoFiscal, 'situacaoFiscal');
     }
-    if (order.documentos.darf?.file) {
-      const { url } = await uploadOrderPDF(order.documentos.darf.file, orderId, 'darf');
-      documentos = {
-        ...documentos,
-        darf: {
-          url,
-          name: order.documentos.darf.file.name,
-          type: order.documentos.darf.file.type,
-          size: order.documentos.darf.file.size
-        }
-      };
+    if (order.documentos.darf) {
+      documentos.darf = await handleUpload(order.documentos.darf, 'darf');
+    }
+
+    // Processa documentos que são arrays
+    if (order.documentos.vendas?.length) {
+      documentos.vendas = await Promise.all(
+        order.documentos.vendas.map((doc: any) => handleUpload(doc, 'vendas'))
+      );
+    }
+    if (order.documentos.juridico?.length) {
+      documentos.juridico = await Promise.all(
+        order.documentos.juridico.map((doc: any) => handleUpload(doc, 'juridico'))
+      );
     }
   }
 
@@ -542,16 +779,33 @@ export async function updateOrder(orderId: string, order: any) {
       const orderItems = order.itens_pedido.map((item: any) => ({
         order_id: orderId,
         code: item.code,
-        tax_type: item.taxType,
-        start_period: formatDateForDB(item.startPeriod),
-        end_period: formatDateForDB(item.endPeriod),
-        due_date: formatDateForDB(item.dueDate),
-        original_value: item.originalValue,
-        current_balance: item.currentBalance,
+        tax_type: item.tax_type, // Mantém o nome correto do campo
+        start_period: formatDateForDB(item.start_period),
+        end_period: formatDateForDB(item.end_period),
+        due_date: formatDateForDB(item.due_date),
+        original_value: item.original_value,
+        current_balance: item.current_balance,
         fine: item.fine || 0,
         interest: item.interest || 0,
         status: item.status,
-        cno: item.cno
+        cno: item.cno,
+        // Campos adicionais importantes que estavam sendo perdidos
+        denominacao: item.denominacao || null,
+        cnpj: item.cnpj || null,
+        inscricao: item.inscricao || null,
+        receita: item.receita || null,
+        inscrito_em: item.inscrito_em || null,
+        ajuizado_em: item.ajuizado_em || null,
+        processo: item.processo || null,
+        tipo_devedor: item.tipo_devedor || null,
+        devedor_principal: item.devedor_principal || null,
+        parcelamento: item.parcelamento || null,
+        valor_suspenso: item.valor_suspenso || null,
+        modalidade: item.modalidade || null,
+        sispar_conta: item.sispar_conta || null,
+        sispar_descricao: item.sispar_descricao || null,
+        sispar_modalidade: item.sispar_modalidade || null,
+        saldo_devedor_consolidado: item.saldo_devedor_consolidado || null
       }));
 
       const { error: itemsError } = await supabase
@@ -573,16 +827,29 @@ export async function updateOrder(orderId: string, order: any) {
 
 function formatDateForDB(dateStr: string): string | null {
   if (!dateStr) return null;
+  
+  // Se já está no formato YYYY-MM-DD, retorna como está
   if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
     return dateStr;
   }
   
-  const [day, month, year] = dateStr.split('/');
-  if (!day || !month || !year) {
-    throw new Error(`Invalid date format: ${dateStr}. Expected DD/MM/YYYY`);
+  // Tenta formato DD/MM/YYYY
+  const ddmmyyyyMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (ddmmyyyyMatch) {
+    const [, day, month, year] = ddmmyyyyMatch;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   }
   
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  // Tenta formato MM/YYYY (só mês e ano) - assume dia 01
+  const mmyyyyMatch = dateStr.match(/^(\d{1,2})\/(\d{4})$/);
+  if (mmyyyyMatch) {
+    const [, month, year] = mmyyyyMatch;
+    return `${year}-${month.padStart(2, '0')}-01`;
+  }
+  
+  // Se nenhum formato foi reconhecido, log um aviso e retorna null
+  console.warn(`Formato de data não reconhecido: ${dateStr}. Retornando null.`);
+  return null;
 }
 
 async function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
@@ -604,7 +871,25 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
-export async function validateCertificateApi(pfxFile: File, password: string): Promise<{ isValid: boolean; expirationDate?: string; error?: string }> {
+interface CertificateInfo {
+  cnpj?: string;
+  razao_social?: string;
+  nome_fantasia?: string;
+  endereco?: string;
+  cep?: string;
+  cidade?: string;
+  estado?: string;
+}
+
+export async function validateCertificateApi(
+  pfxFile: File, 
+  password: string
+): Promise<{ 
+  isValid: boolean; 
+  expirationDate?: string; 
+  error?: string;
+  certificateInfo?: CertificateInfo;
+}> {
   try {
     const arrayBuffer = await readFileAsArrayBuffer(pfxFile);
     const pfxBase64 = arrayBufferToBase64(arrayBuffer);
@@ -640,7 +925,12 @@ export async function validateCertificateApi(pfxFile: File, password: string): P
         return { isValid: false, error: 'Resposta inesperada da função de validação.' };
     }
 
-    return { isValid: data.isValid, expirationDate: data.expirationDate, error: data.isValid ? undefined : 'Certificado expirado ou inválido.' };
+    return { 
+      isValid: data.isValid, 
+      expirationDate: data.expirationDate, 
+      error: data.isValid ? undefined : 'Certificado expirado ou inválido.',
+      certificateInfo: data.certificateInfo
+    };
 
   } catch (err) {
     console.error('Error invoking validate-certificate function:', err);

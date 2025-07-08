@@ -7,6 +7,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Customers from './pages/Customers';
 import CreateCustomer from './pages/CreateCustomer'; // Import the new page
+import EditCustomer from './pages/EditCustomer'; // Import the EditCustomer page
 import Orders from './pages/Orders';
 import PaymentPlans from './pages/PaymentPlans';
 import CreateOrder from './pages/CreateOrder';
@@ -29,6 +30,7 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="customers" element={<Customers />} />
             <Route path="customers/new" element={<CreateCustomer />} /> {/* Add route for new customer */}
+            <Route path="customers/edit/:id" element={<EditCustomer />} /> {/* Add route for editing customer */}
             <Route path="customers/:id" element={<CustomerDetails />} /> 
             <Route path="orders" element={<Orders />} />
             <Route path="orders/new" element={<CreateOrder />} />
