@@ -1,0 +1,194 @@
+pdf-processor-1  | Recebido PDF para extração
+pdf-processor-1  | PDF aberto com 10 páginas.
+pdf-processor-1  | Texto extraído da página 1 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 2 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 3 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 4 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 5 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 6 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 7 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 8 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 9 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  | Texto extraído da página 10 (primeiros 100 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIA
+pdf-processor-1  |
+pdf-processor-1  | ---
+pdf-processor-1  | Texto extraído (primeiros 1000 chars): MINISTÉRIO DA FAZENDA Por meio do e-CAC - CNPJ do certificado: 08.697.901/0001-96 SECRETARIA ESPECIAL DA RECEITA FEDERAL DO BRASIL PROCURADORIA-GERAL DA FAZENDA NACIONAL 16/04/2025 11:07:15 INFORMAÇÕES DE APOIO PARA EMISSÃO DE CERTIDÃO CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA Dados Cadastrais da Matriz ______________________________________________________________________________________ CNPJ: 08.697.901/0001-96 UA de Domicílio: DRF BELO HORIZONTE-MG Código da UA: 06.101.00 Endereço: AV AMAZONAS,2280 - SALA  04 Bairro: BARRO PRETO CEP: 30180-012 Município: BELO HORIZONTE UF: MG Responsável: 006.488.636-03 - CRISTIANO MENDONCA DE NOVAES Situação: ATIVA Natureza Jurídica: 206-2 - SOCIEDADE EMPRESARIA LIMITADA Data de Abertura: 23/02/2007 CNAE: 4120-4/00 - Construção de edifícios Porte da Empresa: DEMAIS Sócios e Administradores ________________________________________________________________________________________ CPF/CNPJ Nome Qualificação Situação Cadastral Cap. Soci
+pdf-processor-1  |
+pdf-processor-1  | ---
+pdf-processor-1  |
+pdf-processor-1  |
+pdf-processor-1  | ---
+pdf-processor-1  | Texto pré-processado (primeiros 1000 chars): 16/04/2025 11:07:15 CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA Dados Cadastrais da Matriz ______________________________________________________________________________________ CNPJ: 08.697.901/0001-96 UA de Domicílio: DRF BELO HORIZONTE-MG Código da UA: 06.101.00 Endereço: AV AMAZONAS,2280 - SALA  04 Bairro: BARRO PRETO CEP: 30180-012 Município: BELO HORIZONTE UF: MG Responsável: 006.488.636-03 - CRISTIANO MENDONCA DE NOVAES Situação: ATIVA Natureza Jurídica: 206-2 - SOCIEDADE EMPRESARIA LIMITADA Data de Abertura: 23/02/2007 CNAE: 4120-4/00 - Construção de edifícios Porte da Empresa: DEMAIS Sócios e Administradores ________________________________________________________________________________________ CPF/CNPJ Nome Qualificação Situação Cadastral Cap. Social Cap. Votante 006.488.636-03 CRISTIANO MENDONCA DE NOVAES ADMINISTRADOR REGULAR 40.362.851/0001-07 C2JA NEGOCIOS & EMPREENDIMENTOS S/A SOCIO ATIVA 100,00% CPF Representante Legal: 006.488.636-03 Qualif. Resp.: ADMI
+pdf-processor-1  |
+pdf-processor-1  | ---
+pdf-processor-1  |
+pdf-processor-1  | Procurando por padrões de título...
+pdf-processor-1  | Encontradas 1 ocorrências do padrão 'Pendência - Débito (SIEF)'
+pdf-processor-1  |
+pdf-processor-1  | --- Iniciando busca pela seção 'Pendência - Débito (SIEF)' ---
+pdf-processor-1  | Seção 'Pendência - Débito (SIEF)' encontrada na linha 42: 'Pendência - Débito (SIEF) _______________________________________________________________________________________'
+pdf-processor-1  | CNPJ definido para: 08.697.901/0001-96
+pdf-processor-1  | Linha ignorada (não reconhecida como início de débito ou cabeçalho): 'Receita'
+pdf-processor-1  | Linha ignorada (não reconhecida como início de débito ou cabeçalho): 'PA/Exerc.'
+pdf-processor-1  | Linha de título de campo pulada: 'Dt. Vcto'
+pdf-processor-1  | Linha de título de campo pulada: 'Vl. Original'
+pdf-processor-1  | Linha de título de campo pulada: 'Sdo. Devedor'
+pdf-processor-1  | Linha de título de campo pulada: 'Multa'
+pdf-processor-1  | Linha de título de campo pulada: 'Juros'
+pdf-processor-1  | Linha ignorada (não reconhecida como início de débito ou cabeçalho): 'Sdo. Dev. Cons. Situação'
+pdf-processor-1  |
+pdf-processor-1  | Início de registro de débito encontrado: '8109-02 - PIS'
+pdf-processor-1  | Período detectado em 1 linha: '01/2025'
+pdf-processor-1  | Tentando ler Vencimento na linha: '25/02/2025'
+pdf-processor-1  | Tentando ler Valor Original na linha: '20.440,08'
+pdf-processor-1  | Tentando ler Saldo Devedor na linha: '20.440,08'
+pdf-processor-1  | Tentando ler Multa na linha: '3.372,61'
+pdf-processor-1  | Tentando ler Juros na linha: '400,62'
+pdf-processor-1  | Tentando ler Saldo Consolidado na linha: '24.213,31'
+pdf-processor-1  | Tentando ler Situação na linha: 'DEVEDOR'
+pdf-processor-1  | Item extraído com sucesso (lógica v4): {'cnpj': '08.697.901/0001-96', 'receita': '8109-02 - PIS', 'periodo_apuracao': '01/2025', 'vencimento': '2025-02-25', 'valor_original': 20440.08, 'saldo_devedor': 20440.08, 'multa': 3372.61, 'juros': 400.62, 'saldo_devedor_consolidado': 24213.31, 'situacao': 'DEVEDOR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro de débito encontrado: '8109-02 - PIS'
+pdf-processor-1  | Período detectado em 1 linha: '02/2025'
+pdf-processor-1  | Tentando ler Vencimento na linha: '25/03/2025'
+pdf-processor-1  | Tentando ler Valor Original na linha: '24.718,49'
+pdf-processor-1  | Tentando ler Saldo Devedor na linha: '24.718,49'
+pdf-processor-1  | Tentando ler Multa na linha: '1.794,56'
+pdf-processor-1  | Tentando ler Juros na linha: '247,18'
+pdf-processor-1  | Tentando ler Saldo Consolidado na linha: '26.760,23'
+pdf-processor-1  | Tentando ler Situação na linha: 'DEVEDOR'
+pdf-processor-1  | Item extraído com sucesso (lógica v4): {'cnpj': '08.697.901/0001-96', 'receita': '8109-02 - PIS', 'periodo_apuracao': '02/2025', 'vencimento': '2025-03-25', 'valor_original': 24718.49, 'saldo_devedor': 24718.49, 'multa': 1794.56, 'juros': 247.18, 'saldo_devedor_consolidado': 26760.23, 'situacao': 'DEVEDOR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro de débito encontrado: '2172-01 - COFINS'
+pdf-processor-1  | Período detectado em 1 linha: '01/2025'
+pdf-processor-1  | Tentando ler Vencimento na linha: '25/02/2025'
+pdf-processor-1  | Tentando ler Valor Original na linha: '94.338,82'
+pdf-processor-1  | Tentando ler Saldo Devedor na linha: '94.338,82'
+pdf-processor-1  | Tentando ler Multa na linha: '15.565,90'
+pdf-processor-1  | Tentando ler Juros na linha: '1.849,04'
+pdf-processor-1  | Tentando ler Saldo Consolidado na linha: '111.753,76'
+pdf-processor-1  | Tentando ler Situação na linha: 'DEVEDOR'
+pdf-processor-1  | Item extraído com sucesso (lógica v4): {'cnpj': '08.697.901/0001-96', 'receita': '2172-01 - COFINS', 'periodo_apuracao': '01/2025', 'vencimento': '2025-02-25', 'valor_original': 94338.82, 'saldo_devedor': 94338.82, 'multa': 15565.9, 'juros': 1849.04, 'saldo_devedor_consolidado': 111753.76, 'situacao': 'DEVEDOR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro de débito encontrado: '2172-01 - COFINS'
+pdf-processor-1  | Período detectado em 1 linha: '02/2025'
+pdf-processor-1  | Tentando ler Vencimento na linha: '25/03/2025'
+pdf-processor-1  | Tentando ler Valor Original na linha: '114.085,32'
+pdf-processor-1  | Tentando ler Saldo Devedor na linha: '114.085,32'
+pdf-processor-1  | Tentando ler Multa na linha: '8.282,59'
+pdf-processor-1  | Tentando ler Juros na linha: '1.140,85'
+pdf-processor-1  | Tentando ler Saldo Consolidado na linha: '123.508,76'
+pdf-processor-1  | Tentando ler Situação na linha: 'DEVEDOR'
+pdf-processor-1  | Item extraído com sucesso (lógica v4): {'cnpj': '08.697.901/0001-96', 'receita': '2172-01 - COFINS', 'periodo_apuracao': '02/2025', 'vencimento': '2025-03-25', 'valor_original': 114085.32, 'saldo_devedor': 114085.32, 'multa': 8282.59, 'juros': 1140.85, 'saldo_devedor_consolidado': 123508.76, 'situacao': 'DEVEDOR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro de débito encontrado: '3373-01 - IRPJ'
+pdf-processor-1  | Período detectado em 2 linhas: '1º' e 'TRIM/2024'
+pdf-processor-1  | Tentando ler Vencimento na linha: '30/04/2024'
+pdf-processor-1  | Tentando ler Valor Original na linha: '265.367,18'
+pdf-processor-1  | Tentando ler Saldo Devedor na linha: '146.346,86'
+pdf-processor-1  | Tentando ler Multa na linha: '29.269,37'
+pdf-processor-1  | Tentando ler Juros na linha: '15.878,63'
+pdf-processor-1  | Tentando ler Saldo Consolidado na linha: '191.494,86'
+pdf-processor-1  | Tentando ler Situação na linha: 'DEVEDOR'
+pdf-processor-1  | Item extraído com sucesso (lógica v4): {'cnpj': '08.697.901/0001-96', 'receita': '3373-01 - IRPJ', 'periodo_apuracao': '1 TRIM/2024', 'vencimento': '2024-04-30', 'valor_original': 265367.18, 'saldo_devedor': 146346.86, 'multa': 29269.37, 'juros': 15878.63, 'saldo_devedor_consolidado': 191494.86, 'situacao': 'DEVEDOR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro de débito encontrado: '3373-01 - IRPJ'
+pdf-processor-1  | Período detectado em 2 linhas: '2º' e 'TRIM/2024'
+pdf-processor-1  | Tentando ler Vencimento na linha: '31/07/2024'
+pdf-processor-1  | Tentando ler Valor Original na linha: '238.774,05'
+pdf-processor-1  | Tentando ler Saldo Devedor na linha: '91.909,61'
+pdf-processor-1  | Tentando ler Multa na linha: '18.381,92'
+pdf-processor-1  | Tentando ler Juros na linha: '7.646,87'
+pdf-processor-1  | Tentando ler Saldo Consolidado na linha: '117.938,40'
+pdf-processor-1  | Tentando ler Situação na linha: 'DEVEDOR'
+pdf-processor-1  | Item extraído com sucesso (lógica v4): {'cnpj': '08.697.901/0001-96', 'receita': '3373-01 - IRPJ', 'periodo_apuracao': '2 TRIM/2024', 'vencimento': '2024-07-31', 'valor_original': 238774.05, 'saldo_devedor': 91909.61, 'multa': 18381.92, 'juros': 7646.87, 'saldo_devedor_consolidado': 117938.4, 'situacao': 'DEVEDOR'}
+pdf-processor-1  | Linha ignorada (não reconhecida como início de débito ou cabeçalho): '16/04/2025 11:07:15'
+pdf-processor-1  | Linha ignorada (não reconhecida como início de débito ou cabeçalho): 'CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA'
+pdf-processor-1  | Fim da seção 'Pendência - Débito (SIEF)' detectado na linha 111: 'Débito com Exigibilidade Suspensa (SIEF) ________________________________________________________________________'
+pdf-processor-1  | Dados extraídos (Pendências Débito SIEF): 6 itens
+pdf-processor-1  | Extração local concluída.
+pdf-processor-1  | INFO:     172.18.0.4:38872 - "POST /api/extraction/extract HTTP/1.1" 200 OK
+nginx-proxy-1    | 177.60.68.91 - - [24/Apr/2025:14:46:48 +0000] "POST /api/extraction/extract HTTP/1.1" 200 1704 "https://app.actplanconsultoria.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" "-"
+
+{
+    "debitosExigSuspensaSief": [],
+    "parcelamentosSipade": [],
+    "pendenciasDebito": [
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "8109-02 - PIS",
+            "periodo_apuracao": "01/2025",
+            "vencimento": "2025-02-25",
+            "valor_original": 20440.08,
+            "saldo_devedor": 20440.08,
+            "multa": 3372.61,
+            "juros": 400.62,
+            "saldo_devedor_consolidado": 24213.31,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "8109-02 - PIS",
+            "periodo_apuracao": "02/2025",
+            "vencimento": "2025-03-25",
+            "valor_original": 24718.49,
+            "saldo_devedor": 24718.49,
+            "multa": 1794.56,
+            "juros": 247.18,
+            "saldo_devedor_consolidado": 26760.23,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "2172-01 - COFINS",
+            "periodo_apuracao": "01/2025",
+            "vencimento": "2025-02-25",
+            "valor_original": 94338.82,
+            "saldo_devedor": 94338.82,
+            "multa": 15565.9,
+            "juros": 1849.04,
+            "saldo_devedor_consolidado": 111753.76,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "2172-01 - COFINS",
+            "periodo_apuracao": "02/2025",
+            "vencimento": "2025-03-25",
+            "valor_original": 114085.32,
+            "saldo_devedor": 114085.32,
+            "multa": 8282.59,
+            "juros": 1140.85,
+            "saldo_devedor_consolidado": 123508.76,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "3373-01 - IRPJ",
+            "periodo_apuracao": "1 TRIM/2024",
+            "vencimento": "2024-04-30",
+            "valor_original": 265367.18,
+            "saldo_devedor": 146346.86,
+            "multa": 29269.37,
+            "juros": 15878.63,
+            "saldo_devedor_consolidado": 191494.86,
+            "situacao": "DEVEDOR"
+        },
+        {
+            "cnpj": "08.697.901/0001-96",
+            "receita": "3373-01 - IRPJ",
+            "periodo_apuracao": "2 TRIM/2024",
+            "vencimento": "2024-07-31",
+            "valor_original": 238774.05,
+            "saldo_devedor": 91909.61,
+            "multa": 18381.92,
+            "juros": 7646.87,
+            "saldo_devedor_consolidado": 117938.4,
+            "situacao": "DEVEDOR"
+        }
+    ],
+    "processosFiscais": [],
+    "parcelamentosSiefpar": [],
+    "debitosSicob": [],
+    "pendenciasInscricao": []
+}

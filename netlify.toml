@@ -6,8 +6,17 @@
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "VITE_EXTRACTION_API_URL,VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
 
+# Proxy para o servidor de extração de PDF
+[[redirects]]
+  from = "/api-pdf-extraction/*"
+  to = "https://185.213.26.203/api/:splat"
+  status = 200
+  force = true
+  headers = {X-From = "Netlify"}
+
 # Redirecionamento para lidar com roteamento de Single Page Application (SPA)
+# Necessário para o React Router funcionar corretamente
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200

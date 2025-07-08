@@ -1,0 +1,40 @@
+pdf-processor-1  | Traceback (most recent call last):
+pdf-processor-1  |   File "/usr/local/bin/uvicorn", line 8, in <module>
+pdf-processor-1  |     sys.exit(main())
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/click/core.py", line 1161, in __call__
+pdf-processor-1  |     return self.main(*args, **kwargs)
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/click/core.py", line 1082, in main
+pdf-processor-1  |     rv = self.invoke(ctx)
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/click/core.py", line 1443, in invoke
+pdf-processor-1  |     return ctx.invoke(self.callback, **ctx.params)
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/click/core.py", line 788, in invoke
+pdf-processor-1  |     return __callback(*args, **kwargs)
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/uvicorn/main.py", line 409, in main
+pdf-processor-1  |     run(
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/uvicorn/main.py", line 575, in run
+pdf-processor-1  |     server.run()
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/uvicorn/server.py", line 65, in run
+pdf-processor-1  |     return asyncio.run(self.serve(sockets=sockets))
+pdf-processor-1  |   File "/usr/local/lib/python3.9/asyncio/runners.py", line 44, in run
+pdf-processor-1  |     return loop.run_until_complete(main)
+pdf-processor-1  |   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/uvicorn/server.py", line 69, in serve
+pdf-processor-1  |     await self._serve(sockets)
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/uvicorn/server.py", line 76, in _serve
+pdf-processor-1  |     config.load()
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/uvicorn/config.py", line 433, in load
+pdf-processor-1  |     self.loaded_app = import_from_string(self.app)
+pdf-processor-1  |   File "/usr/local/lib/python3.9/site-packages/uvicorn/importer.py", line 19, in import_from_string
+pdf-processor-1  |     module = importlib.import_module(module_str)
+pdf-processor-1  |   File "/usr/local/lib/python3.9/importlib/__init__.py", line 127, in import_module
+pdf-processor-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+pdf-processor-1  |   File "<frozen importlib._bootstrap>", line 1030, in _gcd_import
+pdf-processor-1  |   File "<frozen importlib._bootstrap>", line 1007, in _find_and_load
+pdf-processor-1  |   File "<frozen importlib._bootstrap>", line 986, in _find_and_load_unlocked
+pdf-processor-1  |   File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+pdf-processor-1  |   File "<frozen importlib._bootstrap_external>", line 850, in exec_module
+pdf-processor-1  |   File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+pdf-processor-1  |   File "/app/app/main.py", line 656, in <module>
+pdf-processor-1  |     app.add_middleware(
+pdf-processor-1  | NameError: name 'app' is not defined
+pdf-processor-1 exited with code 0

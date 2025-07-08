@@ -1,0 +1,35 @@
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Instalar dependências do sistema necessárias para o Tesseract OCR e outras bibliotecas
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-por \
+    poppler-utils \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency definition files
+COPY pyproject.toml poetry.lock* ./
+
+# Install poetry and project dependencies
+# virtualenvs.create false: Install dependencies in the system site-packages
+RUN pip install --no-cache-dir poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-ansi
+
+# Copy the rest of the application code into the container's WORKDIR
+COPY . ./
+
+# Criar diretório de cache para armazenar resultados processados
+RUN mkdir -p /app/cache && chmod 777 /app/cache
+
+# Command to run the application using Uvicorn
+# Assumes your FastAPI app instance is named 'app' in 'app/main.py'
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]

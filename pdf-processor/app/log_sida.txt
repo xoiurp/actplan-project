@@ -1,0 +1,545 @@
+pdf-processor-1  | Início de registro SIDA encontrado: '60.2.22.014441-39'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.2.22.014441-39'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 702: '15504.418.709/2021-05'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.22.014441-39', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.418.709/2021-05'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '3551-IRPJ'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.418.709/2021-05'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.22.014441-39', 'receita': '3551-IRPJ', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.418.709/2021-05', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.2.22.014442-10'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.2.22.014442-10'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 708: '15504.405.002/2020-40'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.22.014442-10', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.405.002/2020-40'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '3551-IRPJ'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.405.002/2020-40'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.22.014442-10', 'receita': '3551-IRPJ', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.405.002/2020-40', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.2.24.004756-11'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.2.24.004756-11'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 714: '10680.918.850/2023-11'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.004756-11', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.918.850/2023-11'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '3551-IRPJ'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.918.850/2023-11'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.004756-11', 'receita': '3551-IRPJ', 'inscrito_em': '2024-03-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.918.850/2023-11', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.2.24.004757-00'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.2.24.004757-00'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 720: '10680.915.407/2023-80'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.004757-00', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.915.407/2023-80'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '3551-IRPJ'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.915.407/2023-80'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '16/04/2025 11:07:15'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.004757-00', 'receita': '3551-IRPJ', 'inscrito_em': '2024-03-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.915.407/2023-80', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.2.24.009815-84'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.2.24.009815-84'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 729: '18208.052.062/2023-31'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.009815-84', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.062/2023-31'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '3551-IRPJ'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.062/2023-31'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.009815-84', 'receita': '3551-IRPJ', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.062/2023-31', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.2.24.009817-46'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.2.24.009817-46'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 735: '18208.052.011/2023-17'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.009817-46', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.011/2023-17'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '3551-IRPJ'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.011/2023-17'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.009817-46', 'receita': '3551-IRPJ', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.011/2023-17', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.2.24.009825-56'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.2.24.009825-56'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 741: '18208.051.987/2023-64'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.009825-56', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.051.987/2023-64'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '3551-IRPJ'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.051.987/2023-64'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.009825-56', 'receita': '3551-IRPJ', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.051.987/2023-64', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.2.24.009865-43'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.2.24.009865-43'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 747: '10136.207.241/2024-81'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.009865-43', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.207.241/2024-81'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '3551-IRPJ'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.207.241/2024-81'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.2.24.009865-43', 'receita': '3551-IRPJ', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.207.241/2024-81', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.4.25.046524-92'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.4.25.046524-92'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 754: '14966.104.055/2025-51'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046524-92', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '14966.104.055/2025-51'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4133-CONTR.'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SEGURADOS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '27/01/2025'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '14966.104.055/2025-51'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CORRESPONSÁVEL'
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Tipo de Devedor definido como CORRESPONSÁVEL baseado na presença de Devedor Principal
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046524-92', 'receita': '4133-CONTR.', 'inscrito_em': '2025-01-27', 'ajuizado_em': '', 'tipo_devedor': 'CORRESPONSÁVEL', 'devedor_principal': '49.559.724/0001-69', 'processo': '14966.104.055/2025-51', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.4.25.046538-98'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.4.25.046538-98'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 762: '14966.104.056/2025-03'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046538-98', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '14966.104.056/2025-03'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4156-CONTR.'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'EMPREGADOR'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '27/01/2025'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '14966.104.056/2025-03'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CORRESPONSÁVEL'
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Tipo de Devedor definido como CORRESPONSÁVEL baseado na presença de Devedor Principal
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046538-98', 'receita': '4156-CONTR.', 'inscrito_em': '2025-01-27', 'ajuizado_em': '', 'tipo_devedor': 'CORRESPONSÁVEL', 'devedor_principal': '49.559.724/0001-69', 'processo': '14966.104.056/2025-03', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.4.25.046539-79'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.4.25.046539-79'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 767: '4201-'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046539-79', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '4201-'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4201-'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CONTRIB.SAL.EDUCAC'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '27/01/2025'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '14966.104.056/2025-03'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CORRESPONSÁVEL'
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Tipo de Devedor definido como CORRESPONSÁVEL baseado na presença de Devedor Principal
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046539-79', 'receita': '4201-', 'inscrito_em': '2025-01-27', 'ajuizado_em': '', 'tipo_devedor': 'CORRESPONSÁVEL', 'devedor_principal': '49.559.724/0001-69', 'processo': '4201-', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.4.25.046540-02'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.4.25.046540-02'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 778: '14966.104.056/2025-03'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046540-02', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '14966.104.056/2025-03'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4299-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SESI'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '27/01/2025'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '14966.104.056/2025-03'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CORRESPONSÁVEL'
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Tipo de Devedor definido como CORRESPONSÁVEL baseado na presença de Devedor Principal
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046540-02', 'receita': '4299-CONTRIBUICAO', 'inscrito_em': '2025-01-27', 'ajuizado_em': '', 'tipo_devedor': 'CORRESPONSÁVEL', 'devedor_principal': '49.559.724/0001-69', 'processo': '14966.104.056/2025-03', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.4.25.046541-93'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.4.25.046541-93'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 786: '14966.104.056/2025-03'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046541-93', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '14966.104.056/2025-03'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4162-RI.AMB.'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'AP.ESPECIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '27/01/2025'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '14966.104.056/2025-03'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CORRESPONSÁVEL'
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Tipo de Devedor definido como CORRESPONSÁVEL baseado na presença de Devedor Principal
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046541-93', 'receita': '4162-RI.AMB.', 'inscrito_em': '2025-01-27', 'ajuizado_em': '', 'tipo_devedor': 'CORRESPONSÁVEL', 'devedor_principal': '49.559.724/0001-69', 'processo': '14966.104.056/2025-03', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.4.25.046542-74'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.4.25.046542-74'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 794: '14966.104.056/2025-03'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046542-74', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '14966.104.056/2025-03'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4338-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SEBRAE'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '27/01/2025'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '14966.104.056/2025-03'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CORRESPONSÁVEL'
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Tipo de Devedor definido como CORRESPONSÁVEL baseado na presença de Devedor Principal
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046542-74', 'receita': '4338-CONTRIBUICAO', 'inscrito_em': '2025-01-27', 'ajuizado_em': '', 'tipo_devedor': 'CORRESPONSÁVEL', 'devedor_principal': '49.559.724/0001-69', 'processo': '14966.104.056/2025-03', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.4.25.046543-55'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.4.25.046543-55'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 802: '14966.104.056/2025-03'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046543-55', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '14966.104.056/2025-03'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4282-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SENAI'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '27/01/2025'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '14966.104.056/2025-03'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CORRESPONSÁVEL'
+pdf-processor-1  | Devedor Principal SIDA encontrado: '49.559.724/0001-69'
+pdf-processor-1  | Tipo de Devedor definido como CORRESPONSÁVEL baseado na presença de Devedor Principal
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.4.25.046543-55', 'receita': '4282-CONTRIBUICAO', 'inscrito_em': '2025-01-27', 'ajuizado_em': '', 'tipo_devedor': 'CORRESPONSÁVEL', 'devedor_principal': '49.559.724/0001-69', 'processo': '14966.104.056/2025-03', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.20.038626-00'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.20.038626-00'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 810: '10136.528.204/2020-81'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.20.038626-00', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.528.204/2020-81'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/05/2020'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.528.204/2020-81'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.20.038626-00', 'receita': '1804-CONTRIBUICAO', 'inscrito_em': '2020-05-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.528.204/2020-81', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.20.038627-90'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.20.038627-90'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 816: '10136.528.203/2020-36'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.20.038627-90', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.528.203/2020-36'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/05/2020'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.528.203/2020-36'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.20.038627-90', 'receita': '4493-COFINS', 'inscrito_em': '2020-05-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.528.203/2020-36', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034639-62'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.22.034639-62'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 823: '15504.418.709/2021-05'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034639-62', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.418.709/2021-05'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.418.709/2021-05'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '16/04/2025 11:07:15'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034639-62', 'receita': '1804-CONTRIBUICAO', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.418.709/2021-05', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034640-04'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.22.034640-04'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 832: '15504.418.709/2021-05'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034640-04', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.418.709/2021-05'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.418.709/2021-05'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034640-04', 'receita': '4493-COFINS', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.418.709/2021-05', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034641-87'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.22.034641-87'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 838: '15504.412.515/2021-98'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034641-87', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.412.515/2021-98'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.412.515/2021-98'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034641-87', 'receita': '4493-COFINS', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.412.515/2021-98', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034642-68'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.22.034642-68'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 845: '15504.405.002/2020-40'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034642-68', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.405.002/2020-40'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.405.002/2020-40'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034642-68', 'receita': '1804-CONTRIBUICAO', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.405.002/2020-40', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.22.034643-49'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.22.034643-49'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 851: '15504.405.002/2020-40'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034643-49', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.405.002/2020-40'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.405.002/2020-40'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.22.034643-49', 'receita': '4493-COFINS', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.405.002/2020-40', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.010185-23'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.010185-23'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 857: '10680.918.850/2023-11'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010185-23', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.918.850/2023-11'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.918.850/2023-11'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010185-23', 'receita': '4493-COFINS', 'inscrito_em': '2024-03-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.918.850/2023-11', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.010186-04'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.010186-04'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 863: '10680.915.407/2023-80'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010186-04', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.915.407/2023-80'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.915.407/2023-80'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010186-04', 'receita': '4493-COFINS', 'inscrito_em': '2024-03-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.915.407/2023-80', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.010187-95'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.010187-95'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 870: '10680.915.407/2023-80'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010187-95', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.915.407/2023-80'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.915.407/2023-80'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.010187-95', 'receita': '1804-CONTRIBUICAO', 'inscrito_em': '2024-03-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.915.407/2023-80', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019239-43'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.019239-43'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 876: '18208.052.062/2023-31'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019239-43', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.062/2023-31'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.062/2023-31'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019239-43', 'receita': '4493-COFINS', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.062/2023-31', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019242-49'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.019242-49'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 883: '18208.052.011/2023-17'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019242-49', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.011/2023-17'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.011/2023-17'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019242-49', 'receita': '1804-CONTRIBUICAO', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.011/2023-17', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019243-20'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.019243-20'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 889: '18208.052.011/2023-17'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019243-20', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.011/2023-17'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.011/2023-17'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019243-20', 'receita': '4493-COFINS', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.011/2023-17', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019253-00'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.019253-00'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 896: '18208.052.224/2023-31'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019253-00', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.224/2023-31'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.224/2023-31'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019253-00', 'receita': '1804-CONTRIBUICAO', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.224/2023-31', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019263-73'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.019263-73'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 902: '18208.051.987/2023-64'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019263-73', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.051.987/2023-64'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.051.987/2023-64'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019263-73', 'receita': '4493-COFINS', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.051.987/2023-64', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019264-54'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.019264-54'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 909: '18208.051.987/2023-64'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019264-54', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.051.987/2023-64'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.051.987/2023-64'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019264-54', 'receita': '1804-CONTRIBUICAO', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.051.987/2023-64', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019311-05'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.019311-05'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 915: '10136.207.240/2024-37'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019311-05', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.207.240/2024-37'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '4493-COFINS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.207.240/2024-37'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019311-05', 'receita': '4493-COFINS', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.207.240/2024-37', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.6.24.019315-39'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.6.24.019315-39'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 922: '10136.207.239/2024-11'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019315-39', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.207.239/2024-11'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '1804-CONTRIBUICAO'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'SOCIAL'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.207.239/2024-11'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.6.24.019315-39', 'receita': '1804-CONTRIBUICAO', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.207.239/2024-11', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.20.008713-03'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.20.008713-03'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 928: '10136.528.206/2020-70'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.20.008713-03', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.528.206/2020-70'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/05/2020'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.528.206/2020-70'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '16/04/2025 11:07:15'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'CNPJ: 08.697.901 - SINAURB SERVICOS E EMPREENDIMENTOS LTDA'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.20.008713-03', 'receita': '0810-PIS', 'inscrito_em': '2020-05-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.528.206/2020-70', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.22.011216-46'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.22.011216-46'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 937: '15504.418.709/2021-05'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.22.011216-46', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.418.709/2021-05'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.418.709/2021-05'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.22.011216-46', 'receita': '0810-PIS', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.418.709/2021-05', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.22.011217-27'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.22.011217-27'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 943: '15504.405.002/2020-40'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.22.011217-27', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.405.002/2020-40'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '21/12/2022'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '15504.405.002/2020-40'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.22.011217-27', 'receita': '0810-PIS', 'inscrito_em': '2022-12-21', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '15504.405.002/2020-40', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.002915-76'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.24.002915-76'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 949: '10680.918.850/2023-11'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.002915-76', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.918.850/2023-11'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.918.850/2023-11'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.002915-76', 'receita': '0810-PIS', 'inscrito_em': '2024-03-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.918.850/2023-11', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.002916-57'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.24.002916-57'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 955: '10680.915.407/2023-80'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.002916-57', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.915.407/2023-80'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '18/03/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10680.915.407/2023-80'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.002916-57', 'receita': '0810-PIS', 'inscrito_em': '2024-03-18', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10680.915.407/2023-80', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.005251-51'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.24.005251-51'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 961: '10136.207.238/2024-68'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005251-51', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.207.238/2024-68'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '10136.207.238/2024-68'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005251-51', 'receita': '0810-PIS', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '10136.207.238/2024-68', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.005255-85'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.24.005255-85'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 967: '18208.052.062/2023-31'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005255-85', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.062/2023-31'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.062/2023-31'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005255-85', 'receita': '0810-PIS', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.062/2023-31', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.005256-66'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.24.005256-66'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 973: '18208.052.011/2023-17'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005256-66', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.011/2023-17'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.052.011/2023-17'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Item SIDA extraído (fim por nova inscrição): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005256-66', 'receita': '0810-PIS', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.052.011/2023-17', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  |
+pdf-processor-1  | Início de registro SIDA encontrado: '60.7.24.005262-04'
+pdf-processor-1  | Linha completa para análise de Tipo Devedor: '60.7.24.005262-04'
+pdf-processor-1  | [AVISO] Não foi possível encontrar o tipo de devedor na linha
+pdf-processor-1  | Processo SIDA encontrado na linha 979: '18208.051.987/2023-64'
+pdf-processor-1  | Dados parciais SIDA (linha inscrição - regex sequencial): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005262-04', 'receita': '', 'inscrito_em': '', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.051.987/2023-64'}
+pdf-processor-1  | Receita SIDA encontrada (linha seguinte): '0810-PIS'
+pdf-processor-1  | Inscrito em SIDA encontrado (linha seguinte): '13/05/2024'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): '18208.051.987/2023-64'
+pdf-processor-1  | Linha ignorada (SIDA - dentro de registro, não reconhecida): 'DEVEDOR PRINCIPAL'
+pdf-processor-1  | Situação SIDA encontrada: 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'
+pdf-processor-1  | Fim da seção 'Inscrição SIDA' detectado na linha 982: 'Pendência - Parcelamento (SISPAR) _______________________________________________________________________________'
+pdf-processor-1  | Item SIDA extraído (fim da seção): {'cnpj': '08.697.901/0001-96', 'inscricao': '60.7.24.005262-04', 'receita': '0810-PIS', 'inscrito_em': '2024-05-13', 'ajuizado_em': '', 'tipo_devedor': '', 'devedor_principal': '', 'processo': '18208.051.987/2023-64', 'situacao': 'ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR'}
+pdf-processor-1  | Dados extraídos FINAL (Pendências Débito SIEF): 6 itens
+pdf-processor-1  | Dados extraídos FINAL (Débitos Exig. Suspensa SIEF): 79 itens
+pdf-processor-1  | Dados extraídos FINAL (Parcelamentos SIEFPAR): 2 itens
+pdf-processor-1  | Dados extraídos FINAL (Pendências Inscrição SIDA): 43 itens
+pdf-processor-1  | Finalizando processamento do endpoint /extract.
+pdf-processor-1  | INFO:     172.18.0.4:38922 - "POST /api/extraction/extract HTTP/1.1" 200 OK

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pdf-processor"
+version = "0.1.0"
+description = "API service for processing PDF documents using Docling"
+authors = ["Your Name <you@example.com>"] # Placeholder - update if needed
+# readme = "README.md" # Optional README for the service - Not needed for non-package mode
+package-mode = false # Tell Poetry this is not a package to be built/installed
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.111.0" # For building the API
+uvicorn = {extras = ["standard"], version = "^0.29.0"} # ASGI server to run FastAPI
+# Use local Docling source (path relative to pyproject.toml location inside container: /app/pdf-processor)
+docling = { path = "../docling-main/docling-main", develop = false }
+# Add other docling extras or model packages if required later, potentially from the local source's extras
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

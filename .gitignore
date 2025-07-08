@@ -7,10 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build outputs
 dist
 dist-ssr
+.next/
+build/
+
+# Local config
 *.local
+.env*
 
 # Editor directories and files
 .vscode/*
@@ -23,5 +31,15 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment variables
-.env*
+# Cache
+.cache/
+.npm/
+.netlify/
+
+# Temporary files
+*.tmp
+*.temp
+
+# System files
+Thumbs.db
+desktop.ini
