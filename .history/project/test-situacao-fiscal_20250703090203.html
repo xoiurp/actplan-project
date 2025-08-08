@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Situação Fiscal</title>
+</head>
+<body>
+    <h1>Teste de Processamento da Situação Fiscal</h1>
+    <div id="output"></div>
+
+    <script>
+        // Simula a resposta da API baseada no exemplo fornecido
+        const mockApiResponse = {
+            "debitosExigSuspensaSief": [
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "cno": "",
+                    "receita": "0561-07 - IRRF",
+                    "periodo_apuracao": "05/2025",
+                    "vencimento": "2025-06-20",
+                    "valor_original": 3142.3,
+                    "saldo_devedor": 3142.3,
+                    "situacao": "A ANALISAR-A VENCER"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "cno": "",
+                    "receita": "1082-01 - CP-SEGUR.",
+                    "periodo_apuracao": "05/2025",
+                    "vencimento": "2025-06-20",
+                    "valor_original": 9259.3,
+                    "saldo_devedor": 9259.3,
+                    "situacao": "A ANALISAR-A VENCER"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "cno": "",
+                    "receita": "1099-01 - CP-SEGUR.",
+                    "periodo_apuracao": "05/2025",
+                    "vencimento": "2025-06-20",
+                    "valor_original": 333.96,
+                    "saldo_devedor": 333.96,
+                    "situacao": "A ANALISAR-A VENCER"
+                }
+            ],
+            "parcelamentosSipade": [],
+            "pendenciasDebito": [
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "0561-07 - IRRF",
+                    "periodo_apuracao": "12/2024",
+                    "vencimento": "2025-01-20",
+                    "valor_original": 2407.72,
+                    "saldo_devedor": 2407.72,
+                    "multa": 481.54,
+                    "juros": 123.99,
+                    "saldo_devedor_consolidado": 3013.25,
+                    "situacao": "DEVEDOR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "0561-07 - IRRF",
+                    "periodo_apuracao": "01/2025",
+                    "vencimento": "2025-02-20",
+                    "valor_original": 2577.82,
+                    "saldo_devedor": 2577.82,
+                    "multa": 515.56,
+                    "juros": 107.23,
+                    "saldo_devedor_consolidado": 3200.61,
+                    "situacao": "DEVEDOR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "0561-07 - IRRF",
+                    "periodo_apuracao": "02/2025",
+                    "vencimento": "2025-03-20",
+                    "valor_original": 1558.57,
+                    "saldo_devedor": 1558.57,
+                    "multa": 311.71,
+                    "juros": 49.87,
+                    "saldo_devedor_consolidado": 1920.15,
+                    "situacao": "DEVEDOR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "1082-01 - CP-SEGUR.",
+                    "periodo_apuracao": "12/2024",
+                    "vencimento": "2025-01-20",
+                    "valor_original": 6817.31,
+                    "saldo_devedor": 6817.31,
+                    "multa": 1363.46,
+                    "juros": 351.09,
+                    "saldo_devedor_consolidado": 8531.86,
+                    "situacao": "DEVEDOR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "1082-01 - CP-SEGUR.",
+                    "periodo_apuracao": "01/2025",
+                    "vencimento": "2025-02-20",
+                    "valor_original": 6631.52,
+                    "saldo_devedor": 6631.52,
+                    "multa": 1326.3,
+                    "juros": 275.87,
+                    "saldo_devedor_consolidado": 8233.69,
+                    "situacao": "DEVEDOR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "1082-01 - CP-SEGUR.",
+                    "periodo_apuracao": "02/2025",
+                    "vencimento": "2025-03-20",
+                    "valor_original": 7291.26,
+                    "saldo_devedor": 7291.26,
+                    "multa": 1458.25,
+                    "juros": 233.32,
+                    "saldo_devedor_consolidado": 8982.83,
+                    "situacao": "DEVEDOR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "1099-01 - CP-SEGUR.",
+                    "periodo_apuracao": "12/2024",
+                    "vencimento": "2025-01-20",
+                    "valor_original": 155.32,
+                    "saldo_devedor": 155.32,
+                    "multa": 31.06,
+                    "juros": 7.99,
+                    "saldo_devedor_consolidado": 194.37,
+                    "situacao": "DEVEDOR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "1099-01 - CP-SEGUR.",
+                    "periodo_apuracao": "01/2025",
+                    "vencimento": "2025-02-20",
+                    "valor_original": 166.98,
+                    "saldo_devedor": 166.98,
+                    "multa": 33.39,
+                    "juros": 6.94,
+                    "saldo_devedor_consolidado": 207.31,
+                    "situacao": "DEVEDOR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "receita": "1099-01 - CP-SEGUR.",
+                    "periodo_apuracao": "02/2025",
+                    "vencimento": "2025-03-20",
+                    "valor_original": 333.96,
+                    "saldo_devedor": 333.96,
+                    "multa": 66.79,
+                    "juros": 10.68,
+                    "saldo_devedor_consolidado": 411.43,
+                    "situacao": "DEVEDOR"
+                }
+            ],
+            "processosFiscais": [],
+            "parcelamentosSiefpar": [
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "parcelamento": "02110001200048962772454",
+                    "valor_suspenso": 42141.12,
+                    "modalidade": "Parcelamento Simplificado"
+                }
+            ],
+            "debitosSicob": [],
+            "pendenciasInscricao": [
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "inscricao": "80.4.21.266774-67",
+                    "receita": "1507-SIMPLES",
+                    "inscrito_em": "2021-07-05",
+                    "ajuizado_em": "",
+                    "tipo_devedor": "DEVEDOR PRINCIPAL",
+                    "devedor_principal": "DEVEDOR PRINCIPAL",
+                    "processo": "12376.744.563/2021-67",
+                    "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "inscricao": "80.4.21.530081-98",
+                    "receita": "1507-SIMPLES",
+                    "inscrito_em": "2021-10-18",
+                    "ajuizado_em": "",
+                    "tipo_devedor": "DEVEDOR PRINCIPAL",
+                    "devedor_principal": "DEVEDOR PRINCIPAL",
+                    "processo": "11777.239.063/2021-22",
+                    "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "inscricao": "80.4.22.260577-89",
+                    "receita": "1507-SIMPLES",
+                    "inscrito_em": "2022-06-27",
+                    "ajuizado_em": "",
+                    "tipo_devedor": "DEVEDOR PRINCIPAL",
+                    "devedor_principal": "DEVEDOR PRINCIPAL",
+                    "processo": "12376.675.057/2022-00",
+                    "situacao": "ATIVA NAO AJUIZAVEL NEGOCIADA NO SISPAR"
+                }
+            ],
+            "pendenciasParcelamentoSispar": [
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "conta": "005377051",
+                    "descricao": "TRANSACAO - DEMAIS DEBITOS",
+                    "modalidade": "TRANSACAO EXTRAORDINARIA - SIMPLES NACIONAL - MICROEMPRESA E EMPRESA DE PEQUENO PORTE - 142 MESES"
+                },
+                {
+                    "cnpj": "19.107.062/0001-25",
+                    "conta": "007238844",
+                    "descricao": "PARCELAMENTO CONVENCIONAL",
+                    "modalidade": "PARCELAMENTO SEM GARANTIA - SIMPLES NACIONAL"
+                }
+            ]
+        };
+
+        // Simula a função convertToOrderItems
+        function convertToOrderItems(data) {
+            const now = new Date().toISOString();
+            console.log('🔄 Iniciando conversão de dados para OrderItems...', data);
+
+            // Mapeia Pendências de Débito (SIEF)
+            const debitos = (data.pendenciasDebito || []).map((debito, index) => {
+                console.log(`📋 Processando débito ${index + 1}:`, debito);
+                
+                const isSimples = (debito.receita || "").toUpperCase().includes('SIMPLES NAC') ||
+                                 (debito.receita || "").toUpperCase().includes('SIMPLES') ||
+                                 (debito.receita || "").includes('1507-SIMPLES') ||
+                                 (debito.receita || "").includes('1507');
+                const tax_type = isSimples ? "SIMPLES_NACIONAL" : "DEBITO";
+                
+                console.log(`   - É Simples Nacional: ${isSimples}`);
+                console.log(`   - Tax Type: ${tax_type}`);
+                console.log(`   - Receita original: "${debito.receita}"`);
+                
+                let code = debito.receita || "";
+                if (!code || code === "SEM CÓDIGO" || code.startsWith("ITEM-")) {
+                    if (isSimples) {
+                        code = "SIMPLES_NACIONAL";
+                    } else if (debito.periodo_apuracao) {
+                        const periodo = debito.periodo_apuracao.replace(/[\/\s]/g, "-");
+                        code = `ITEM-${periodo}`;
+                    } else {
+                        code = "ITEM-SEM-CODIGO";
+                    }
+                    console.log(`   - Código gerado: ${code}`);
+                }
+                
+                const orderItem = {
+                    id: crypto.randomUUID(),
+                    order_id: "",
+                    code: code,
+                    tax_type: tax_type,
+                    start_period: debito.periodo_apuracao || "",
+                    end_period: debito.periodo_apuracao || "",
+                    due_date: debito.vencimento || "",
+                    original_value: debito.valor_original || 0,
+                    current_balance: debito.saldo_devedor || 0,
+                    fine: debito.multa || 0,
+                    interest: debito.juros || 0,
+                    status: debito.situacao || "DEVEDOR",
+                    cno: debito.cno || "",
+                    saldo_devedor_consolidado: debito.saldo_devedor_consolidado || 0,
+                    created_at: now,
+                    updated_at: now
+                };
+                
+                console.log(`   - Item convertido:`, orderItem);
+                return orderItem;
+            });
+
+            // Mapeia Débito com Exigibilidade Suspensa (SIEF)
+            const debitosExigSuspensa = (data.debitosExigSuspensaSief || []).map((debito, index) => {
+                console.log(`📋 Processando débito exig. suspensa ${index + 1}:`, debito);
+                
+                let code = debito.receita || "";
+                if (!code || code.trim() === "") {
+                    if (debito.periodo_apuracao) {
+                        const periodo = debito.periodo_apuracao.replace(/[\/\s]/g, "-");
+                        code = `EXIG-SUSPENSA-${periodo}`;
+                    } else {
+                        code = `EXIG-SUSPENSA-${Date.now()}`;
+                    }
+                    console.log(`   - Código gerado para exig. suspensa: ${code}`);
+                }
+                
+                const orderItem = {
+                    id: crypto.randomUUID(),
+                    order_id: "",
+                    code: code,
+                    tax_type: "DEBITO_EXIG_SUSPENSA_SIEF",
+                    start_period: debito.periodo_apuracao || "",
+                    end_period: debito.periodo_apuracao || "",
+                    due_date: debito.vencimento || "",
+                    original_value: debito.valor_original || 0,
+                    current_balance: debito.saldo_devedor || 0,
+                    fine: debito.multa || 0,
+                    interest: debito.juros || 0,
+                    status: debito.situacao || "",
+                    cno: debito.cno || "",
+                    saldo_devedor_consolidado: debito.saldo_devedor_consolidado || 0,
+                    created_at: now,
+                    updated_at: now,
+                };
+                
+                console.log(`   - Item exig. suspensa convertido:`, orderItem);
+                return orderItem;
+            });
+
+            // Mapeia Parcelamentos SIEFPAR
+            const parcelamentosSiefpar = (data.parcelamentosSiefpar || []).map((item, index) => {
+                console.log(`📋 Processando parcelamento SIEFPAR ${index + 1}:`, item);
+                
+                let code = item.parcelamento || "";
+                if (!code || code.trim() === "") {
+                    code = `PARCELAMENTO-${Date.now()}`;
+                    console.log(`   - Código gerado para SIEFPAR: ${code}`);
+                }
+                
+                const orderItem = {
+                    id: crypto.randomUUID(),
+                    order_id: "",
+                    code: code,
+                    tax_type: "PARCELAMENTO_SIEFPAR",
+                    start_period: "PARCELAMENTO",
+                    end_period: "PARCELAMENTO",
+                    due_date: "SUSPENSO",
+                    original_value: item.valor_suspenso || 0,
+                    current_balance: item.valor_suspenso || 0,
+                    fine: 0,
+                    interest: 0,
+                    status: item.modalidade || "ATIVO",
+                    cno: "",
+                    cnpj: item.cnpj || "",
+                    created_at: now,
+                    updated_at: now,
+                };
+                
+                console.log(`   - Item SIEFPAR convertido:`, orderItem);
+                return orderItem;
+            });
+
+            // Mapeia Pendências de Inscrição (SIDA)
+            const pendenciasInscricao = (data.pendenciasInscricao || []).map((item, index) => {
+                console.log(`📋 Processando inscrição SIDA ${index + 1}:`, item);
+                
+                let code = item.inscricao || "";
+                if (!code || code.trim() === "") {
+                    code = `INSCRICAO-${Date.now()}`;
+                    console.log(`   - Código gerado para SIDA: ${code}`);
+                }
+                
+                const orderItem = {
+                    id: crypto.randomUUID(),
+                    order_id: "",
+                    inscricao: item.inscricao || "",
+                    receita: item.receita || "",
+                    inscrito_em: item.inscrito_em || "",
+                    ajuizado_em: item.ajuizado_em || "",
+                    processo: item.processo || "",
+                    tipo_devedor: item.tipo_devedor || "",
+                    devedor_principal: item.devedor_principal || "",
+                    status: item.situacao || "ATIVA",
+                    tax_type: "PENDENCIA_INSCRICAO_SIDA",
+                    code: code,
+                    start_period: item.inscrito_em || "INSCRICAO",
+                    end_period: item.inscrito_em || "INSCRICAO",
+                    due_date: item.ajuizado_em || "NAO AJUIZADO",
+                    original_value: 0,
+                    current_balance: 0,
+                    fine: 0,
+                    interest: 0,
+                    cno: "",
+                    cnpj: item.cnpj || "",
+                    saldo_devedor_consolidado: 0,
+                    created_at: now,
+                    updated_at: now,
+                };
+                
+                console.log(`   - Item SIDA convertido:`, orderItem);
+                return orderItem;
+            });
+
+            // Mapeia Pendências de Parcelamento (SISPAR)
+            const pendenciasParcelamentoSispar = (data.pendenciasParcelamentoSispar || []).map((item, index) => {
+                console.log(`📋 Processando parcelamento SISPAR ${index + 1}:`, item);
+                
+                let code = item.conta || "";
+                if (!code || code.trim() === "") {
+                    code = `SISPAR-${Date.now()}`;
+                    console.log(`   - Código gerado para SISPAR: ${code}`);
+                }
+                
+                const orderItem = {
+                    id: crypto.randomUUID(),
+                    order_id: "",
+                    code: code,
+                    tax_type: "PENDENCIA_PARCELAMENTO_SISPAR",
+                    start_period: "PARCELAMENTO",
+                    end_period: "PARCELAMENTO",
+                    due_date: "NEGOCIADO",
+                    original_value: 0,
+                    current_balance: 0,
+                    fine: 0,
+                    interest: 0,
+                    status: item.modalidade || item.descricao || "ATIVO",
+                    cno: "",
+                    cnpj: item.cnpj || "",
+                    saldo_devedor_consolidado: 0,
+                    sispar_conta: item.conta || "",
+                    sispar_descricao: item.descricao || "",
+                    sispar_modalidade: item.modalidade || "",
+                    created_at: now,
+                    updated_at: now,
+                };
+                
+                console.log(`   - Item SISPAR convertido:`, orderItem);
+                return orderItem;
+            });
+
+            const allItems = [
+                ...debitos,
+                ...debitosExigSuspensa,
+                ...parcelamentosSiefpar,
+                ...pendenciasInscricao,
+                ...pendenciasParcelamentoSispar
+            ];
+
+            console.log(`🔄 Conversão concluída: ${allItems.length} itens processados`, {
+                debitos: debitos.length,
+                debitosExigSuspensa: debitosExigSuspensa.length,
+                parcelamentosSiefpar: parcelamentosSiefpar.length,
+                pendenciasInscricao: pendenciasInscricao.length,
+                pendenciasParcelamentoSispar: pendenciasParcelamentoSispar.length
+            });
+
+            return allItems;
+        }
+
+        // Executa o teste
+        console.log('🧪 Iniciando teste de conversão...');
+        const convertedItems = convertToOrderItems(mockApiResponse);
+        console.log('✅ Teste concluído!');
+        console.log(`📊 Total de itens convertidos: ${convertedItems.length}`);
+
+        // Exibe resultado na página
+        document.getElementById('output').innerHTML = `
+            <h2>Resultado do Teste</h2>
+            <p><strong>Total de itens convertidos:</strong> ${convertedItems.length}</p>
+            <h3>Detalhes por Seção:</h3>
+            <ul>
+                <li>Débitos Exig. Suspensa: ${mockApiResponse.debitosExigSuspensaSief.length}</li>
+                <li>Pendências Débito: ${mockApiResponse.pendenciasDebito.length}</li>
+                <li>Parcelamentos SIEFPAR: ${mockApiResponse.parcelamentosSiefpar.length}</li>
+                <li>Pendências Inscrição: ${mockApiResponse.pendenciasInscricao.length}</li>
+                <li>Pendências Parcelamento SISPAR: ${mockApiResponse.pendenciasParcelamentoSispar.length}</li>
+            </ul>
+            <p><strong>Total esperado:</strong> ${
+                mockApiResponse.debitosExigSuspensaSief.length +
+                mockApiResponse.pendenciasDebito.length +
+                mockApiResponse.parcelamentosSiefpar.length +
+                mockApiResponse.pendenciasInscricao.length +
+                mockApiResponse.pendenciasParcelamentoSispar.length
+            }</p>
+            <p><strong>Conversão bem-sucedida:</strong> ${convertedItems.length === (
+                mockApiResponse.debitosExigSuspensaSief.length +
+                mockApiResponse.pendenciasDebito.length +
+                mockApiResponse.parcelamentosSiefpar.length +
+                mockApiResponse.pendenciasInscricao.length +
+                mockApiResponse.pendenciasParcelamentoSispar.length
+            ) ? '✅ SIM' : '❌ NÃO'}</p>
+            <h3>Itens Convertidos:</h3>
+            <pre>${JSON.stringify(convertedItems, null, 2)}</pre>
+        `;
+    </script>
+</body>
+</html> 

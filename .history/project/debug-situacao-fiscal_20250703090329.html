@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Situação Fiscal</title>
+</head>
+<body>
+    <h1>Debug Situação Fiscal</h1>
+    <div id="result"></div>
+    <script>
+        // Dados da resposta da API conforme fornecido
+        const apiResponse = {
+            "debitosExigSuspensaSief": 3,
+            "pendenciasDebito": 10, 
+            "parcelamentosSiefpar": 1,
+            "pendenciasInscricao": 3,
+            "pendenciasParcelamentoSispar": 2
+        };
+        
+        const total = Object.values(apiResponse).reduce((sum, count) => sum + count, 0);
+        
+        document.getElementById('result').innerHTML = `
+            <h2>Análise dos Dados</h2>
+            <p>Total esperado: ${total} itens</p>
+            <p>Você está importando apenas 9 itens de ${total} esperados.</p>
+            <p>Isso significa que ${total - 9} itens estão sendo perdidos no processo.</p>
+            
+            <h3>Possíveis causas:</h3>
+            <ul>
+                <li>Validação muito restritiva no frontend</li>
+                <li>Problemas na conversão de dados</li>
+                <li>Campos ausentes ou em formato incorreto</li>
+                <li>Problemas de mapeamento entre API e frontend</li>
+            </ul>
+        `;
+    </script>
+</body>
+</html> 

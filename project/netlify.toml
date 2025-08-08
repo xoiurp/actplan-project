@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_EXTRACTION_API_URL,VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
+
+# Redirecionamento para lidar com roteamento de Single Page Application (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 

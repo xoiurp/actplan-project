@@ -1,4 +1,4 @@
-import { User, Customer, Order, DashboardStats, PaymentPlan, Installment } from '../types';
+import { User, Customer, Order, DashboardStats, PaymentPlan, Installment, DocumentInfo } from '../types';
 import { supabase } from './supabase';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -65,8 +65,7 @@ export async function createPaymentPlan(orderId: string, totalAmount: number, in
       payment_plan_id: paymentPlan.id,
       status: 'completed'
     })
-    .eq('id', orderId)
-    .eq('user_id', user.id);
+    .eq('id', orderId);
 
   if (orderError) throw orderError;
 
@@ -185,21 +184,15 @@ export async function getCustomers(): Promise<Customer[]> {
 }
 
 export async function getCustomer(id: string): Promise<Customer | null> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   const { data, error } = await supabase
     .from('customers')
     .select('*')
     .eq('id', id)
-    .eq('user_id', user.id)
     .single();
 
   if (error) {
     if (error.code === 'PGRST116') { 
-      console.warn(`Customer with ID ${id} not found or access denied.`);
+      console.warn(`Customer with ID ${id} not found.`);
       return null;
     }
     if (error instanceof Error) {
@@ -243,16 +236,10 @@ export async function createCustomer(customer: Omit<Customer, 'id' | 'created_at
 }
 
 export async function updateCustomer(id: string, customer: Partial<Customer>): Promise<Customer> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   const { data, error } = await supabase
     .from('customers')
     .update(customer)
     .eq('id', id)
-    .eq('user_id', user.id)
     .select()
     .single();
 
@@ -261,16 +248,10 @@ export async function updateCustomer(id: string, customer: Partial<Customer>): P
 }
 
 export async function deleteCustomer(id: string): Promise<void> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   const { error } = await supabase
     .from('customers')
     .delete()
-    .eq('id', id)
-    .eq('user_id', user.id);
+    .eq('id', id);
 
   if (error) throw error;
 }
@@ -310,7 +291,7 @@ export async function uploadCertificate(file: File, customerId: string): Promise
   return { url: secureUrl };
 }
 
-export async function uploadOrderPDF(file: File, orderId: string, type: 'situacaoFiscal' | 'darf'): Promise<{ url: string }> {
+export async function uploadOrderPDF(file: File, orderId: string, type: 'situacaoFiscal' | 'darf' | 'vendas' | 'juridico'): Promise<{ url: string, name: string, type: string, size: number }> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     throw new Error('User not authenticated');
@@ -333,33 +314,7 @@ export async function uploadOrderPDF(file: File, orderId: string, type: 'situaca
 
   const secureUrl = publicUrl.replace('http://', 'https://');
 
-  const { data: order, error: orderError } = await supabase
-    .from('orders')
-    .select('documentos')
-    .eq('id', orderId)
-    .single();
-
-  if (orderError) throw orderError;
-
-  const documentos = {
-    ...order?.documentos,
-    [type]: {
-      url: secureUrl,
-      name: safeFileName,
-      type: file.type,
-      size: file.size
-    }
-  };
-
-  const { error: updateError } = await supabase
-    .from('orders')
-    .update({ documentos })
-    .eq('id', orderId)
-    .eq('user_id', user.id);
-
-  if (updateError) throw updateError;
-
-  return { url: secureUrl };
+  return { url: secureUrl, name: safeFileName, type: file.type, size: file.size };
 }
 
 export async function getOrders() {
@@ -481,49 +436,65 @@ export async function createOrder(order: any) {
 
   if (error) throw error;
 
-  let documentos: any = {};
+  const documentos: any = {};
+
   if (order.documentos) {
     console.log('Processando documentos:', order.documentos);
-    
-    // Verifica se há arquivo de situação fiscal para upload
-    if (order.documentos.situacaoFiscal?.file && order.documentos.situacaoFiscal.file.name) {
-      console.log('Fazendo upload da situação fiscal...');
-      const { url } = await uploadOrderPDF(order.documentos.situacaoFiscal.file, data.id, 'situacaoFiscal');
-      documentos = {
-        ...documentos,
-        situacaoFiscal: {
-          url,
-          name: order.documentos.situacaoFiscal.file.name,
-          type: order.documentos.situacaoFiscal.file.type,
-          size: order.documentos.situacaoFiscal.file.size
-        }
-      };
-      console.log('Upload da situação fiscal concluído:', documentos.situacaoFiscal);
+
+    // Função auxiliar para upload e atualização do objeto de documentos
+    const handleUpload = async (docInfo: any, type: 'situacaoFiscal' | 'darf' | 'vendas' | 'juridico') => {
+      if (docInfo.file) {
+        const uploadedFile = await uploadOrderPDF(docInfo.file, data.id, type);
+        return { ...uploadedFile };
+      }
+      return docInfo; // Retorna o docInfo existente se não houver novo arquivo
+    };
+
+    // Processa documentos que são objetos únicos
+    if (order.documentos.situacaoFiscal) {
+      documentos.situacaoFiscal = await handleUpload(order.documentos.situacaoFiscal, 'situacaoFiscal');
     }
-    
-    // Verifica se há arquivo DARF para upload
-    if (order.documentos.darf?.file && order.documentos.darf.file.name) {
-      console.log('Fazendo upload do DARF...');
-      const { url } = await uploadOrderPDF(order.documentos.darf.file, data.id, 'darf');
-      documentos = {
-        ...documentos,
-        darf: {
-          url,
-          name: order.documentos.darf.file.name,
-          type: order.documentos.darf.file.type,
-          size: order.documentos.darf.file.size
-        }
-      };
-      console.log('Upload do DARF concluído:', documentos.darf);
+    if (order.documentos.darf) {
+      documentos.darf = await handleUpload(order.documentos.darf, 'darf');
     }
 
-    if (Object.keys(documentos).length > 0) {
-      console.log('Atualizando pedido com documentos:', documentos);
+    // Processa documentos que são arrays
+    if (order.documentos.vendas?.length) {
+      documentos.vendas = await Promise.all(
+        order.documentos.vendas.map((doc: any) => handleUpload(doc, 'vendas'))
+      );
+    }
+    if (order.documentos.juridico?.length) {
+      documentos.juridico = await Promise.all(
+        order.documentos.juridico.map((doc: any) => handleUpload(doc, 'juridico'))
+      );
+    }
+
+    const finalDocumentos: any = {};
+
+    for (const key in documentos) {
+        const typedKey = key as keyof typeof documentos;
+        const value = documentos[typedKey];
+
+        if (Array.isArray(value)) {
+            finalDocumentos[typedKey] = value.map((item: DocumentInfo) => {
+                const { file, ...rest } = item;
+                return rest;
+            });
+        } else if (typeof value === 'object' && value !== null) {
+            const { file, ...rest } = value;
+            finalDocumentos[typedKey] = rest;
+        } else {
+            finalDocumentos[typedKey] = value;
+        }
+    }
+
+    if (Object.keys(finalDocumentos).length > 0) {
+      console.log('Atualizando pedido com documentos:', finalDocumentos);
       const { error: updateError } = await supabase
         .from('orders')
-        .update({ documentos })
-        .eq('id', data.id)
-        .eq('user_id', user.id);
+        .update({ documentos: finalDocumentos })
+        .eq('id', data.id);
 
       if (updateError) throw updateError;
       console.log('Pedido atualizado com documentos com sucesso');
@@ -624,11 +595,6 @@ export async function createOrder(order: any) {
 }
 
 export async function deleteOrder(orderId: string): Promise<void> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   // First delete all order items
   const { error: itemsError } = await supabase
     .from('order_items')
@@ -641,18 +607,12 @@ export async function deleteOrder(orderId: string): Promise<void> {
   const { error } = await supabase
     .from('orders')
     .delete()
-    .eq('id', orderId)
-    .eq('user_id', user.id);
+    .eq('id', orderId);
 
   if (error) throw error;
 }
 
 export async function deleteMultipleOrders(orderIds: string[]): Promise<void> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   // Delete all order items for these orders
   const { error: itemsError } = await supabase
     .from('order_items')
@@ -665,8 +625,17 @@ export async function deleteMultipleOrders(orderIds: string[]): Promise<void> {
   const { error } = await supabase
     .from('orders')
     .delete()
-    .in('id', orderIds)
-    .eq('user_id', user.id);
+    .in('id', orderIds);
+
+  if (error) throw error;
+}
+
+export async function deleteOrderItem(itemId: string): Promise<void> {
+  // Delete the order item
+  const { error } = await supabase
+    .from('order_items')
+    .delete()
+    .eq('id', itemId);
 
   if (error) throw error;
 }
@@ -689,31 +658,34 @@ export async function updateOrder(orderId: string, order: any) {
 
   let documentos = existingOrder.documentos || {};
   if (order.documentos) {
-    // Verifica se há arquivo de situação fiscal para upload
-    if (order.documentos.situacaoFiscal?.file && order.documentos.situacaoFiscal.file.name) {
-      const { url } = await uploadOrderPDF(order.documentos.situacaoFiscal.file, orderId, 'situacaoFiscal');
-      documentos = {
-        ...documentos,
-        situacaoFiscal: {
-          url,
-          name: order.documentos.situacaoFiscal.file.name,
-          type: order.documentos.situacaoFiscal.file.type,
-          size: order.documentos.situacaoFiscal.file.size
-        }
-      };
+    const handleUpload = async (docInfo: any, type: 'situacaoFiscal' | 'darf' | 'vendas' | 'juridico') => {
+      if (docInfo.file) {
+        const uploadedFile = await uploadOrderPDF(docInfo.file, orderId, type);
+        return { ...uploadedFile };
+      }
+      // Se não há arquivo novo, mantém os dados existentes, removendo o campo 'file' se houver
+      const { file, ...rest } = docInfo;
+      return rest;
+    };
+
+    // Processa documentos que são objetos únicos
+    if (order.documentos.situacaoFiscal) {
+      documentos.situacaoFiscal = await handleUpload(order.documentos.situacaoFiscal, 'situacaoFiscal');
     }
-    // Verifica se há arquivo DARF para upload
-    if (order.documentos.darf?.file && order.documentos.darf.file.name) {
-      const { url } = await uploadOrderPDF(order.documentos.darf.file, orderId, 'darf');
-      documentos = {
-        ...documentos,
-        darf: {
-          url,
-          name: order.documentos.darf.file.name,
-          type: order.documentos.darf.file.type,
-          size: order.documentos.darf.file.size
-        }
-      };
+    if (order.documentos.darf) {
+      documentos.darf = await handleUpload(order.documentos.darf, 'darf');
+    }
+
+    // Processa documentos que são arrays
+    if (order.documentos.vendas?.length) {
+      documentos.vendas = await Promise.all(
+        order.documentos.vendas.map((doc: any) => handleUpload(doc, 'vendas'))
+      );
+    }
+    if (order.documentos.juridico?.length) {
+      documentos.juridico = await Promise.all(
+        order.documentos.juridico.map((doc: any) => handleUpload(doc, 'juridico'))
+      );
     }
   }
 
@@ -729,15 +701,14 @@ export async function updateOrder(orderId: string, order: any) {
     documentos
   };
 
-  if (!existingOrder || existingOrder.user_id !== user.id) {
-    throw new Error('Order not found or access denied');
+  if (!existingOrder) {
+    throw new Error('Order not found');
   }
 
   const { data, error } = await supabase
     .from('orders')
     .update(formattedData)
     .eq('id', orderId)
-    .eq('user_id', user.id)
     .select()
     .single();
 
@@ -847,7 +818,25 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
-export async function validateCertificateApi(pfxFile: File, password: string): Promise<{ isValid: boolean; expirationDate?: string; error?: string }> {
+interface CertificateInfo {
+  cnpj?: string;
+  razao_social?: string;
+  nome_fantasia?: string;
+  endereco?: string;
+  cep?: string;
+  cidade?: string;
+  estado?: string;
+}
+
+export async function validateCertificateApi(
+  pfxFile: File, 
+  password: string
+): Promise<{ 
+  isValid: boolean; 
+  expirationDate?: string; 
+  error?: string;
+  certificateInfo?: CertificateInfo;
+}> {
   try {
     const arrayBuffer = await readFileAsArrayBuffer(pfxFile);
     const pfxBase64 = arrayBufferToBase64(arrayBuffer);
@@ -883,7 +872,12 @@ export async function validateCertificateApi(pfxFile: File, password: string): P
         return { isValid: false, error: 'Resposta inesperada da função de validação.' };
     }
 
-    return { isValid: data.isValid, expirationDate: data.expirationDate, error: data.isValid ? undefined : 'Certificado expirado ou inválido.' };
+    return { 
+      isValid: data.isValid, 
+      expirationDate: data.expirationDate, 
+      error: data.isValid ? undefined : 'Certificado expirado ou inválido.',
+      certificateInfo: data.certificateInfo
+    };
 
   } catch (err) {
     console.error('Error invoking validate-certificate function:', err);
