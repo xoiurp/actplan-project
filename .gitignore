@@ -24,4 +24,13 @@ build/
 
 # Arquivos de sistema
 Thumbs.db
-desktop.ini 
+desktop.ini
+
+# Nested git repositories - ignore to avoid deployment issues
+project/project/
+vps bkp/actplan-project/
+
+# Python cache
+**/__pycache__/
+*.pyc
+*.pyo 
