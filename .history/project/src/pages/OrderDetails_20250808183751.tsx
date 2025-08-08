@@ -485,19 +485,6 @@ export default function OrderDetails() {
                     por {userEmailMap.get(record.reopened_by) || 'Desconhecido'}
                   </span>
                 </div>
-                {record.reopen_status === 'reclosed' && record.closed_by && (
-                  <div className="flex justify-between items-start mt-2">
-                    <div>
-                      <span className="font-medium">Fechado</span>
-                      <span className="text-sm text-muted-foreground ml-2">
-                        em {record.closed_at ? new Date(record.closed_at).toLocaleDateString('pt-BR') : ''}
-                      </span>
-                    </div>
-                    <span className="text-sm text-muted-foreground">
-                      por {userEmailMap.get(record.closed_by) || 'Desconhecido'}
-                    </span>
-                  </div>
-                )}
                 <div className="text-sm mb-2">
                   <span className="font-medium">Status anterior:</span>{' '}
                   {orderStatusMap[record.previous_status as OrderStatus]?.label || record.previous_status}

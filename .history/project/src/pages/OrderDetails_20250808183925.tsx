@@ -498,6 +498,7 @@ export default function OrderDetails() {
                     </span>
                   </div>
                 )}
+                </div>
                 <div className="text-sm mb-2">
                   <span className="font-medium">Status anterior:</span>{' '}
                   {orderStatusMap[record.previous_status as OrderStatus]?.label || record.previous_status}

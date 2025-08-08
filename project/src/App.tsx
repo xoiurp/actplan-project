@@ -16,6 +16,7 @@ import OrderDetails from './pages/OrderDetails';
 import CustomerDetails from './pages/CustomerDetails'; // Import the new page
 import PaymentPlanDetails from './pages/PaymentPlanDetails';
 import CreateBulkPaymentPlan from './pages/CreateBulkPaymentPlan';
+import Reports from './pages/Reports';
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="payment-plans" element={<PaymentPlans />} />
             <Route path="payment-plans/bulk" element={<CreateBulkPaymentPlan />} />
             <Route path="payment-plans/:id" element={<PaymentPlanDetails />} />
+            <Route path="reports" element={<Reports />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

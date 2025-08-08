@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getOrders, createPaymentPlan, getUsersByIds } from '../lib/api';
+import { getOrders, createPaymentPlan } from '../lib/api';
 import { Building2, User, Phone, MapPin, Loader2, FileText, Edit, ChevronDown, ChevronUp, CreditCard } from 'lucide-react';
 import { formatCurrency } from '../lib/utils';
 import { CreatePaymentPlanModal } from '@/components/CreatePaymentPlanModal';
@@ -58,6 +58,8 @@ interface ReopenHistoryRecord {
   closed_at: string | null;
   closed_by: string | null;
   closing_notes: string | null;
+  reopened_by_user?: { email: string };
+  closed_by_user?: { email: string };
 }
 
 export default function OrderDetails() {
@@ -79,7 +81,11 @@ export default function OrderDetails() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('order_reopen_history')
-        .select(`*`)
+        .select(`
+          *,
+          reopened_by_user:users!reopened_by(email),
+          closed_by_user:users!closed_by(email)
+        `)
         .eq('order_id', id)
         .order('reopened_at', { ascending: false });
 
@@ -88,30 +94,6 @@ export default function OrderDetails() {
     },
     enabled: !!id
   });
-
-  // Get user emails for history
-  const userIds = useMemo(() => {
-    if (!reopenHistory) return [];
-    const ids = new Set<string>();
-    reopenHistory.forEach(record => {
-      ids.add(record.reopened_by);
-      if (record.closed_by) {
-        ids.add(record.closed_by);
-      }
-    });
-    return Array.from(ids);
-  }, [reopenHistory]);
-
-  const { data: usersData } = useQuery({
-    queryKey: ['users', userIds],
-    queryFn: () => getUsersByIds(userIds),
-    enabled: userIds.length > 0,
-  });
-
-  const userEmailMap = useMemo(() => {
-    if (!usersData) return new Map<string, string>();
-    return new Map(usersData.map(user => [user.id, user.email]));
-  }, [usersData]);
 
   // Log para debug dos dados DARF
   React.useEffect(() => {
@@ -482,22 +464,9 @@ export default function OrderDetails() {
                     </span>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    por {userEmailMap.get(record.reopened_by) || 'Desconhecido'}
+                    por {record.reopened_by_user?.email}
                   </span>
                 </div>
-                {record.reopen_status === 'reclosed' && record.closed_by && (
-                  <div className="flex justify-between items-start mt-2">
-                    <div>
-                      <span className="font-medium">Fechado</span>
-                      <span className="text-sm text-muted-foreground ml-2">
-                        em {record.closed_at ? new Date(record.closed_at).toLocaleDateString('pt-BR') : ''}
-                      </span>
-                    </div>
-                    <span className="text-sm text-muted-foreground">
-                      por {userEmailMap.get(record.closed_by) || 'Desconhecido'}
-                    </span>
-                  </div>
-                )}
                 <div className="text-sm mb-2">
                   <span className="font-medium">Status anterior:</span>{' '}
                   {orderStatusMap[record.previous_status as OrderStatus]?.label || record.previous_status}

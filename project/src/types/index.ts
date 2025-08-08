@@ -51,6 +51,7 @@ export interface Order {
   data_pedido: string;
   comissao_percentage: number;
   reducao_percentage: number;
+  valor_reducao?: number;
   fornecedor: string;
   vencimento: string;
   notas: string;

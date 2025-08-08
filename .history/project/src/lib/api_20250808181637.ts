@@ -501,18 +501,10 @@ export async function createOrder(order: any) {
     }
   }
 
-  // Calcular o valor total dos itens para determinar o valor_reducao
-  let totalValue = 0;
-  
   if (order.itens_pedido?.length > 0) {
     console.log('Processando itens do pedido:', order.itens_pedido);
     
-    // Calcular o total antes de inserir os itens
-    totalValue = order.itens_pedido.reduce((sum: number, item: OrderItem) => {
-      return sum + (item.saldo_devedor_consolidado || item.current_balance || 0);
-    }, 0);
-    
-    const orderItems = order.itens_pedido.map((item: OrderItem, index: number) => {
+    const orderItems = order.itens_pedido.map((item: any, index: number): any => {
       console.log(`\n🔍 [DB Item ${index}] Processando para inserção:`, {
         code: item.code,
         start_period: item.start_period,
@@ -524,9 +516,9 @@ export async function createOrder(order: any) {
         order_id: data.id,
         code: item.code || `ITEM_${index}`,
         tax_type: item.tax_type || 'UNKNOWN',
-        start_period: formatDateForDB(item.start_period || '') || '2024-01-01',
-        end_period: formatDateForDB(item.end_period || '') || '2024-01-01',
-        due_date: formatDateForDB(item.due_date || '') || '2024-01-01',
+        start_period: formatDateForDB(item.start_period) || '2024-01-01',
+        end_period: formatDateForDB(item.end_period) || '2024-01-01',
+        due_date: formatDateForDB(item.due_date) || '2024-01-01',
         original_value: item.original_value || 0,
         current_balance: item.current_balance || 0,
         fine: item.fine || 0,
@@ -584,7 +576,7 @@ export async function createOrder(order: any) {
     console.log('Itens formatados para inserção:', orderItems);
     
     // Log de validação dos campos obrigatórios (sem bloquear)
-    const itemsWithNullFields = orderItems.filter((item: OrderItem) => !item.start_period || !item.due_date);
+    const itemsWithNullFields = orderItems.filter(item => !item.start_period || !item.due_date);
     if (itemsWithNullFields.length > 0) {
       console.warn('⚠️ Itens com campos obrigatórios que podem estar vazios:', itemsWithNullFields);
       // Não bloqueia mais - as correções no darfProcessor devem resolver isso
@@ -596,27 +588,6 @@ export async function createOrder(order: any) {
 
     if (itemsError) throw itemsError;
     console.log('Itens do pedido inseridos com sucesso');
-  }
-
-  // Calcular e atualizar o valor_reducao se houver reducao_percentage
-  if (order.reducaoPercentage && totalValue > 0) {
-    const valorReducao = totalValue * (order.reducaoPercentage / 100);
-    console.log('Calculando valor_reducao:', {
-      totalValue,
-      reducaoPercentage: order.reducaoPercentage,
-      valorReducao
-    });
-    
-    const { error: updateReducaoError } = await supabase
-      .from('orders')
-      .update({ valor_reducao: valorReducao })
-      .eq('id', data.id);
-    
-    if (updateReducaoError) {
-      console.error('Erro ao atualizar valor_reducao:', updateReducaoError);
-    } else {
-      console.log('valor_reducao atualizado com sucesso');
-    }
   }
 
   console.log('Pedido criado com sucesso:', data);
@@ -751,15 +722,7 @@ export async function updateOrder(orderId: string, order: any) {
 
   if (error) throw error;
 
-  // Calcular o valor total dos itens para determinar o valor_reducao
-  let totalValue = 0;
-  
   if (order.itens_pedido?.length > 0) {
-    // Calcular o total antes de atualizar os itens
-    totalValue = order.itens_pedido.reduce((sum: number, item: OrderItem) => {
-      return sum + (item.saldo_devedor_consolidado || item.current_balance || 0);
-    }, 0);
-    
     try {
       const { error: deleteError } = await supabase
         .from('order_items')
@@ -772,9 +735,9 @@ export async function updateOrder(orderId: string, order: any) {
         order_id: orderId,
         code: item.code,
         tax_type: item.tax_type, // Mantém o nome correto do campo
-        start_period: formatDateForDB(item.start_period || ''),
-        end_period: formatDateForDB(item.end_period || ''),
-        due_date: formatDateForDB(item.due_date || ''),
+        start_period: formatDateForDB(item.start_period),
+        end_period: formatDateForDB(item.end_period),
+        due_date: formatDateForDB(item.due_date),
         original_value: item.original_value,
         current_balance: item.current_balance,
         fine: item.fine || 0,
@@ -811,27 +774,6 @@ export async function updateOrder(orderId: string, order: any) {
       } else {
         throw new Error(`An unknown error occurred while updating order items: ${error}`);
       }
-    }
-  }
-
-  // Calcular e atualizar o valor_reducao se houver reducao_percentage
-  if (order.reducaoPercentage && totalValue > 0) {
-    const valorReducao = totalValue * (order.reducaoPercentage / 100);
-    console.log('Atualizando valor_reducao:', {
-      totalValue,
-      reducaoPercentage: order.reducaoPercentage,
-      valorReducao
-    });
-    
-    const { error: updateReducaoError } = await supabase
-      .from('orders')
-      .update({ valor_reducao: valorReducao })
-      .eq('id', orderId);
-    
-    if (updateReducaoError) {
-      console.error('Erro ao atualizar valor_reducao:', updateReducaoError);
-    } else {
-      console.log('valor_reducao atualizado com sucesso');
     }
   }
 
@@ -950,22 +892,4 @@ export async function validateCertificateApi(
     const message = err instanceof Error ? err.message : String(err);
     return { isValid: false, error: `Erro ao chamar a função de validação: ${message}` };
   }
-}
-
-export async function getUsersByIds(userIds: string[]): Promise<{ id: string; email: string }[]> {
-  if (!userIds || userIds.length === 0) {
-    return [];
-  }
-
-  const { data, error } = await supabase
-    .from('users')
-    .select('id, email')
-    .in('id', userIds);
-
-  if (error) {
-    console.error('Error fetching users by IDs:', error);
-    throw error;
-  }
-
-  return data;
 }
