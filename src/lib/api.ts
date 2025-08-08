@@ -1,4 +1,4 @@
-import { User, Customer, Order, DashboardStats, PaymentPlan, Installment, DocumentInfo } from '../types';
+import { User, Customer, Order, OrderItem, DashboardStats, PaymentPlan, Installment, DocumentInfo } from '../types';
 import { supabase } from './supabase';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -65,8 +65,7 @@ export async function createPaymentPlan(orderId: string, totalAmount: number, in
       payment_plan_id: paymentPlan.id,
       status: 'completed'
     })
-    .eq('id', orderId)
-    .eq('user_id', user.id);
+    .eq('id', orderId);
 
   if (orderError) throw orderError;
 
@@ -185,21 +184,15 @@ export async function getCustomers(): Promise<Customer[]> {
 }
 
 export async function getCustomer(id: string): Promise<Customer | null> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   const { data, error } = await supabase
     .from('customers')
     .select('*')
     .eq('id', id)
-    .eq('user_id', user.id)
     .single();
 
   if (error) {
     if (error.code === 'PGRST116') { 
-      console.warn(`Customer with ID ${id} not found or access denied.`);
+      console.warn(`Customer with ID ${id} not found.`);
       return null;
     }
     if (error instanceof Error) {
@@ -243,16 +236,10 @@ export async function createCustomer(customer: Omit<Customer, 'id' | 'created_at
 }
 
 export async function updateCustomer(id: string, customer: Partial<Customer>): Promise<Customer> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   const { data, error } = await supabase
     .from('customers')
     .update(customer)
     .eq('id', id)
-    .eq('user_id', user.id)
     .select()
     .single();
 
@@ -261,16 +248,10 @@ export async function updateCustomer(id: string, customer: Partial<Customer>): P
 }
 
 export async function deleteCustomer(id: string): Promise<void> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   const { error } = await supabase
     .from('customers')
     .delete()
-    .eq('id', id)
-    .eq('user_id', user.id);
+    .eq('id', id);
 
   if (error) throw error;
 }
@@ -523,7 +504,7 @@ export async function createOrder(order: any) {
   if (order.itens_pedido?.length > 0) {
     console.log('Processando itens do pedido:', order.itens_pedido);
     
-    const orderItems = order.itens_pedido.map((item: any, index: number): any => {
+    const orderItems = order.itens_pedido.map((item: OrderItem, index: number) => {
       console.log(`\n🔍 [DB Item ${index}] Processando para inserção:`, {
         code: item.code,
         start_period: item.start_period,
@@ -535,9 +516,9 @@ export async function createOrder(order: any) {
         order_id: data.id,
         code: item.code || `ITEM_${index}`,
         tax_type: item.tax_type || 'UNKNOWN',
-        start_period: formatDateForDB(item.start_period) || '2024-01-01',
-        end_period: formatDateForDB(item.end_period) || '2024-01-01',
-        due_date: formatDateForDB(item.due_date) || '2024-01-01',
+        start_period: formatDateForDB(item.start_period || '') || '2024-01-01',
+        end_period: formatDateForDB(item.end_period || '') || '2024-01-01',
+        due_date: formatDateForDB(item.due_date || '') || '2024-01-01',
         original_value: item.original_value || 0,
         current_balance: item.current_balance || 0,
         fine: item.fine || 0,
@@ -595,7 +576,7 @@ export async function createOrder(order: any) {
     console.log('Itens formatados para inserção:', orderItems);
     
     // Log de validação dos campos obrigatórios (sem bloquear)
-    const itemsWithNullFields = orderItems.filter(item => !item.start_period || !item.due_date);
+    const itemsWithNullFields = orderItems.filter((item: OrderItem) => !item.start_period || !item.due_date);
     if (itemsWithNullFields.length > 0) {
       console.warn('⚠️ Itens com campos obrigatórios que podem estar vazios:', itemsWithNullFields);
       // Não bloqueia mais - as correções no darfProcessor devem resolver isso
@@ -614,11 +595,6 @@ export async function createOrder(order: any) {
 }
 
 export async function deleteOrder(orderId: string): Promise<void> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   // First delete all order items
   const { error: itemsError } = await supabase
     .from('order_items')
@@ -631,18 +607,12 @@ export async function deleteOrder(orderId: string): Promise<void> {
   const { error } = await supabase
     .from('orders')
     .delete()
-    .eq('id', orderId)
-    .eq('user_id', user.id);
+    .eq('id', orderId);
 
   if (error) throw error;
 }
 
 export async function deleteMultipleOrders(orderIds: string[]): Promise<void> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
   // Delete all order items for these orders
   const { error: itemsError } = await supabase
     .from('order_items')
@@ -655,34 +625,12 @@ export async function deleteMultipleOrders(orderIds: string[]): Promise<void> {
   const { error } = await supabase
     .from('orders')
     .delete()
-    .in('id', orderIds)
-    .eq('user_id', user.id);
+    .in('id', orderIds);
 
   if (error) throw error;
 }
 
 export async function deleteOrderItem(itemId: string): Promise<void> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    throw new Error('User not authenticated');
-  }
-
-  // Verify that the item belongs to an order owned by the current user
-  const { data: item, error: fetchError } = await supabase
-    .from('order_items')
-    .select(`
-      id,
-      order_id,
-      orders!inner(user_id)
-    `)
-    .eq('id', itemId)
-    .single();
-
-  if (fetchError) throw fetchError;
-  if (!item || (item as any).orders.user_id !== user.id) {
-    throw new Error('Order item not found or access denied');
-  }
-
   // Delete the order item
   const { error } = await supabase
     .from('order_items')
@@ -750,18 +698,25 @@ export async function updateOrder(orderId: string, order: any) {
     fornecedor: order.fornecedor,
     vencimento: order.vencimento ? order.vencimento : null,
     notas: order.notas,
-    documentos
+    documentos,
+    // Adicionando as flags de inclusão que estavam faltando
+    include_pendencias_debito: order.include_pendencias_debito,
+    include_debitos_exig_suspensa: order.include_debitos_exig_suspensa,
+    include_parcelamentos_siefpar: order.include_parcelamentos_siefpar,
+    include_pendencias_inscricao: order.include_pendencias_inscricao,
+    include_pendencias_parcelamento: order.include_pendencias_parcelamento,
+    include_simples_nacional: order.include_simples_nacional,
+    include_darf: order.include_darf
   };
 
-  if (!existingOrder || existingOrder.user_id !== user.id) {
-    throw new Error('Order not found or access denied');
+  if (!existingOrder) {
+    throw new Error('Order not found');
   }
 
   const { data, error } = await supabase
     .from('orders')
     .update(formattedData)
     .eq('id', orderId)
-    .eq('user_id', user.id)
     .select()
     .single();
 
@@ -776,13 +731,13 @@ export async function updateOrder(orderId: string, order: any) {
       
       if (deleteError) throw deleteError;
 
-      const orderItems = order.itens_pedido.map((item: any) => ({
+      const orderItems = order.itens_pedido.map((item: OrderItem) => ({
         order_id: orderId,
         code: item.code,
         tax_type: item.tax_type, // Mantém o nome correto do campo
-        start_period: formatDateForDB(item.start_period),
-        end_period: formatDateForDB(item.end_period),
-        due_date: formatDateForDB(item.due_date),
+        start_period: formatDateForDB(item.start_period || ''),
+        end_period: formatDateForDB(item.end_period || ''),
+        due_date: formatDateForDB(item.due_date || ''),
         original_value: item.original_value,
         current_balance: item.current_balance,
         fine: item.fine || 0,
