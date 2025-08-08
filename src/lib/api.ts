@@ -893,3 +893,21 @@ export async function validateCertificateApi(
     return { isValid: false, error: `Erro ao chamar a função de validação: ${message}` };
   }
 }
+
+export async function getUsersByIds(userIds: string[]): Promise<{ id: string; email: string }[]> {
+  if (!userIds || userIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, email')
+    .in('id', userIds);
+
+  if (error) {
+    console.error('Error fetching users by IDs:', error);
+    throw error;
+  }
+
+  return data;
+}
