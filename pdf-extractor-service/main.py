@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
-import tabula
+import tabula as tb
 import pandas as pd
 import io
 
@@ -21,7 +21,7 @@ async def extract_situacao_fiscal(file: UploadFile = File(...)):
         # Usar tabula-py para extrair tabelas
         # pages='all' tenta extrair de todas as páginas
         # multiple_tables=True tenta extrair múltiplas tabelas por página
-        tables = tabula.read_pdf(io.BytesIO(pdf_content), pages='all', multiple_tables=True, stream=True)
+        tables = tb.read_pdf(io.BytesIO(pdf_content), pages='all', multiple_tables=True, stream=True)
 
         # Processar as tabelas extraídas
         extracted_items = []
