@@ -501,8 +501,16 @@ export async function createOrder(order: any) {
     }
   }
 
+  // Calcular o valor total dos itens para determinar o valor_reducao
+  let totalValue = 0;
+  
   if (order.itens_pedido?.length > 0) {
     console.log('Processando itens do pedido:', order.itens_pedido);
+    
+    // Calcular o total antes de inserir os itens
+    totalValue = order.itens_pedido.reduce((sum: number, item: OrderItem) => {
+      return sum + (item.saldo_devedor_consolidado || item.current_balance || 0);
+    }, 0);
     
     const orderItems = order.itens_pedido.map((item: OrderItem, index: number) => {
       console.log(`\n🔍 [DB Item ${index}] Processando para inserção:`, {
@@ -588,6 +596,27 @@ export async function createOrder(order: any) {
 
     if (itemsError) throw itemsError;
     console.log('Itens do pedido inseridos com sucesso');
+  }
+
+  // Calcular e atualizar o valor_reducao se houver reducao_percentage
+  if (order.reducaoPercentage && totalValue > 0) {
+    const valorReducao = totalValue * (order.reducaoPercentage / 100);
+    console.log('Calculando valor_reducao:', {
+      totalValue,
+      reducaoPercentage: order.reducaoPercentage,
+      valorReducao
+    });
+    
+    const { error: updateReducaoError } = await supabase
+      .from('orders')
+      .update({ valor_reducao: valorReducao })
+      .eq('id', data.id);
+    
+    if (updateReducaoError) {
+      console.error('Erro ao atualizar valor_reducao:', updateReducaoError);
+    } else {
+      console.log('valor_reducao atualizado com sucesso');
+    }
   }
 
   console.log('Pedido criado com sucesso:', data);
@@ -722,7 +751,15 @@ export async function updateOrder(orderId: string, order: any) {
 
   if (error) throw error;
 
+  // Calcular o valor total dos itens para determinar o valor_reducao
+  let totalValue = 0;
+  
   if (order.itens_pedido?.length > 0) {
+    // Calcular o total antes de atualizar os itens
+    totalValue = order.itens_pedido.reduce((sum: number, item: OrderItem) => {
+      return sum + (item.saldo_devedor_consolidado || item.current_balance || 0);
+    }, 0);
+    
     try {
       const { error: deleteError } = await supabase
         .from('order_items')
@@ -774,6 +811,27 @@ export async function updateOrder(orderId: string, order: any) {
       } else {
         throw new Error(`An unknown error occurred while updating order items: ${error}`);
       }
+    }
+  }
+
+  // Calcular e atualizar o valor_reducao se houver reducao_percentage
+  if (order.reducaoPercentage && totalValue > 0) {
+    const valorReducao = totalValue * (order.reducaoPercentage / 100);
+    console.log('Atualizando valor_reducao:', {
+      totalValue,
+      reducaoPercentage: order.reducaoPercentage,
+      valorReducao
+    });
+    
+    const { error: updateReducaoError } = await supabase
+      .from('orders')
+      .update({ valor_reducao: valorReducao })
+      .eq('id', orderId);
+    
+    if (updateReducaoError) {
+      console.error('Erro ao atualizar valor_reducao:', updateReducaoError);
+    } else {
+      console.log('valor_reducao atualizado com sucesso');
     }
   }
 

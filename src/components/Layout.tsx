@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from 'react';
 import { useLocation, Navigate, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, ShoppingCart, LogOut, Loader2, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingCart, LogOut, Loader2, CreditCard, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 import { NavMain } from './nav-main';
@@ -79,6 +79,7 @@ export default function Layout() {
     { title: 'Clientes', url: '/customers', icon: Users },
     { title: 'Pedidos', url: '/orders', icon: ShoppingCart },
     { title: 'Cobranças', url: '/payment-plans', icon: CreditCard },
+    { title: 'Relatórios', url: '/reports', icon: FileText },
   ];
 
   const documentItems = [
