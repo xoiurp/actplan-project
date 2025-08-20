@@ -508,22 +508,23 @@ def extract_pendencias_debito(text):
                     elif re.match(r'^[\d.,]+$', line_content) and (',' in line_content or '.' in line_content):
                         valor = parse_br_currency(line_content)
                         if valor > 0:
-                            # A ordem dos valores no PDF é: Vl. Original, Sdo. Devedor, Multa, Juros, Sdo. Dev. Cons.
+                            # ORDEM CORRIGIDA dos valores no PDF: Vl. Original, Sdo. Devedor, Multa, Juros, Sdo. Dev. Cons.
+                            # Baseado na análise real dos dados: posição 3=Multa, posição 4=Juros, posição 5=Sdo.Cons
                             if debito_data.get("valor_original", 0.0) == 0.0:
                                 debito_data["valor_original"] = valor
-                                print(f"✅ Valor Original identificado: '{line_content}' -> {valor}", file=sys.stdout)
+                                print(f"✅ [POS 1] Valor Original identificado: '{line_content}' -> {valor}", file=sys.stdout)
                             elif debito_data.get("saldo_devedor", 0.0) == 0.0:
                                 debito_data["saldo_devedor"] = valor
-                                print(f"✅ Saldo Devedor identificado: '{line_content}' -> {valor}", file=sys.stdout)
+                                print(f"✅ [POS 2] Saldo Devedor identificado: '{line_content}' -> {valor}", file=sys.stdout)
                             elif debito_data.get("multa", 0.0) == 0.0:
                                 debito_data["multa"] = valor
-                                print(f"✅ Multa identificada: '{line_content}' -> {valor}", file=sys.stdout)
+                                print(f"✅ [POS 3] Multa identificada: '{line_content}' -> {valor}", file=sys.stdout)
                             elif debito_data.get("juros", 0.0) == 0.0:
                                 debito_data["juros"] = valor
-                                print(f"✅ Juros identificados: '{line_content}' -> {valor}", file=sys.stdout)
+                                print(f"✅ [POS 4] Juros identificados: '{line_content}' -> {valor}", file=sys.stdout)
                             elif debito_data.get("saldo_devedor_consolidado", 0.0) == 0.0:
                                 debito_data["saldo_devedor_consolidado"] = valor
-                                print(f"✅ Saldo Consolidado identificado: '{line_content}' -> {valor}", file=sys.stdout)
+                                print(f"✅ [POS 5] Saldo Consolidado identificado: '{line_content}' -> {valor}", file=sys.stdout)
                             else:
                                 print(f"⚠️ Valor monetário extra ignorado: '{line_content}' -> {valor}", file=sys.stdout)
                     
