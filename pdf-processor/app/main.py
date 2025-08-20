@@ -1666,3 +1666,9 @@ async def extract_darf_pdf(file: UploadFile = File(...)):
              response_to_send = JSONResponse(content={"error": "Erro inesperado no processamento DARF."}, status_code=500)
 
     return response_to_send
+
+# Configuração para Google Cloud Run
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)

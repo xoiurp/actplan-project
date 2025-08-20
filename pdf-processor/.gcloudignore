@@ -1,0 +1,18 @@
+# Ignore cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+cache/
+*.log
+
+# Ignore development files
+.git/
+.gitignore
+README_DEPLOY.md
+deploy.bat
+
+# Ignore Poetry files (using requirements.txt instead)
+poetry.lock
+pyproject.toml
