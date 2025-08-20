@@ -25,3 +25,9 @@ dist-ssr
 
 # Environment variables
 .env*
+
+# Ignore nested git repositories to avoid submodule issues
+actplan/
+project/project/
+vps bkp/actplan-project/
+*.git/
