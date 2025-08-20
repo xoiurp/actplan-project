@@ -17,15 +17,44 @@ def parse_br_currency(value_str):
     """Converte string de moeda BR (com . e ,) para float."""
     if not isinstance(value_str, str):
          value_str = str(value_str) # Garante que é string
-    # Remove R$, espaços, e pontos (milhar). Troca vírgula (decimal) por ponto.
-    cleaned_str = re.sub(r'[R$\s.]', '', value_str).replace(',', '.')
-    if not cleaned_str or not re.match(r'^-?[\d.]+$', cleaned_str):
-        print(f"Aviso: Valor monetário inválido ou vazio '{value_str}', retornando 0.0", file=sys.stdout)
+    
+    # Remove espaços e R$ no início
+    value_str = value_str.strip().replace('R$', '').strip()
+    
+    if not value_str:
+        print(f"💰 Valor monetário vazio, retornando 0.0", file=sys.stdout)
         return 0.0
+    
+    # Padrão brasileiro: 1.234.567,89 (pontos para milhares, vírgula para decimais)
+    # Remove todos os pontos (separadores de milhares) e troca vírgula por ponto
+    if ',' in value_str:
+        # Se tem vírgula, é o separador decimal brasileiro
+        parts = value_str.rsplit(',', 1)  # Separa pela última vírgula
+        if len(parts) == 2:
+            integer_part = parts[0].replace('.', '')  # Remove pontos dos milhares
+            decimal_part = parts[1]
+            cleaned_str = f"{integer_part}.{decimal_part}"
+        else:
+            cleaned_str = parts[0].replace('.', '')
+    else:
+        # Se não tem vírgula, pode ser valor inteiro ou já estar no formato americano
+        if '.' in value_str and len(value_str.split('.')[-1]) <= 2:
+            # Se o último grupo após o ponto tem 1-2 dígitos, pode ser decimal
+            cleaned_str = value_str
+        else:
+            # Provavelmente são separadores de milhares, remove todos os pontos
+            cleaned_str = value_str.replace('.', '')
+    
+    if not cleaned_str or not re.match(r'^-?\d+(\.\d+)?$', cleaned_str):
+        print(f"💰 Valor monetário inválido '{value_str}' -> '{cleaned_str}', retornando 0.0", file=sys.stdout)
+        return 0.0
+    
     try:
-        return float(cleaned_str)
+        result = float(cleaned_str)
+        print(f"💰 Valor convertido: '{value_str}' -> {result}", file=sys.stdout)
+        return result
     except ValueError:
-        print(f"Aviso: Falha ao converter valor monetário '{value_str}' para float, retornando 0.0", file=sys.stdout)
+        print(f"💰 Falha ao converter valor monetário '{value_str}' para float, retornando 0.0", file=sys.stdout)
         return 0.0
 
 def format_date(date_str):
@@ -370,18 +399,26 @@ def extract_pendencias_debito(text):
             k = 0
             while k < len(collected_lines):
                 current_line = collected_lines[k]
-                # Verifica se a linha termina com 'º' e a próxima começa com 'TRIM'
-                if k + 1 < len(collected_lines) and \
-                   (current_line.endswith('º') or current_line.endswith('ª') or current_line.endswith('o')) and \
-                   collected_lines[k+1].upper().startswith('TRIM'):
-                    
-                    merged_line = f"{current_line} {collected_lines[k+1]}"
-                    processed_lines.append(merged_line)
-                    print(f"Linhas de período trimestral unidas: '{merged_line}'", file=sys.stdout)
-                    k += 2 # Pula a linha atual e a próxima
-                else:
-                    processed_lines.append(current_line)
-                    k += 1
+                
+                # Verifica se a linha é um número ordinal (1º, 2º, 3º, 4º) e a próxima contém 'TRIM'
+                is_ordinal = re.match(r'^\s*(\d+)[ºªo°]\s*$', current_line.strip())
+                
+                if is_ordinal and k + 1 < len(collected_lines):
+                    next_line = collected_lines[k+1].strip()
+                    # Verifica se a próxima linha contém TRIM/YYYY
+                    if re.search(r'TRIM\s*/\s*\d{4}', next_line, re.IGNORECASE):
+                        merged_line = f"{current_line.strip()} {next_line}"
+                        processed_lines.append(merged_line)
+                        print(f"🔧 Linhas de período trimestral unidas: '{current_line.strip()}' + '{next_line}' = '{merged_line}'", file=sys.stdout)
+                        k += 2  # Pula a linha atual e a próxima
+                        continue
+                
+                # Também verifica padrões alternativos como "1º TRIM/2024" já na mesma linha
+                if re.search(r'\d+[ºªo°]\s*TRIM\s*/\s*\d{4}', current_line, re.IGNORECASE):
+                    print(f"🔧 Período trimestral já completo na linha: '{current_line}'", file=sys.stdout)
+                
+                processed_lines.append(current_line)
+                k += 1
             # --- Fim do pré-processamento ---
 
             # Para SIMPLES NAC., tenta uma abordagem mais direta analisando todas as linhas como uma sequência
@@ -446,7 +483,10 @@ def extract_pendencias_debito(text):
             
             # Processamento flexível para todos os tipos (incluindo SIMPLES NAC. se o sequencial falhou)
             if not debito_data.get("periodo_apuracao") or not debito_data.get("vencimento"):
-                for line_content in processed_lines:
+                print(f"📋 Processamento flexível: analisando {len(processed_lines)} linhas para '{debito_data.get('receita', 'N/A')}'", file=sys.stdout)
+                
+                for idx, line_content in enumerate(processed_lines):
+                    print(f"📋 Linha {idx+1}/{len(processed_lines)}: '{line_content}'", file=sys.stdout)
                     # Identifica PERÍODO (DD/MM/YYYY, MM/YYYY ou N TRIM/YYYY)
                     periodo_match_ddmmyyyy = re.match(r'(\d{2}/\d{2}/\d{4})', line_content)
                     periodo_match_mmyyyy = re.match(r'(\d{2})/(\d{4})', line_content)
@@ -498,6 +538,12 @@ def extract_pendencias_debito(text):
             # VALIDAÇÃO MAIS RESTRITIVA - foca em dados reais
             is_simples_nac = debito_data.get("receita") == "SIMPLES NAC."
             is_sem_codigo = debito_data.get("receita") == "SEM CÓDIGO"
+            
+            # Identifica códigos de receita importantes como IRPJ, CSLL, PIS, COFINS
+            receita_text = debito_data.get("receita", "")
+            is_important_tax = any(tax in receita_text.upper() for tax in ["IRPJ", "CSLL", "PIS", "COFINS"])
+            is_code_format = re.match(r'\d{4}-\d{2}\s*-\s*', receita_text)
+            
             has_basic_data = debito_data.get("periodo_apuracao") and debito_data.get("vencimento")
             has_financial_data = (debito_data.get("valor_original", 0) > 0 or 
                                 debito_data.get("saldo_devedor", 0) > 0)
@@ -509,6 +555,9 @@ def extract_pendencias_debito(text):
             has_real_due_date = (debito_data.get("vencimento") and 
                                 debito_data["vencimento"] != "N/A" and 
                                 debito_data["vencimento"].strip() != "")
+            
+            print(f"🔍 VALIDAÇÃO - Receita: '{receita_text}', É imposto importante: {is_important_tax}, Formato código: {bool(is_code_format)}", file=sys.stdout)
+            print(f"🔍 VALIDAÇÃO - Dados básicos: {has_basic_data}, Dados financeiros: {has_financial_data}, Período real: {has_real_period}, Vencimento real: {has_real_due_date}", file=sys.stdout)
             
             # Para SIMPLES NAC., usa validação MUITO mais flexível - SEMPRE aceita
             if is_simples_nac:
@@ -537,6 +586,27 @@ def extract_pendencias_debito(text):
                 
                 result.append(debito_data)
                 print(f"✅ SIMPLES NAC. extraído (sempre aceito): {debito_data}", file=sys.stdout)
+                i = j  # Continua da linha onde parou a coleta
+            elif is_important_tax and is_code_format:
+                # VALIDAÇÃO ESPECIAL PARA IMPOSTOS IMPORTANTES (IRPJ, CSLL, PIS, COFINS)
+                # Esses impostos são sempre aceitos, mesmo com dados parciais
+                print(f"🎯 IMPOSTO IMPORTANTE detectado: {receita_text} - SEMPRE aceito", file=sys.stdout)
+                
+                # Preenche campos obrigatórios com valores padrão se necessário
+                if not has_real_period:
+                    debito_data["periodo_apuracao"] = "A DEFINIR"
+                if not has_real_due_date:
+                    debito_data["vencimento"] = "A DEFINIR"
+                if not debito_data.get("situacao"):
+                    debito_data["situacao"] = "DEVEDOR"
+                
+                # Garante que todos os campos numéricos tenham valores
+                for field in ["valor_original", "saldo_devedor", "multa", "juros", "saldo_devedor_consolidado"]:
+                    if not debito_data.get(field):
+                        debito_data[field] = 0.0
+                
+                result.append(debito_data)
+                print(f"✅ IMPOSTO IMPORTANTE extraído (sempre aceito): {debito_data}", file=sys.stdout)
                 i = j  # Continua da linha onde parou a coleta
             elif has_basic_data and debito_data.get("receita"):
                 # Validação normal para itens com código
