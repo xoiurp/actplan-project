@@ -227,20 +227,25 @@ function extractPendenciasDebito(text) {
             debitoData.vencimento = formatDate(lineContent);
           }
         }
-        // Monetary values
+        // Monetary values - ORDEM CORRIGIDA: Vl.Original, Sdo.Devedor, Multa, Juros, Sdo.Dev.Cons
         else if (/^[\d.,]+$/.test(lineContent) && (lineContent.includes(',') || lineContent.includes('.'))) {
           const valor = parseBrCurrency(lineContent);
           if (valor > 0) {
             if (!debitoData.valor_original) {
               debitoData.valor_original = valor;
+              console.log(`✅ [POS 1] Valor Original: ${lineContent} -> ${valor}`);
             } else if (!debitoData.saldo_devedor) {
               debitoData.saldo_devedor = valor;
-            } else if (!debitoData.saldo_devedor_consolidado) {
-              debitoData.saldo_devedor_consolidado = valor;
+              console.log(`✅ [POS 2] Saldo Devedor: ${lineContent} -> ${valor}`);
             } else if (!debitoData.multa) {
               debitoData.multa = valor;
+              console.log(`✅ [POS 3] Multa: ${lineContent} -> ${valor}`);
             } else if (!debitoData.juros) {
               debitoData.juros = valor;
+              console.log(`✅ [POS 4] Juros: ${lineContent} -> ${valor}`);
+            } else if (!debitoData.saldo_devedor_consolidado) {
+              debitoData.saldo_devedor_consolidado = valor;
+              console.log(`✅ [POS 5] Saldo Consolidado: ${lineContent} -> ${valor}`);
             }
           }
         }
